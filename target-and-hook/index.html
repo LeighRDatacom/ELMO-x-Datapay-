@@ -1,0 +1,330 @@
+<div class="eh-stage-wrap">
+  <div class="eh-stage-card">
+    
+    <div class="eh-stage-header">
+      <div class="eh-team-bar eh-team-elmo">ELMO TEAM</div>
+      <div class="eh-team-divider">↔</div>
+      <div class="eh-team-bar eh-team-datapay">DATAPAY TEAM</div>
+    </div>
+
+    <div class="eh-stage-shell">
+      <div class="eh-stage-number">1</div>
+
+      <div class="eh-stage-main">
+        <div class="eh-stage-top">
+          <div>
+            <h2>Target &amp; Hook</h2>
+          </div>
+          <div class="eh-portal-status">Portal Status = Prospecting</div>
+        </div>
+
+        <div class="eh-goal-row">
+          <strong>Goal:</strong>
+          Identify and log the opportunity before pitching. Enters via
+          <strong>Outbound</strong> (AM identifies mutual customer) or
+          <strong>Inbound</strong> (customer interest via marketing, events, or referral).
+        </div>
+
+        <div class="eh-stage-body">
+          <div class="eh-connector-dots">
+            <span class="dot purple"></span>
+            <span class="dot teal"></span>
+          </div>
+
+          <p class="eh-body-intro">
+            Whichever AM is closest to the customer leads this step. Both sides follow the same actions.
+          </p>
+
+          <ol class="eh-actions-list">
+            <li>Review mutual customer list for API v2 candidates</li>
+            <li>Log opportunity in Partner Portal before pitching</li>
+            <li>Check if opportunity already exists (no duplicates)</li>
+            <li>Use conversation starter in health checks or catch-ups</li>
+          </ol>
+
+          <div class="eh-note-box">
+            <strong>If an opportunity already exists:</strong>
+            Contact the AM who logged it and align on next steps. Do not create a duplicate.
+          </div>
+        </div>
+
+        <div class="eh-gate-row">
+          <div class="eh-gate-card">
+            <div class="eh-gate-pill">1</div>
+            <div class="eh-gate-label">GATE</div>
+            <h3>Opportunity Registration Complete</h3>
+            <p><strong>Output:</strong> Opportunity logged in Partner Portal before any customer pitch</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .eh-stage-wrap {
+    font-family: "Montserrat", Arial, sans-serif;
+    padding: 24px;
+    background: #f5f7fa;
+  }
+
+  .eh-stage-card {
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+
+  .eh-stage-header {
+    display: grid;
+    grid-template-columns: 1fr 48px 1fr;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 0;
+  }
+
+  .eh-team-bar {
+    color: #fff;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 14px 16px;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .eh-team-elmo {
+    background: linear-gradient(90deg, #7a2ee6, #6426cf);
+  }
+
+  .eh-team-datapay {
+    background: #117d74;
+  }
+
+  .eh-team-divider {
+    text-align: center;
+    color: #7f8b99;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .eh-stage-shell {
+    position: relative;
+    background: #ffffff;
+    border: 1px solid #d9e1e8;
+    border-radius: 0 0 14px 14px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+    overflow: hidden;
+  }
+
+  .eh-stage-number {
+    position: absolute;
+    left: 16px;
+    top: 10px;
+    width: 32px;
+    height: 32px;
+    background: #0f9b94;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    z-index: 2;
+  }
+
+  .eh-stage-main {
+    margin-left: 52px;
+  }
+
+  .eh-stage-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    background: #edf2f5;
+    border-bottom: 1px solid #d9e1e8;
+  }
+
+  .eh-stage-top h2 {
+    margin: 0;
+    font-size: 28px;
+    line-height: 1.2;
+    color: #14213d;
+    font-weight: 700;
+  }
+
+  .eh-portal-status {
+    white-space: nowrap;
+    background: #c9f1e8;
+    color: #117d74;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .eh-goal-row {
+    padding: 16px 20px;
+    border-bottom: 1px solid #d9e1e8;
+    color: #5f6b7a;
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .eh-goal-row strong {
+    color: #24344d;
+  }
+
+  .eh-stage-body {
+    padding: 32px 20px 28px;
+    text-align: center;
+  }
+
+  .eh-connector-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 18px;
+  }
+
+  .eh-connector-dots .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .eh-connector-dots .purple {
+    background: #7a2ee6;
+  }
+
+  .eh-connector-dots .teal {
+    background: #0f9b94;
+  }
+
+  .eh-body-intro {
+    max-width: 760px;
+    margin: 0 auto 20px;
+    font-size: 28px;
+    line-height: 1.45;
+    color: #24344d;
+    font-weight: 500;
+  }
+
+  .eh-actions-list {
+    max-width: 620px;
+    margin: 0 auto 28px;
+    padding-left: 24px;
+    text-align: left;
+    color: #6a7685;
+    font-size: 15px;
+    line-height: 1.9;
+  }
+
+  .eh-actions-list li::marker {
+    color: #0f9b94;
+    font-weight: 700;
+  }
+
+  .eh-note-box {
+    max-width: 420px;
+    margin: 0 auto;
+    background: #bfeee3;
+    color: #17665e;
+    border: 1px solid #9fddd0;
+    border-radius: 12px;
+    padding: 16px 18px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .eh-gate-row {
+    border-top: 1px solid #d9e1e8;
+    background: #f8fafb;
+    padding: 28px 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .eh-gate-card {
+    background: #edf5db;
+    border: 1px solid #cfe09e;
+    border-radius: 14px;
+    padding: 22px 24px;
+    text-align: center;
+    max-width: 360px;
+    width: 100%;
+  }
+
+  .eh-gate-pill {
+    width: 28px;
+    height: 28px;
+    margin: 0 auto 8px;
+    border-radius: 50%;
+    background: #7ac70c;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .eh-gate-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: #4c6b17;
+    margin-bottom: 10px;
+  }
+
+  .eh-gate-card h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    line-height: 1.35;
+    color: #476b0f;
+    font-weight: 700;
+  }
+
+  .eh-gate-card p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #6f7d4d;
+  }
+
+  @media (max-width: 900px) {
+    .eh-stage-header {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .eh-team-divider {
+      display: none;
+    }
+
+    .eh-stage-main {
+      margin-left: 0;
+    }
+
+    .eh-stage-number {
+      position: static;
+      margin: 16px 0 0 16px;
+    }
+
+    .eh-stage-top {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .eh-portal-status {
+      white-space: normal;
+    }
+
+    .eh-body-intro {
+      font-size: 22px;
+    }
+  }
+</style>
