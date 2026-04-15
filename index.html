@@ -1,0 +1,1842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ELMO × Datapay — API V2 Integration Enablement</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --sidebar-bg:#111318;--sidebar-hover:#1e2028;--sidebar-active:#2a2d36;
+    --accent:#0d9488;--accent-light:#ccfbf1;--accent-dark:#065f56;
+    --elmo-purple:#6d28d9;--elmo-light:#ede9fe;
+    --datapay-teal:#0f766e;
+    --surface:#f8fafc;--card:#ffffff;--border:#e2e8f0;
+    --text:#1e293b;--text-secondary:#64748b;--text-light:#94a3b8;
+    --danger:#dc2626;--warning:#f59e0b;--success:#10b981;
+    --gate:#84cc16;--gate-dark:#4d7c0f;--gate-light:#f7fee7;--gate-border:#d9f99d;
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:'Montserrat',sans-serif;background:var(--surface);color:var(--text);display:flex;min-height:100vh;font-size:15px;line-height:1.6}
+
+  .sidebar{width:250px;background:var(--sidebar-bg);color:#fff;position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:100;overflow-y:auto}
+  .sidebar-brand{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .sidebar-brand h1{font-size:18px;font-weight:700;letter-spacing:.3px;line-height:1.3}
+  .sidebar-brand h1 .x{color:var(--accent);font-weight:400;margin:0 2px}
+  .sidebar-brand p{font-size:11px;color:var(--text-light);margin-top:6px;text-transform:uppercase;letter-spacing:1.2px}
+  .sidebar-badge{display:inline-flex;align-items:center;gap:5px;margin-top:10px}
+  .sidebar-badge span{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+  .badge-elmo{background:var(--elmo-purple);color:#fff}
+  .badge-datapay{background:var(--datapay-teal);color:#fff}
+  .badge-api{background:rgba(255,255,255,.1);color:var(--accent)}
+  .sidebar-nav{flex:1;padding:16px 0}
+  .sidebar-nav a{display:flex;align-items:center;gap:10px;padding:11px 24px;color:rgba(255,255,255,.6);text-decoration:none;font-size:14px;font-weight:500;transition:all .15s;cursor:pointer;border-left:3px solid transparent}
+  .sidebar-nav a:hover{background:var(--sidebar-hover);color:rgba(255,255,255,.85)}
+  .sidebar-nav a.active{background:var(--sidebar-active);color:#fff;border-left-color:var(--accent)}
+  .sidebar-nav a .nav-icon{width:20px;text-align:center;font-size:14px;flex-shrink:0}
+  .sidebar-nav a .nav-time{margin-left:auto;font-size:10px;color:var(--text-light);font-weight:400}
+  .sidebar-footer{padding:16px 24px;border-top:1px solid rgba(255,255,255,.08);font-size:10px;color:rgba(255,255,255,.3);text-align:center}
+
+.main {
+  margin-left: 250px;
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+}
+
+.tab-content {
+  display: none;
+  padding: 48px 40px 80px;
+  width: 100%;
+  max-width: 1500px;
+  animation: fadeIn .3s ease;
+}  
+
+
+  .tab-content.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  .page-title{font-size:36px;font-weight:300;color:var(--text);line-height:1.2;margin-bottom:8px}
+  .page-subtitle{font-size:16px;color:var(--text-secondary);font-weight:400;margin-bottom:40px;max-width:1000px}
+  .section-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+  .section-title::before{content:'';width:24px;height:2px;background:var(--accent);border-radius:1px}
+  h3{font-size:20px;font-weight:600;margin-bottom:8px}
+  h4{font-size:16px;font-weight:600;margin-bottom:6px}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:20px;transition:box-shadow .2s}
+  .card:hover{box-shadow:0 4px 20px rgba(0,0,0,.04)}
+  .card-grid{display:grid;gap:20px;margin-bottom:32px}
+  .card-grid-2{grid-template-columns:1fr 1fr}
+
+  .pillar-card{border-left:4px solid var(--accent)}
+  .pillar-card .pillar-problem{font-size:12px;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+  .pillar-card .pillar-promise{font-size:15px;font-weight:500;margin-bottom:8px}
+  .pillar-card .pillar-proof{font-size:13px;color:var(--text-secondary)}
+  .pillar-card .pillar-proof li{margin-bottom:2px}
+
+  .workflow-header{display:grid;grid-template-columns:1fr 80px 1fr;gap:0;margin-bottom:0}
+  .wf-col-header{padding:14px 20px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;border-radius:10px 10px 0 0;text-align:center}
+  .wf-col-header.elmo{background:var(--elmo-purple);color:#fff}
+  .wf-col-header.center{background:transparent;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-light)}
+  .wf-col-header.datapay{background:var(--datapay-teal);color:#fff}
+
+  .process-timeline{position:relative;padding-left:64px}
+  .process-timeline::before{content:'';position:absolute;left:19px;top:0;bottom:0;width:2px;background:var(--accent);border-radius:1px;z-index:0}
+  .workflow-step{border:none;border-radius:0;margin-bottom:0;overflow:visible;background:transparent;position:relative;padding-bottom:8px}
+  .workflow-step:last-of-type{padding-bottom:0}
+  .step-num{position:absolute;left:-64px;top:14px;width:40px;height:40px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;z-index:2;box-shadow:0 0 0 5px var(--surface),0 2px 8px rgba(0,0,0,.08);transition:all .2s}
+  .workflow-step:hover .step-num{box-shadow:0 0 0 5px var(--surface),0 4px 14px rgba(13,148,136,.2);transform:scale(1.05)}
+  .step-num.step-num-final{background:var(--success);font-size:18px}
+  .step-header{background:var(--card);color:var(--text);padding:18px 24px;display:flex;align-items:center;gap:14px;cursor:pointer;user-select:none;transition:all .15s;border:1px solid var(--border);border-radius:12px 12px 0 0;border-bottom:1px solid var(--border);position:relative;z-index:1}
+  .step-header:hover{background:var(--surface)}
+  .step-header.collapsed{border-radius:12px}
+  .step-header h3{font-size:16px;font-weight:600;margin:0;flex:1;color:var(--text)}
+  .step-header .step-stage{font-size:11px;background:var(--accent-light);padding:3px 10px;border-radius:20px;color:var(--accent-dark);white-space:nowrap;font-weight:600}
+  .step-chevron{font-size:18px;color:var(--text-light);transition:transform .2s}
+  .step-header.collapsed .step-chevron{transform:rotate(-90deg)}
+  .step-body{display:block;padding:0;border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;background:var(--card);overflow:hidden;position:relative;z-index:1}
+  .step-body.collapsed{display:none}
+
+  /* Two-column split (Steps 3–5) */
+  .step-columns{display:grid;grid-template-columns:1fr 1fr;min-height:100px}
+  .step-col{padding:24px;font-size:14px}
+  .step-col.elmo-col{border-right:2px dashed var(--border);background:rgba(109,40,217,.02)}
+  .step-col.datapay-col{background:rgba(15,118,110,.02)}
+  .step-col h4{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+  .step-col h4 .col-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .step-col h4 .col-dot.elmo-dot{background:var(--elmo-purple)}
+  .step-col h4 .col-dot.datapay-dot{background:var(--datapay-teal)}
+  .step-col ul{list-style:none;padding:0}
+  .step-col ul li{padding:4px 0;font-size:13px;color:var(--text-secondary);padding-left:36px;position:relative}
+  .step-col ul li::before{content:attr(data-num);position:absolute;left:0;font-weight:700;font-size:12px}
+  .step-col.elmo-col ul li::before{color:var(--elmo-purple)}
+  .step-col.datapay-col ul li::before{color:var(--datapay-teal)}
+
+  /* Unified block (Steps 1–2: identical actions) */
+ .step-unified{
+  padding:24px 32px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  max-width:620px;
+  margin:0 auto
+}
+  .step-unified-dots{display:flex;align-items:center;justify-content:center;gap:4px}
+  .step-unified-dots .dot-elmo{width:8px;height:8px;border-radius:50%;background:var(--elmo-purple)}
+  .step-unified-dots .dot-datapay{width:8px;height:8px;border-radius:50%;background:var(--datapay-teal)}
+  .step-unified h4{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+  .step-unified ul{list-style:none;padding:0;text-align:left;display:inline-block;margin-top:12px}
+  .step-unified ul li{padding:4px 0;font-size:13px;color:var(--text-secondary);padding-left:36px;position:relative}
+  .step-unified ul li::before{content:attr(data-num);position:absolute;left:0;color:var(--accent);font-weight:700}
+
+  /* Centred callout boxes */
+  .centred-callout-wrapper{display:flex;justify-content:center;padding:0 24px 16px}
+  .centred-callout{border-radius:10px;padding:14px 20px;font-size:13px;text-align:center;max-width:420px;width:100%}
+  .centred-callout.teal{background:var(--accent-light);border:1px solid #a7f3d0}
+  .centred-callout.teal strong{color:var(--accent-dark)}
+  .centred-callout.red{background:#fef2f2;border:1px solid #fecaca}
+  .centred-callout.red strong{color:var(--danger)}
+
+  .action-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;display:flex;align-items:center;gap:14px;transition:all .15s;cursor:pointer;text-decoration:none;color:inherit}
+  .action-card:hover{border-color:var(--accent);box-shadow:0 4px 16px rgba(13,148,136,.08)}
+  .action-card-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .action-card-body{flex:1}
+  .action-card-title{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .action-card-desc{font-size:12px;color:var(--text-secondary);margin-top:2px}
+  .action-cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+  /* Stage Gate */
+  .stage-gate-wrapper{padding:20px 24px;background:var(--surface);border-top:1px solid var(--border);display:flex;justify-content:center}
+  .stage-gate{width:100%;max-width:420px;background:var(--gate-light);border:1px solid var(--gate-border);border-radius:12px;padding:20px 24px;text-align:center}
+  .stage-gate-badge{display:inline-flex;align-items:center;gap:8px;margin-bottom:10px}
+  .stage-gate-num{width:28px;height:28px;border-radius:50%;background:var(--gate);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+  .stage-gate-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--gate-dark)}
+  .stage-gate-title{font-size:15px;font-weight:600;color:var(--gate-dark);margin-bottom:8px;line-height:1.3}
+  .stage-gate-outputs{font-size:12px;color:var(--gate-dark);opacity:.8;line-height:1.5}
+  .stage-gate-outputs strong{font-weight:600;opacity:1}
+
+  /* Implementation phases */
+  .impl-phases{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;padding:24px}
+  .impl-phase{text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 16px;border-top:3px solid var(--accent)}
+  .impl-phase-num{font-size:28px;font-weight:700;color:var(--accent)}
+  .impl-phase h4{font-size:14px;margin:4px 0}
+  .impl-phase p{font-size:12px;color:var(--text-secondary);margin:0}
+
+  /* Floating Step Navigator */
+  .step-nav{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:50;display:none;flex-direction:column;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 10px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+  .step-nav.visible{display:flex}
+  .step-nav a{display:flex;align-items:center;gap:8px;text-decoration:none;padding:6px 8px;border-radius:8px;transition:all .15s;cursor:pointer}
+  .step-nav a:hover{background:var(--surface)}
+  .step-nav a.active{background:var(--accent-light)}
+  .step-nav-dot{width:24px;height:24px;border-radius:50%;background:var(--surface);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text-light);transition:all .15s;flex-shrink:0}
+  .step-nav a.active .step-nav-dot{background:var(--accent);border-color:var(--accent);color:#fff}
+  .step-nav-label{font-size:11px;font-weight:600;color:var(--text-light);white-space:nowrap}
+  .step-nav a.active .step-nav-label{color:var(--accent-dark)}
+
+  .info-tip{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;cursor:help;position:relative;flex-shrink:0;vertical-align:middle;margin-left:4px;line-height:1}
+  .info-tip .tip-content{display:none;position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);background:var(--sidebar-bg);color:#fff;padding:14px 16px;border-radius:10px;font-size:12px;font-weight:400;line-height:1.5;width:300px;z-index:500;box-shadow:0 8px 30px rgba(0,0,0,.2);text-transform:none;letter-spacing:0}
+  .info-tip .tip-content::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--sidebar-bg)}
+  .info-tip:hover .tip-content{display:block}
+  .info-tip-right .tip-content{left:auto;right:0;transform:none}
+  .info-tip-right .tip-content::after{left:auto;right:16px;transform:none}
+  .gap-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;vertical-align:middle}
+
+  .pricing-philosophy{background:linear-gradient(135deg,var(--sidebar-bg) 0%,#1e293b 100%);color:#fff;border-radius:12px;padding:32px;margin-bottom:32px}
+  .pricing-philosophy h3{font-size:20px;font-weight:300;margin-bottom:12px}
+  .pricing-philosophy p{color:rgba(255,255,255,.7);font-size:14px;line-height:1.7}
+  .pricing-side{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px}
+  .price-card{border-radius:12px;padding:28px;border:2px solid var(--border);background:var(--card)}
+  .price-card.elmo-price{border-top:4px solid var(--elmo-purple)}
+  .price-card.datapay-price{border-top:4px solid var(--datapay-teal)}
+  .price-card h4{font-size:18px;margin-bottom:4px}
+  .price-card .price-sub{font-size:13px;color:var(--text-secondary);margin-bottom:16px}
+  .price-line{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;align-items:flex-start;gap:16px}
+  .price-line:last-child{border-bottom:none}
+  .price-line .price-label{color:var(--text-secondary);flex:1}
+  .price-line .price-value{font-weight:600;text-align:right}
+  .price-note{font-size:12px;color:var(--text-light);margin-top:12px;font-style:italic}
+  .hosting-tiers{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+  .hosting-tiers th{text-align:left;font-weight:600;padding:8px 12px;background:var(--surface);border:1px solid var(--border);font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-secondary)}
+  .hosting-tiers td{padding:8px 12px;border:1px solid var(--border)}
+  .hosting-tiers td:last-child{font-weight:600;text-align:right}
+  .tm-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+  .tm-table th{text-align:left;font-weight:600;padding:8px 12px;background:var(--surface);border:1px solid var(--border);font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-secondary)}
+  .tm-table td{padding:8px 12px;border:1px solid var(--border)}
+  .tm-table td:nth-child(2),.tm-table td:nth-child(3),.tm-table td:nth-child(4){text-align:right}
+  .tm-table tr:last-child td{font-weight:700;background:var(--surface)}
+
+  .toolkit-group{margin-bottom:32px}
+  .toolkit-group-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-light);padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:12px}
+  .tool-card{display:flex;align-items:flex-start;gap:16px;padding:16px;border:1px solid var(--border);border-radius:10px;background:var(--card);margin-bottom:10px;transition:border-color .15s}
+  .tool-card:hover{border-color:var(--accent)}
+  .tool-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+  .tool-icon.deck{background:#dbeafe;color:#2563eb}
+  .tool-icon.handbook{background:#fce7f3;color:#db2777}
+  .tool-icon.demo{background:#fef3c7;color:#d97706}
+  .tool-icon.sow{background:#d1fae5;color:#059669}
+  .tool-icon.qual{background:var(--accent-light);color:var(--accent)}
+  .tool-icon.portal{background:#e0e7ff;color:#4338ca}
+  .tool-icon.playbook{background:#f3e8ff;color:var(--elmo-purple)}
+  .tool-body h4{font-size:15px;margin-bottom:3px}
+  .tool-body p{font-size:13px;color:var(--text-secondary)}
+  .tool-body .tool-audience{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:6px;color:var(--accent)}
+
+  .expandable-header{display:flex;align-items:center;gap:10px;padding:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;user-select:none;margin-bottom:10px}
+  .expandable-header:hover{border-color:var(--accent)}
+  .expandable-header.open{border-radius:10px 10px 0 0;margin-bottom:0;border-bottom-color:transparent}
+  .expandable-header .exp-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:#e0e7ff;color:#4338ca}
+  .expandable-header .exp-body{flex:1}
+  .expandable-header .exp-body h4{font-size:15px;margin-bottom:2px}
+  .expandable-header .exp-body p{font-size:13px;color:var(--text-secondary)}
+  .expandable-header .exp-chevron{font-size:18px;color:var(--text-light);transition:transform .2s}
+  .expandable-header.open .exp-chevron{transform:rotate(180deg)}
+  .expandable-body{display:none;border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:24px;background:var(--card);margin-bottom:10px}
+  .expandable-body.open{display:block}
+
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px}
+  .contact-card{border-radius:12px;padding:24px;border:1px solid var(--border);background:var(--card)}
+  .contact-card.elmo-contacts{border-top:4px solid var(--elmo-purple)}
+  .contact-card.datapay-contacts{border-top:4px solid var(--datapay-teal)}
+  .contact-card h4{font-size:16px;margin-bottom:14px}
+  .contact-entry{padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+  .contact-entry:last-child{border-bottom:none}
+  .contact-entry .contact-name{font-weight:600;color:var(--text)}
+  .contact-entry .contact-role{color:var(--text-secondary)}
+  .contact-entry .contact-email{color:var(--accent);font-size:12px}
+
+  .help-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px;border-left:4px solid var(--accent)}
+  .help-card h4{margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .help-card p{font-size:14px;color:var(--text-secondary);margin-bottom:8px}
+  .help-routing{font-size:13px;padding:6px 0}
+  .help-routing strong{color:var(--text)}
+
+  .divider{height:1px;background:var(--border);margin:40px 0}
+  .tag-row{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+  .tag{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+  .tag-internal{background:#fee2e2;color:#991b1b}
+  .tag-session{background:var(--accent-light);color:var(--accent-dark)}
+  .tag-v2{background:#f3e8ff;color:var(--elmo-purple)}
+  .check-list{list-style:none;padding:0}
+  .check-list li{padding:6px 0;font-size:14px;display:flex;align-items:flex-start;gap:8px}
+  .check-list li::before{content:'✓';color:var(--success);font-weight:700;flex-shrink:0}
+  a.tool-card:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(13,148,136,.1)}
+
+  .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:600;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+  .modal-overlay.open{display:flex}
+  .modal-box{background:#fff;border-radius:16px;width:560px;max-width:90vw;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:modalIn .2s ease}
+  .modal-box.wide{width:720px}
+  @keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+  .modal-header{display:flex;align-items:flex-start;justify-content:space-between;padding:24px 24px 16px;border-bottom:1px solid var(--border)}
+  .modal-header h3{font-size:18px;font-weight:700;margin:0}
+  .modal-header .modal-sub{font-size:12px;color:var(--text-light);margin-top:2px}
+  .modal-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--text-secondary);transition:all .15s;flex-shrink:0}
+  .modal-close:hover{background:var(--surface);border-color:var(--accent);color:var(--accent)}
+  .modal-body{padding:24px}
+  .modal-body .modal-section{margin-bottom:20px}
+  .modal-body .modal-section:last-child{margin-bottom:0}
+  .modal-body .modal-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+  .modal-body p{font-size:14px;color:var(--text-secondary);line-height:1.7}
+  .modal-body blockquote{font-style:italic;color:var(--text);background:var(--surface);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 8px 8px 0;margin:8px 0 0;font-size:13px;line-height:1.6}
+
+  .obj-hub-card{border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;transition:border-color .15s}
+  .obj-hub-card:last-child{margin-bottom:0}
+  .obj-hub-card:hover{border-color:var(--warning)}
+  .obj-hub-top{padding:16px 18px;display:flex;align-items:flex-start;gap:12px}
+  .obj-hub-icon{font-size:20px;flex-shrink:0}
+  .obj-hub-content{flex:1}
+  .obj-hub-q{font-size:14px;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:4px}
+  .obj-hub-a{font-size:13px;color:var(--text-secondary);line-height:1.5}
+  .obj-hub-toggle{width:26px;height:26px;border-radius:50%;background:var(--warning);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;transition:all .15s;border:none}
+  .obj-hub-toggle:hover{transform:scale(1.1)}
+  .obj-hub-toggle.open{background:var(--accent)}
+  .obj-hub-detail{display:none;padding:0 18px 18px;border-top:1px solid var(--border)}
+  .obj-hub-detail.open{display:block;margin-top:12px}
+  .obj-detail-section{margin-bottom:14px}
+  .obj-detail-section:last-child{margin-bottom:0}
+  .obj-detail-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;padding-top:14px}
+  .obj-detail-label.why{color:var(--warning)}
+  .obj-detail-label.how{color:var(--accent)}
+  .obj-detail-label.say{color:var(--elmo-purple)}
+  .obj-detail-text{font-size:13px;color:var(--text-secondary);line-height:1.6}
+  .obj-detail-text blockquote{font-style:italic;color:var(--text);background:var(--surface);border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 8px 8px 0;margin:6px 0 0;font-size:12px;line-height:1.6}
+
+  .overview-intro h3+.overview-list{margin-bottom:1.75rem}
+  .overview-intro h3:nth-of-type(2){margin-top:2rem}
+  .overview-intro{margin-bottom:2rem}
+  h1,h2,h3,h4,h5,h6{font-weight:500}
+  strong{font-weight:600}
+  .card{border:1px solid #e5e7eb;border-left:4px solid #14b8a6;box-shadow:0 4px 12px rgba(0,0,0,.04);transition:all .2s ease}
+  .card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.08)}
+  .card h4{font-weight:600}
+
+  @media(max-width:1100px){
+    .step-columns{grid-template-columns:1fr}.step-col.elmo-col{border-right:none;border-bottom:2px dashed var(--border)}
+    .pricing-side,.contact-grid{grid-template-columns:1fr}
+    .step-nav{display:none !important}.action-cards-grid{grid-template-columns:1fr !important}
+    .impl-phases{grid-template-columns:1fr 1fr !important}
+  }
+  @media(max-width:768px){
+    .sidebar{width:200px}.main{margin-left:200px}.tab-content{padding:32px 24px 60px}
+    .card-grid-2{grid-template-columns:1fr}
+    .workflow-header{grid-template-columns:1fr 1fr}.wf-col-header.center{display:none}
+    .process-timeline{padding-left:0}.process-timeline::before{display:none}
+    .step-num{position:static !important;box-shadow:none !important;width:32px !important;height:32px !important;font-size:13px !important}
+    .impl-phases{grid-template-columns:1fr !important}
+  }
+
+/* Card ownership indicators */
+.action-card-owner{
+  display:flex;align-items:center;gap:3px;
+  position:absolute;top:10px;right:10px
+}
+.action-card-owner .owner-dot{width:7px;height:7px;border-radius:50%}
+.action-card-owner .owner-dot.elmo{background:var(--elmo-purple)}
+.action-card-owner .owner-dot.datapay{background:var(--datapay-teal)}
+.action-card{position:relative}
+.action-card.owner-elmo{border-left:3px solid var(--elmo-purple)}
+.action-card.owner-datapay{border-left:3px solid var(--datapay-teal)}
+
+/* ── Step card separation ── */
+.workflow-step {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  transition: box-shadow 0.2s ease;
+  /* NO overflow:hidden — step numbers need to sit outside */
+  /* NO border-left — conflicts with the vertical timeline */
+}
+
+/* Lift slightly on hover for interactivity feel */
+.workflow-step:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08), 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Breathing room between steps */
+.workflow-step + .workflow-step {
+  margin-top: 32px;
+}
+
+/* Step header subtle tint */
+.step-header {
+  background: linear-gradient(135deg, rgba(13, 148, 136, 0.04), transparent);
+}
+
+/* ACTIVE TILE */
+.pricing-tile.active {
+  background: rgba(0, 169, 183, 0.08); /* soft teal tint */
+  border: 1px solid var(--accent);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+/* ACTIVE DETAIL PANEL */
+.pricing-detail.active {
+  display: block;
+  background: rgba(0, 169, 183, 0.06); /* slightly tinted */
+  border: 1px solid var(--accent);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+/* INACTIVE FADE (optional but nice) */
+.pricing-tile {
+  opacity: 0.7;
+}
+
+.pricing-tile.active {
+  opacity: 1;
+}
+
+
+/* ACTIVE TILE */
+.pricing-tile.active {
+  background: rgba(0, 169, 183, 0.08); /* soft teal tint */
+  border: 1px solid var(--accent);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+/* ACTIVE DETAIL PANEL */
+.pricing-detail.active {
+  display: block;
+  background: rgba(0, 169, 183, 0.06); /* slightly tinted */
+  border: 1px solid var(--accent);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+/* INACTIVE FADE (optional but nice) */
+.pricing-tile {
+  opacity: 0.7;
+}
+
+.pricing-tile.active {
+  opacity: 1;
+}
+
+/* DEFAULT TILE */
+.pricing-tile {
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+/* ACTIVE BASE */
+.pricing-tile.active {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+/* ELMO (Purple) */
+.pricing-tile.elmo.active {
+  background: rgba(120, 39, 255, 0.08);
+  border: 1px solid #7827ff;
+}
+
+/* DATAPAY (Teal) */
+.pricing-tile.datapay.active {
+  background: rgba(0, 169, 183, 0.08);
+  border: 1px solid #00a9b7;
+}
+
+/* TOGETHER (Neutral but stronger) */
+.pricing-tile.together.active {
+  background: rgba(0,0,0,0.04);
+  border: 1px solid var(--border);
+}
+
+/* DETAIL PANEL BASE */
+.pricing-detail.active {
+  display: block;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+/* PANEL COLOUR MATCHING */
+.pricing-detail.elmo.active {
+  background: rgba(120, 39, 255, 0.05);
+  border: 1px solid #7827ff;
+}
+
+.pricing-detail.datapay.active {
+  background: rgba(0, 169, 183, 0.05);
+  border: 1px solid #00a9b7;
+}
+
+.pricing-detail.together.active {
+  background: rgba(0,0,0,0.03);
+}
+
+
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand"><h1>ELMO <span class="x">×</span> Datapay</h1><p>API V2 Integration Enablement</p><div class="sidebar-badge"><span class="badge-elmo">ELMO</span><span class="badge-datapay">Datapay</span><span class="badge-api">API V2</span></div></div>
+  <nav class="sidebar-nav">
+    <a onclick="showTab('overview')" id="nav-overview" class="active"><span class="nav-icon">◉</span> Overview<span class="nav-time">~10 min</span></a>
+    <a onclick="showTab('process')" id="nav-process"><span class="nav-icon">⇄</span> Joint Sales Process<span class="nav-time">~20 min</span></a>
+    <a onclick="showTab('pricing')" id="nav-pricing"><span class="nav-icon">$</span> Pricing<span class="nav-time">~10 min</span></a>
+    <a onclick="showTab('toolkit')" id="nav-toolkit"><span class="nav-icon">◫</span> Toolkit<span class="nav-time">~10 min</span></a>
+    <a onclick="showTab('contacts')" id="nav-contacts"><span class="nav-icon">☎</span> Where to Get Help<span class="nav-time">~5 min</span></a>
+  </nav>
+  <div class="sidebar-footer">Internal Only — Not for Customer Distribution<br>ELMO × Datapay Partnership 2026</div>
+</aside>
+
+<main class="main">
+
+<!-- ═══ TAB 1: OVERVIEW ═══ -->
+<div class="tab-content active" id="tab-overview">
+  <div class="tag-row"><span class="tag tag-internal">Internal Only</span><span class="tag tag-session">60-Minute Enablement</span><span class="tag tag-v2">API V2.0</span></div>
+  <h1 class="page-title">ELMO × Datapay Partnership Enablement</h1>
+  <p class="page-subtitle">This tool guides sellers and account managers through the ELMO x Datapay API v2 sales motion, from identifying the right customers through to a coordinated pitch and close.</p>
+
+<style>
+/* ──────────────────────────────────────────────────────────────────────
+   Overview refresh │ Hero + Video + Interactive value pillars + Know block
+   Scoped to #tab-overview
+   ────────────────────────────────────────────────────────────────────── */
+
+#tab-overview .edp-overview-hero{
+  background:linear-gradient(135deg,#f0fdfa 0%,#f8fafc 50%,#ede9fe 100%);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:44px 48px 40px;
+  margin-bottom:28px;
+  position:relative;
+  overflow:hidden;
+}
+#tab-overview .edp-overview-hero::before{
+  content:'';
+  position:absolute;
+  top:-60px;right:-60px;
+  width:180px;height:180px;
+  background:radial-gradient(circle,rgba(13,148,136,.08) 0%,transparent 70%);
+  border-radius:50%;
+  pointer-events:none;
+}
+#tab-overview .edp-overview-hero::after{
+  content:'';
+  position:absolute;
+  bottom:-40px;left:-40px;
+  width:140px;height:140px;
+  background:radial-gradient(circle,rgba(109,40,217,.06) 0%,transparent 70%);
+  border-radius:50%;
+  pointer-events:none;
+}
+#tab-overview .edp-overview-hero__headline{
+  font-family:'Montserrat',sans-serif;
+  font-size:30px;
+  font-weight:600;
+  color:var(--text);
+  line-height:1.25;
+  margin-bottom:20px;
+  letter-spacing:-.2px;
+  position:relative;
+}
+#tab-overview .edp-overview-hero__headline em{font-style:normal;color:var(--accent)}
+#tab-overview .edp-overview-hero__body{position:relative;max-width:820px}
+#tab-overview .edp-overview-hero__body p{
+  font-size:15px;line-height:1.72;color:var(--text-secondary);margin-bottom:16px;font-weight:400;
+}
+#tab-overview .edp-overview-hero__body p:last-of-type{margin-bottom:0}
+#tab-overview .edp-overview-hero__body p strong{color:var(--text);font-weight:600}
+#tab-overview .edp-overview-callout{
+  position:relative;display:flex;align-items:flex-start;gap:14px;margin-top:28px;padding:18px 24px;
+  background:rgba(255,255,255,.72);border:1px solid rgba(13,148,136,.2);border-left:4px solid var(--accent);
+  border-radius:10px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+#tab-overview .edp-overview-callout__icon{
+  flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  background:var(--accent);color:#fff;border-radius:50%;font-size:14px;font-weight:700;margin-top:1px;
+}
+#tab-overview .edp-overview-callout__text{font-size:14.5px;line-height:1.65;color:var(--text);font-weight:500}
+#tab-overview .edp-overview-callout__text strong{font-weight:700;color:var(--accent-dark)}
+
+#tab-overview .edp-subhero{margin:28px 0 34px}
+#tab-overview .edp-subhero-card{
+  background:linear-gradient(135deg,#f7fbfb 0%,#f4f6ff 100%);
+  border:1px solid #dbe5ea;border-radius:20px;padding:28px;box-shadow:0 8px 24px rgba(16,24,40,.04);
+}
+#tab-overview .edp-subhero-inner{
+  display:grid;grid-template-columns:1.15fr 0.85fr;gap:24px;align-items:stretch;
+}
+#tab-overview .edp-subhero-video{
+  position:relative;min-height:280px;border-radius:18px;overflow:hidden;
+  background:linear-gradient(135deg,rgba(8,15,30,.88),rgba(37,59,92,.72)),linear-gradient(135deg,#0f172a 0%,#0f766e 38%,#c4b5fd 100%);
+  border:1px solid rgba(255,255,255,.08);
+}
+#tab-overview .edp-subhero-video::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 15% 75%,rgba(20,184,166,.24),transparent 24%),radial-gradient(circle at 82% 30%,rgba(167,139,250,.20),transparent 26%);
+  pointer-events:none;
+}
+#tab-overview .edp-subhero-video-content{
+  position:relative;z-index:1;height:100%;padding:22px;display:flex;flex-direction:column;justify-content:space-between;
+}
+#tab-overview .edp-subhero-video-label{
+  display:inline-flex;align-self:flex-start;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.15);color:#fff;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+}
+#tab-overview .edp-subhero-video-bottom{display:flex;align-items:flex-end}
+#tab-overview .edp-subhero-play{
+  width:64px;height:64px;border-radius:999px;border:none;background:linear-gradient(135deg,#14b8a6,#0f9f92);
+  color:#fff;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 12px 24px rgba(20,184,166,.28);cursor:pointer;
+}
+#tab-overview .edp-subhero-play svg{width:22px;height:22px;margin-left:3px;fill:currentColor}
+#tab-overview .edp-subhero-copy{display:flex;flex-direction:column;justify-content:center;gap:18px}
+#tab-overview .edp-subhero-eyebrow{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#0f9f92}
+#tab-overview .edp-subhero-heading{margin:0;font-size:32px;line-height:1.12;font-weight:700;color:#14233b;letter-spacing:-.02em}
+#tab-overview .edp-subhero-heading .accent{color:#0f9f92}
+#tab-overview .edp-subhero-support{margin:0;font-size:17px;line-height:1.6;color:#4c6178}
+#tab-overview .edp-subhero-quote{
+  margin:0;padding-left:16px;border-left:3px solid #0f9f92;font-size:15px;line-height:1.6;color:#14233b;font-weight:600;
+}
+
+#tab-overview .edp-pillars{
+  margin:34px 0 34px;background:linear-gradient(180deg,#f8fcfb 0%,#f4f8f7 100%);
+  border:1px solid #e2eeeb;border-radius:22px;padding:20px 20px 18px;
+}
+#tab-overview .edp-section-label,
+#tab-overview .edp-know-label{
+  display:flex;align-items:center;gap:12px;margin:0 0 18px;font-size:15px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;color:#0f9f92;
+}
+#tab-overview .edp-section-label::before,
+#tab-overview .edp-know-label::before{
+  content:"";width:32px;height:2px;border-radius:999px;background:#0f9f92;
+}
+#tab-overview .edp-pillar-tabs{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:12px;
+}
+#tab-overview .edp-pillar-tab{
+  appearance:none;border:1px solid #d8e3e8;background:#fff;border-radius:16px;padding:14px;text-align:left;cursor:pointer;
+  display:flex;gap:12px;align-items:flex-start;transition:all .2s ease;box-shadow:0 4px 14px rgba(16,24,40,.03);
+}
+#tab-overview .edp-pillar-tab:hover{
+  border-color:#b8d9d5;box-shadow:0 8px 20px rgba(16,24,40,.05);transform:translateY(-1px);
+}
+#tab-overview .edp-pillar-tab.is-active{
+  border-color:#0f9f92;box-shadow:inset 0 3px 0 #0f9f92,0 8px 20px rgba(16,24,40,.05);background:linear-gradient(180deg,#fbfefe 0%,#fff 100%);
+}
+#tab-overview .edp-pillar-icon{
+  flex:0 0 auto;width:38px;height:38px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;background:#dff7f2;font-size:18px;line-height:1;
+}
+#tab-overview .edp-pillar-text{display:flex;flex-direction:column;gap:4px;min-width:0}
+#tab-overview .edp-pillar-name{font-size:15px;font-weight:700;line-height:1.3;color:#14233b}
+#tab-overview .edp-pillar-micro{font-size:13px;line-height:1.4;color:#6a7f95}
+#tab-overview .edp-pillar-panel{
+  background:linear-gradient(135deg,#f7fbfb 0%,#f6f8ff 100%);
+  border:1px solid #dbe5ea;border-radius:18px;padding:22px 22px 20px;box-shadow:0 8px 24px rgba(16,24,40,.04);
+}
+#tab-overview .edp-pillar-panel-title{margin:0 0 16px;font-size:22px;line-height:1.2;font-weight:700;color:#14233b}
+#tab-overview .edp-pillar-panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:14px}
+#tab-overview .edp-pillar-panel-block{min-width:0}
+#tab-overview .edp-pillar-panel-label{
+  margin-bottom:8px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0f9f92;
+}
+#tab-overview .edp-pillar-panel-body{margin:0;font-size:16px;line-height:1.6;color:#4c6178}
+#tab-overview .edp-pillar-hear-list{margin:0;padding-left:18px;display:grid;gap:8px;color:#4c6178;font-size:15px;line-height:1.55}
+#tab-overview .edp-pillar-hear-list li{margin:0}
+
+#tab-overview .edp-know{margin:40px 0 36px}
+#tab-overview .edp-know-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+#tab-overview .edp-know-card{border-radius:18px;padding:20px 20px 18px;box-shadow:0 8px 24px rgba(16,24,40,.04)}
+#tab-overview .edp-know-card--actions{background:linear-gradient(180deg,#fcfbff 0%,#fff 100%);border:1px solid #e4dcfb}
+#tab-overview .edp-know-card--integration{background:linear-gradient(180deg,#f8fcfb 0%,#fff 100%);border:1px solid #dbe7e4}
+#tab-overview .edp-know-title{margin:0 0 14px;font-size:18px;font-weight:700;color:#14233b}
+#tab-overview .edp-account-use-mini{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#tab-overview .edp-account-use-item{background:#fff;border:1px solid #ede7fb;border-radius:12px;padding:12px 12px 10px}
+#tab-overview .edp-account-use-label,
+#tab-overview .edp-integration-mini-label{margin:0 0 4px;font-size:14px;font-weight:700;color:#14233b}
+#tab-overview .edp-account-use-copy,
+#tab-overview .edp-integration-mini-copy{margin:0;font-size:13px;line-height:1.5;color:#60748a}
+#tab-overview .edp-integration-mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:14px}
+#tab-overview .edp-integration-mini-item{background:#fff;border:1px solid #e4efec;border-radius:12px;padding:12px 12px 10px}
+#tab-overview .edp-integration-exclusions{margin-top:10px;padding-top:12px;border-top:1px solid #e7efed;font-size:13px;color:#70839a}
+#tab-overview .edp-integration-exclusions strong{color:#14233b}
+
+@media(max-width:1100px){
+  #tab-overview .edp-overview-hero{padding:36px 36px 32px}
+  #tab-overview .edp-overview-hero__headline{font-size:26px}
+  #tab-overview .edp-pillar-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:1000px){
+  #tab-overview .edp-know-grid{grid-template-columns:1fr}
+}
+@media(max-width:980px){
+  #tab-overview .edp-subhero-inner{grid-template-columns:1fr}
+  #tab-overview .edp-subhero-heading{font-size:28px}
+  #tab-overview .edp-subhero-video{min-height:220px}
+}
+@media(max-width:800px){
+  #tab-overview .edp-pillar-panel-grid{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  #tab-overview .edp-overview-hero{padding:28px 24px 24px}
+  #tab-overview .edp-overview-hero__headline{font-size:22px}
+  #tab-overview .edp-overview-hero__body p{font-size:14px}
+  #tab-overview .edp-overview-callout{flex-direction:column;gap:10px}
+}
+@media(max-width:640px){
+  #tab-overview .edp-subhero-card{padding:20px;border-radius:16px}
+  #tab-overview .edp-subhero-video-content{padding:18px}
+  #tab-overview .edp-subhero-heading{font-size:24px}
+  #tab-overview .edp-subhero-support{font-size:16px}
+  #tab-overview .edp-subhero-play{width:56px;height:56px}
+  #tab-overview .edp-pillar-tabs,
+  #tab-overview .edp-account-use-mini,
+  #tab-overview .edp-integration-mini{grid-template-columns:1fr}
+  #tab-overview .edp-pillar-tab,
+  #tab-overview .edp-pillar-panel,
+  #tab-overview .edp-know-card{padding-left:18px;padding-right:18px}
+  #tab-overview .edp-pillar-panel-title{font-size:20px}
+  #tab-overview .edp-pillar-panel-body,
+  #tab-overview .edp-pillar-hear-list{font-size:15px}
+}
+</style>
+
+<div class="edp-overview-hero">
+  <h2 class="edp-overview-hero__headline">
+    Connected HR &amp; Payroll <em>without compromise</em>
+  </h2>
+  <div class="edp-overview-hero__body">
+    <p>Mid-market NZ organisations have been forced to choose between platforms that compromise on payroll depth, or standalone payroll solutions that never integrate deeply enough to trust.</p>
+    <p><strong>This partnership eliminates that trade-off.</strong></p>
+    <p>Datapay's specialist payroll expertise, connected with ELMO's complete workforce platform on a single data foundation — delivering <strong>one trusted source of truth</strong> for your people data.</p>
+  </div>
+  <div class="edp-overview-callout">
+    <div class="edp-overview-callout__icon">→</div>
+    <div class="edp-overview-callout__text"><strong>Genuine two-way sync between HR and payroll</strong> means your most critical workforce data stays connected, accurate and audit-ready.</div>
+  </div>
+</div>
+
+<section class="edp-subhero" aria-label="Payroll made powerful video introduction">
+  <div class="edp-subhero-card">
+    <div class="edp-subhero-inner">
+      <div class="edp-subhero-video">
+        <div class="edp-subhero-video-content">
+          <div class="edp-subhero-video-label">Video placeholder</div>
+          <div class="edp-subhero-video-bottom">
+            <button class="edp-subhero-play" type="button" aria-label="Play overview video">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 5.14v13.72c0 .77.84 1.25 1.5.86l10.5-6.86a1 1 0 0 0 0-1.72L9.5 4.28A1 1 0 0 0 8 5.14z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="edp-subhero-copy">
+        <div class="edp-subhero-eyebrow">See the value in motion</div>
+        <h3 class="edp-subhero-heading">Payroll made <span class="accent">powerful in practice</span></h3>
+        <p class="edp-subhero-support">Update once in HR. Flow straight through to payroll. No rekeying, no surprises — just accurate, compliant payroll every time.</p>
+        <p class="edp-subhero-quote">You shouldn’t have to reconcile your workforce data. It should just work.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="edp-pillars" aria-labelledby="edp-pillars-title">
+  <div class="edp-section-label" id="edp-pillars-title">Why this partnership wins</div>
+
+  <div class="edp-pillar-tabs" role="tablist" aria-label="Why this partnership wins">
+    <button class="edp-pillar-tab is-active" role="tab" aria-selected="true" aria-controls="edp-pillar-panel" id="edp-tab-integrity"
+      data-title="Data integrity you can trust"
+      data-value="Creates a single, trusted source of workforce data, reducing duplication, improving accuracy, and lowering compliance risk."
+      data-hear="We’re still rekeying data between systems.|We need confidence there are no surprises.|HR updates aren’t flowing through properly."
+      data-talk="That’s exactly where the integration helps. Two-way sync removes duplicate entry, reduces reconciliation, and gives both HR and payroll a more accurate, consistent data set to work from."
+      type="button">
+      <span class="edp-pillar-icon" aria-hidden="true">🔗</span>
+      <span class="edp-pillar-text">
+        <span class="edp-pillar-name">Data integrity</span>
+        <span class="edp-pillar-micro">Single trusted source of truth</span>
+      </span>
+    </button>
+
+    <button class="edp-pillar-tab" role="tab" aria-selected="false" aria-controls="edp-pillar-panel" id="edp-tab-depth"
+      data-title="Specialist depth, not generalist breadth"
+      data-value="Handles complex payroll requirements with specialist precision, not as a bolt-on to a generalist platform."
+      data-hear="Our payroll requirements are too nuanced for most platforms.|We don’t want to simplify something that’s actually complex.|Payroll is where things usually fall over."
+      data-talk="That’s where this partnership is different. You’re not forcing payroll into a generalist platform, you’re connecting ELMO with Datapay’s specialist payroll capability, so you get integration without losing payroll depth."
+      type="button">
+      <span class="edp-pillar-icon" aria-hidden="true">🎯</span>
+      <span class="edp-pillar-text">
+        <span class="edp-pillar-name">Specialist depth</span>
+        <span class="edp-pillar-micro">Payroll precision, not bolt-on</span>
+      </span>
+    </button>
+
+    <button class="edp-pillar-tab" role="tab" aria-selected="false" aria-controls="edp-pillar-panel" id="edp-tab-local"
+      data-title="Local expertise, local support"
+      data-value="Supports NZ payroll compliance with local expertise, backed by teams who understand legislation and complexity."
+      data-hear="We need confidence this will work for NZ conditions.|Compliance changes are hard to keep up with.|We don’t want to explain NZ payroll to an offshore support team."
+      data-talk="One of the strengths of this partnership is that it’s grounded in NZ payroll reality. You’ve got local expertise behind the integration, which matters when compliance, legislation, and payroll complexity aren’t negotiable."
+      type="button">
+      <span class="edp-pillar-icon" aria-hidden="true">🛡️</span>
+      <span class="edp-pillar-text">
+        <span class="edp-pillar-name">Local expertise</span>
+        <span class="edp-pillar-micro">NZ knowledge on the ground</span>
+      </span>
+    </button>
+
+    <button class="edp-pillar-tab" role="tab" aria-selected="false" aria-controls="edp-pillar-panel" id="edp-tab-foundation"
+      data-title="A connected foundation for workforce data"
+      data-value="Built on a connected data foundation across HR and payroll, enabling consistent, scalable workforce management."
+      data-hear="We’ve modernised HR, but payroll is still holding us back.|Our systems don’t feel joined up.|We want progress without creating more fragmentation."
+      data-talk="This helps create a stronger foundation across HR and payroll, so the two systems work together instead of operating in parallel. That gives you a more connected way to manage workforce data as the organisation grows."
+      type="button">
+      <span class="edp-pillar-icon" aria-hidden="true">⚙️</span>
+      <span class="edp-pillar-text">
+        <span class="edp-pillar-name">Connected foundation</span>
+        <span class="edp-pillar-micro">HR and payroll working as one</span>
+      </span>
+    </button>
+  </div>
+
+  <div class="edp-pillar-panel" id="edp-pillar-panel" role="tabpanel" aria-labelledby="edp-tab-integrity">
+    <h3 class="edp-pillar-panel-title">Data integrity you can trust</h3>
+    <div class="edp-pillar-panel-block">
+      <div class="edp-pillar-panel-label">Value statement</div>
+      <p class="edp-pillar-panel-body edp-pillar-panel-body--value">Creates a single, trusted source of workforce data, reducing duplication, improving accuracy, and lowering compliance risk.</p>
+    </div>
+    <div class="edp-pillar-panel-grid">
+      <div class="edp-pillar-panel-block">
+        <div class="edp-pillar-panel-label">What you may hear</div>
+        <ul class="edp-pillar-hear-list">
+          <li>“We’re still rekeying data between systems.”</li>
+          <li>“We need confidence there are no surprises.”</li>
+          <li>“HR updates aren’t flowing through properly.”</li>
+        </ul>
+      </div>
+      <div class="edp-pillar-panel-block">
+        <div class="edp-pillar-panel-label">How to bring it in</div>
+        <p class="edp-pillar-panel-body edp-pillar-panel-body--talk">That’s exactly where the integration helps. Two-way sync removes duplicate entry, reduces reconciliation, and gives both HR and payroll a more accurate, consistent data set to work from.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="edp-know">
+  <div class="edp-know-label">What to know before you start</div>
+  <div class="edp-know-grid">
+    <div class="edp-know-card edp-know-card--actions">
+      <h3 class="edp-know-title">How to use this in your accounts</h3>
+      <div class="edp-account-use-mini">
+        <div class="edp-account-use-item">
+          <h4 class="edp-account-use-label">Re-open accounts</h4>
+          <p class="edp-account-use-copy">Use integration as a reason to re-engage existing accounts.</p>
+        </div>
+        <div class="edp-account-use-item">
+          <h4 class="edp-account-use-label">Bring both sides together</h4>
+          <p class="edp-account-use-copy">Get HR and payroll into the same conversation early.</p>
+        </div>
+        <div class="edp-account-use-item">
+          <h4 class="edp-account-use-label">Align outcomes</h4>
+          <p class="edp-account-use-copy">Frame the discussion around compliance, efficiency and value.</p>
+        </div>
+        <div class="edp-account-use-item">
+          <h4 class="edp-account-use-label">Increase stickiness</h4>
+          <p class="edp-account-use-copy">Strengthen value by connecting HR and payroll more tightly.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="edp-know-card edp-know-card--integration">
+      <h3 class="edp-know-title">What the integration does</h3>
+      <div class="edp-integration-mini">
+        <div class="edp-integration-mini-item">
+          <h4 class="edp-integration-mini-label">Sync data</h4>
+          <p class="edp-integration-mini-copy">Employee data flows between ELMO and Datapay in real time.</p>
+        </div>
+        <div class="edp-integration-mini-item">
+          <h4 class="edp-integration-mini-label">Automate events</h4>
+          <p class="edp-integration-mini-copy">Key lifecycle events like new hires move through without rekeying.</p>
+        </div>
+        <div class="edp-integration-mini-item">
+          <h4 class="edp-integration-mini-label">Surface conflicts</h4>
+          <p class="edp-integration-mini-copy">Issues are flagged quickly so teams can resolve them with confidence.</p>
+        </div>
+      </div>
+      <div class="edp-integration-exclusions">
+        <strong>Does not include:</strong> Leave, payslips, timesheets, rostering, GL/finance, termination or custom middleware.
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+(function () {
+  const overview = document.getElementById('tab-overview');
+  if (!overview) return;
+
+  const tabs = overview.querySelectorAll('.edp-pillar-tab');
+  const panel = overview.querySelector('#edp-pillar-panel');
+
+  if (!tabs.length || !panel) return;
+
+  const title = panel.querySelector('.edp-pillar-panel-title');
+  const valueBody = panel.querySelector('.edp-pillar-panel-body--value');
+  const hearList = panel.querySelector('.edp-pillar-hear-list');
+  const talkBody = panel.querySelector('.edp-pillar-panel-body--talk');
+
+  if (!title || !valueBody || !hearList || !talkBody) return;
+
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      tabs.forEach((t) => {
+        t.classList.remove('is-active');
+        t.setAttribute('aria-selected', 'false');
+      });
+
+      tab.classList.add('is-active');
+      tab.setAttribute('aria-selected', 'true');
+      panel.setAttribute('aria-labelledby', tab.id);
+
+      title.textContent = tab.dataset.title || "";
+      valueBody.textContent = tab.dataset.value || "";
+      talkBody.textContent = tab.dataset.talk || "";
+
+      const hearItems = (tab.dataset.hear || "").split("|").filter(Boolean);
+      hearList.innerHTML = hearItems
+        .map((item) => `<li>“${item.replace(/^“|”$/g, "").trim()}”</li>`)
+        .join("");
+    });
+  });
+})();
+</script>
+
+
+<!-- ═══ TAB 2: JOINT SALES PROCESS ═══ -->
+<div class="tab-content" id="tab-process">
+  <h1 class="page-title">Joint Sales Process</h1>
+  <p class="page-subtitle">A coordinated upsell process — the originating AM leads early discussions, then it folds into joint pricing and contracting. Each step maps to Partner Portal stages.</p>
+  <div class="workflow-header"><div class="wf-col-header elmo">ELMO Team</div><div class="wf-col-header center">⟷</div><div class="wf-col-header datapay">Datapay Team</div></div>
+
+  <div class="process-timeline">
+
+  <!-- ── STEP 1: UNIFIED ── -->
+  <div class="workflow-step" id="process-step-1">
+    <div class="step-num">1</div>
+    <div class="step-header" onclick="toggleStep(this)">
+      <h3>Target & Hook</h3>
+      <span class="step-stage">Portal Status = Prospecting</span>
+      <span class="step-chevron">▾</span>
+    </div>
+    <div class="step-body">
+      <div style="padding:16px 24px;background:var(--surface);font-size:13px;color:var(--text-secondary);border-bottom:1px solid var(--border)"><strong>Goal:</strong> Identify and log the opportunity before pitching. Enters via <strong>Outbound</strong> (AM identifies mutual customer) or <strong>Inbound</strong> (customer interest via marketing, events, or referral).</div>
+
+      <!-- Unified actions block -->
+      <div class="step-unified">
+        <div class="step-unified-lead">
+          <div class="step-unified-dots"><div class="dot-elmo"></div><div class="dot-datapay"></div></div>
+          Whichever AM is closest to the customer leads this step. Both sides follow the same actions.
+        </div>
+        
+<ul>
+  <li data-num="1.1">Review mutual customer list for API V2 candidates</li>
+  <li data-num="1.2">Log opportunity in Partner Portal before pitching</li>
+  <li data-num="1.3">Check if opportunity already exists (no duplicates)</li>
+  <li data-num="1.4">Use conversation starter in health checks or catch-ups</li>
+</ul>
+      </div>
+
+      <div class="centred-callout-wrapper">
+        <div class="centred-callout teal"><strong>If an opportunity already exists:</strong> Contact the AM who logged it and align on next steps. Do not create a duplicate.</div>
+      </div>
+
+      <div style="padding:20px 24px;background:var(--surface);border-top:1px solid var(--border)">
+        <div class="action-cards-grid">
+          <div class="action-card" style="cursor:default">
+  <div class="action-card-owner"><div class="owner-dot elmo"></div><div class="owner-dot datapay"></div></div>
+  <div class="action-card-icon" style="background:#fef3c7;color:#d97706">📄</div>
+  <div class="action-card-body">
+    <div class="action-card-title">Review Mutual Customer List <span class="gap-tag">Gap</span></div>
+    <div class="action-card-desc">Identify API V2 candidates in your portfolio</div>
+  </div>
+  <span class="info-tip">i<span class="tip-content">...</span></span>
+</div>
+          
+
+
+
+<div class="action-card" onclick="openModal('partner-portal-modal')">
+  <div class="action-card-owner"><div class="owner-dot elmo"></div><div class="owner-dot datapay"></div></div>
+  <div class="action-card-icon" style="background:#e0e7ff;color:#4338ca">📋</div>
+  <div class="action-card-body">
+    <div class="action-card-title">Log in Partner Portal</div>
+    <div class="action-card-desc">Log the opportunity before any customer pitch</div>
+  </div>
+  <span style="font-size:11px;font-weight:600;color:var(--accent);white-space:nowrap;flex-shrink:0">Open →</span>
+</div>
+
+
+        </div>
+      </div>
+      <div class="stage-gate-wrapper"><div class="stage-gate"><div class="stage-gate-badge"><div class="stage-gate-num">1</div><div class="stage-gate-label">Gate</div></div><div class="stage-gate-title">Opportunity Registration Complete</div><div class="stage-gate-outputs"><strong>Output:</strong> Opportunity logged in Partner Portal before any customer pitch</div></div></div>
+    </div>
+  </div>
+
+  <!-- ── STEP 2: UNIFIED ── -->
+  <div class="workflow-step" id="process-step-2">
+    <div class="step-num">2</div>
+    <div class="step-header" onclick="toggleStep(this)">
+      <h3>Lead Qualification</h3>
+      <span class="step-stage">Portal Status = Qualification in Progress</span>
+      <span class="step-chevron">▾</span>
+    </div>
+    <div class="step-body">
+      <div style="padding:16px 24px;background:var(--surface);font-size:13px;color:var(--text-secondary);border-bottom:1px solid var(--border)"><strong>Goal:</strong> Confirm customer meets eligibility criteria before any pitch. Both teams use the same tool and process.</div>
+
+      <!-- Unified actions block -->
+      <div class="step-unified">
+        <div class="step-unified-lead">
+          <div class="step-unified-dots"><div class="dot-elmo"></div><div class="dot-datapay"></div></div>
+          Both AMs use the same qualification tool and follow the same process. The AM who logged the opportunity runs qualification.
+        </div>
+        
+        <ul>
+          
+  <li data-num="2.1">Run the Qualification Tool to confirm eligibility</li>
+  <li data-num="2.2">Update Partner Portal to "Qualification in Progress"</li>
+  <li data-num="2.3">If Qualified → proceed to Step 3</li>
+  <li data-num="2.4">If Caution → review jointly with technical docs</li>
+  <li data-num="2.5">If Disqualify → do not pitch, update Portal to "Closed — Not Qualified"</li>
+</ul>
+      </div>
+
+      <div style="padding:20px 24px;background:var(--surface);border-top:1px solid var(--border)">
+        <div class="action-cards-grid">
+          <a href="https://leighrobinsonnz.github.io/sales-motion-app/" target="_blank" rel="noopener" class="action-card">
+  <div class="action-card-owner"><div class="owner-dot elmo"></div><div class="owner-dot datapay"></div></div>
+  <div class="action-card-icon" style="background:var(--accent-light);color:var(--accent)">🔍</div>
+  <div class="action-card-body">
+    <div class="action-card-title">Run the Qualification Tool <span style="font-size:11px;color:var(--accent);font-weight:400">↗</span></div>
+    <div class="action-card-desc">2–3 minutes · Returns Qualified / Caution / Disqualify</div>
+  </div>
+  <span class="info-tip" onclick="event.preventDefault();event.stopPropagation()">i<span class="tip-content"><strong>Why:</strong> Confirm the opportunity qualifies before any pitch.<br><br><strong>How:</strong> Enter customer and seller name, answer 10–12 questions.<br><br><strong>Outcome:</strong> Qualified → Step 3. Caution → review. Disqualify → do not pitch.</span></span>
+</a>
+          <a href="https://datacom--dev.sandbox.my.site.com/SaaSPartner" target="_blank" rel="noopener" class="action-card">
+  <div class="action-card-owner"><div class="owner-dot elmo"></div><div class="owner-dot datapay"></div></div>
+  <div class="action-card-icon" style="background:#e0e7ff;color:#4338ca">📋</div>
+  <div class="action-card-body">
+    <div class="action-card-title">Update Partner Portal <span style="font-size:11px;color:var(--accent);font-weight:400">↗</span></div>
+    <div class="action-card-desc">Set stage to "Qualification in Progress"</div>
+  </div>
+  <span class="info-tip info-tip-right" onclick="event.preventDefault();event.stopPropagation()">i<span class="tip-content"><strong>At this stage:</strong> Update to "Qualification in Progress".</span></span>
+</a>
+        </div>
+      </div>
+
+      <div class="centred-callout-wrapper" style="padding-top:16px;border-top:1px solid var(--border)">
+        <div class="centred-callout red"><strong>⊘ If not eligible:</strong> Qualify out. Don't pitch an unqualified opportunity. <span class="info-tip" style="background:var(--danger)">i<span class="tip-content"><strong>Update Portal to:</strong> "Closed — Not Qualified". Add a note explaining why.<br><br><strong>Why:</strong> Tracking disqualifications helps prioritise the roadmap.</span></span></div>
+      </div>
+
+      <div class="stage-gate-wrapper"><div class="stage-gate"><div class="stage-gate-badge"><div class="stage-gate-num">2</div><div class="stage-gate-label">Gate</div></div><div class="stage-gate-title">Customer Eligibility Confirmed</div><div class="stage-gate-outputs"><strong>Output:</strong> Qualification Tool completed with a "Qualified" result</div></div></div>
+    </div>
+  </div>
+
+  <!-- ── STEP 3: TWO COLUMNS ── -->
+  <div class="workflow-step" id="process-step-3">
+    <div class="step-num">3</div>
+    <div class="step-header" onclick="toggleStep(this)">
+      <h3>Opportunity Validation</h3>
+      <span class="step-stage">Portal Status = Qualified</span>
+      <span class="step-chevron">▾</span>
+    </div>
+    <div class="step-body">
+      <div style="padding:16px 24px;background:var(--surface);font-size:13px;color:var(--text-secondary);border-bottom:1px solid var(--border)"><strong>Goal:</strong> Joint value conversation and demo with the customer. Present the story, show the integration, confirm suitability.</div>
+      <div class="step-columns">
+        <div class="step-col elmo-col"><h4><span class="col-dot elmo-dot"></span> ELMO Actions</h4><ul><li data-num="3.1">Co-lead Joint Value Story using pitch deck</li>
+  <li data-num="3.2">Present / demo the integration (live or recorded)</li>
+  <li data-num="3.3">Walk through data fields and mappings</li>
+  <li data-num="3.4">Customer reviews and confirms suitability</li></ul></div>
+        <div class="step-col datapay-col"><h4><span class="col-dot datapay-dot"></span> Datapay Actions</h4><ul>
+  <li data-num="3.1">Co-lead Value Story — reinforce payroll depth</li>
+  <li data-num="3.2">Support demo with payroll-side context</li>
+  <li data-num="3.3">Address Holidays Act, KiwiSaver, compliance</li>
+  <li data-num="3.4">Provide Customer 101 for technical due diligence</li>
+</ul></div>
+      </div>
+
+<div class="centred-callout-wrapper" style="padding-top:16px;padding-bottom:0;border-top:1px solid var(--border)">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+    <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px">
+      <div class="step-unified-dots"><div class="dot-elmo"></div><div class="dot-datapay"></div></div>
+      Shared Actions
+    </div>
+    <div style="display:inline-flex;flex-direction:column;gap:6px;text-align:left">
+      <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-secondary)">
+        <span style="color:var(--text);font-weight:700;font-size:12px">3.5</span>
+        Update Partner Portal to "Qualified"
+      </div>
+    </div>
+    <div style="height:12px"></div>
+  </div>
+</div>
+
+
+      <div style="padding:20px 24px;background:var(--surface);border-top:1px solid var(--border)">
+        <div class="action-cards-grid">
+          
+<div class="action-card" style="cursor:default"><div class="action-card-owner"><div class="owner-dot elmo"></div><div class="owner-dot datapay"></div></div><div class="action-card-icon" style="background:#dbeafe;color:#2563eb">📊</div>
+
+<div class="action-card-body"><div class="action-card-title">Present a Joint Pitch <span class="gap-tag">Finalising</span></div><div class="action-card-desc">Co-branded deck — value story, pain points, integration walkthrough</div></div><span class="info-tip info-tip-right">i<span class="tip-content"><strong>What:</strong> Co-branded slide deck — joint value story, integration overview, "Sarah starts Monday" scenario.<br><br><strong>When:</strong> During the joint validation meeting. Both AMs present together.<br><br><strong>Status:</strong> Being finalised.</span></span></div>
+
+
+<div class="action-card" style="cursor:default"><div class="action-card-owner"><div class="owner-dot elmo"></div><div class="owner-dot datapay"></div></div><div class="action-card-icon" style="background:#fef3c7;color:#d97706">🎬</div>
+
+
+<div class="action-card-body"><div class="action-card-title">Use a Pre-recorded Demo <span class="gap-tag">Gap</span></div><div class="action-card-desc">Recorded walkthrough as alternative to live demo or leave-behind</div></div><span class="info-tip info-tip-right">i<span class="tip-content"><strong>What:</strong> Recorded walkthrough — real-time sync, dashboard, conflict resolution, new hire flow.<br><br><strong>Status:</strong> Not yet recorded.</span></span></div>
+
+
+          <div class="action-card" style="cursor:default"><div class="action-card-owner"><div class="owner-dot elmo"></div><div class="owner-dot datapay"></div></div><div class="action-card-icon" style="background:#fce7f3;color:#db2777">📘</div>
+
+
+<div class="action-card-body"><div class="action-card-title">Supply the Customer Handbook</div><div class="action-card-desc">Technical guide for customer due diligence — data fields, sync, FAQs</div></div><span class="info-tip info-tip-right">i<span class="tip-content"><strong>What:</strong> Customer 101 Handbook — features, data mapping, sync directions, troubleshooting, support model.<br><br><strong>When:</strong> After the validation call for internal due diligence.</span></span></div>
+          
+
+<div class="action-card" onclick="openModal('objections-hub')" style="border-left:3px solid var(--warning)"><div class="action-card-owner"><div class="owner-dot elmo"></div><div class="owner-dot datapay"></div></div><div class="action-card-icon" style="background:#fef3c7;color:#d97706">⚡</div><div class="action-card-body"><div class="action-card-title">Handle Customer Objections</div><div class="action-card-desc">4 common pushbacks with approach guidance and talk tracks</div></div><span style="font-size:11px;font-weight:600;color:var(--warning);white-space:nowrap;flex-shrink:0">Open →</span></div>
+        </div>
+      </div>
+
+
+      <div class="stage-gate-wrapper"><div class="stage-gate"><div class="stage-gate-badge"><div class="stage-gate-num">3</div><div class="stage-gate-label">Gate</div></div><div class="stage-gate-title">Customer Validation & Interest Confirmed</div><div class="stage-gate-outputs"><strong>Output:</strong> Customer confirms suitability and is ready for pricing conversation</div></div></div>
+    </div>
+  </div>
+
+  <!-- ── STEP 4: TWO COLUMNS ── -->
+  <div class="workflow-step" id="process-step-4">
+    <div class="step-num">4</div>
+    <div class="step-header" onclick="toggleStep(this)">
+      <h3>Solution Proposal</h3>
+      <span class="step-stage">Portal Status = Proposal Submitted</span>
+      <span class="step-chevron">▾</span>
+    </div>
+    <div class="step-body">
+      <div style="padding:16px 24px;background:var(--surface);font-size:13px;color:var(--text-secondary);border-bottom:1px solid var(--border)"><strong>Goal:</strong> Customer confirmed interest → trigger SOW and pricing on both sides → run the Joint Proposal Call.</div>
+      <div class="step-columns">
+        <div class="step-col elmo-col"><h4><span class="col-dot elmo-dot"></span> ELMO Actions</h4><ul>
+
+  <li data-num="4.1">Prepare ELMO Order Form with integration pricing</li>
+  <li data-num="4.2">Coordinate timing with Datapay AM for joint call</li>
+  
+
+</ul></div>
+        <div class="step-col datapay-col"><h4><span class="col-dot datapay-dot"></span> Datapay Actions</h4><ul>
+
+  <li data-num="4.1">Log project in Datapay Salesforce (not Partner Portal)</li>
+  <li data-num="4.2">Submit request to Datapay PS for standard SOW</li>
+  <li data-num="4.3">AD reviews scope — flag complex configs</li>
+  
+
+
+</ul></div>
+      </div>
+
+<div class="centred-callout-wrapper" style="padding-top:16px;padding-bottom:0;border-top:1px solid var(--border)">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+    <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px">
+      <div class="step-unified-dots"><div class="dot-elmo"></div><div class="dot-datapay"></div></div>
+      Shared Actions
+    </div>
+    <div style="display:inline-flex;flex-direction:column;gap:6px;text-align:left">
+      <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-secondary)">
+        <span style="color:var(--text);font-weight:700;font-size:12px">4.4</span>
+        Co-present SOW & pricing on joint call
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-secondary)">
+        <span style="color:var(--text);font-weight:700;font-size:12px">4.5</span>
+        Update Partner Portal to "Proposal Submitted"
+      </div>
+    </div>
+    <div style="height:12px"></div>
+  </div>
+</div>
+
+      <div style="padding:20px 24px;background:var(--surface);border-top:1px solid var(--border)">
+        <div class="action-cards-grid">
+          
+
+<div class="action-card owner-elmo" style="cursor:default">
+  <div class="action-card-owner"><div class="owner-dot elmo"></div></div>
+  <div class="action-card-icon" style="background:var(--elmo-light);color:var(--elmo-purple)">📝</div>
+  <div class="action-card-body">
+    <div class="action-card-title">Prepare the ELMO Order Form <span class="gap-tag">Process TBC</span></div>
+    <div class="action-card-desc">ELMO integration pricing attached to existing agreement</div>
+  </div>
+  <span class="info-tip info-tip-right">i<span class="tip-content"><strong>What:</strong> Order Form — integration SaaS fee + PS estimate. Attached to existing agreement.<br><br><strong>When:</strong> After Step 3, before Joint Proposal Call.<br><br><strong>How:</strong> Standard process. Annual SaaS + 10–15 hrs T&M.</span></span>
+</div>
+
+         
+<a href="https://datacomunity.sharepoint.com/:b:/s/SaaSProductsGTMC/IQCO8LRr4u4kTYtbQkMIbnu_AUQr3FUEjHSr8lzFcEp1O5c?e=KzyXYu" target="_blank" rel="noopener" class="action-card owner-datapay"><div class="action-card-owner"><div class="owner-dot datapay"></div></div>
+
+
+<div class="action-card-icon" style="background:#d1fae5;color:#059669">📄</div><div class="action-card-body"><div class="action-card-title">Request the Datapay SOW <span style="font-size:11px;color:var(--accent);font-weight:400">↗</span></div><div class="action-card-desc">Submit to Datapay PS for standard SOW</div></div><span class="info-tip info-tip-right" onclick="event.preventDefault();event.stopPropagation()">i<span class="tip-content"><strong>What:</strong> Standardised SOW — test environment, API enablement, T&M, ongoing costs.<br><br><strong>How:</strong> Datapay AM submits to PS. 2–3 day turnaround.</span></span></a>
+          
+
+<div class="action-card" onclick="openModal('proposal-call-modal')" style="border-left:3px solid var(--accent)"><div class="action-card-owner"><div class="owner-dot elmo"></div><div class="owner-dot datapay"></div></div><div class="action-card-icon" style="background:var(--accent-light);color:var(--accent)">🤝</div>
+
+
+<div class="action-card-body"><div class="action-card-title">Run the Joint Proposal Call</div><div class="action-card-desc">Both AMs on one call — confirm scope, present pricing</div></div><span style="font-size:11px;font-weight:600;color:var(--accent);white-space:nowrap;flex-shrink:0">View guide →</span></div>
+
+
+          <a href="https://datacom--dev.sandbox.my.site.com/SaaSPartner" target="_blank" rel="noopener" class="action-card"><div class="action-card-owner"><div class="owner-dot elmo"></div><div class="owner-dot datapay"></div></div><div class="action-card-icon" style="background:#e0e7ff;color:#4338ca">📋</div><div class="action-card-body"><div class="action-card-title">Update Partner Portal <span style="font-size:11px;color:var(--accent);font-weight:400">↗</span></div><div class="action-card-desc">Set stage to "Proposal Submitted"</div></div><span class="info-tip info-tip-right" onclick="event.preventDefault();event.stopPropagation()">i<span class="tip-content"><strong>When:</strong> After Joint Proposal Call.<br><br><strong>Update:</strong> Stage → "Proposal Submitted". Add note. Update revenue.</span></span></a>
+        </div>
+      </div>
+
+      <div class="stage-gate-wrapper"><div class="stage-gate"><div class="stage-gate-badge"><div class="stage-gate-num">4</div><div class="stage-gate-label">Gate</div></div><div class="stage-gate-title">Joint Proposal Delivered</div><div class="stage-gate-outputs"><strong>Outputs:</strong> Both pricing documents presented · Portal updated to "Proposal Submitted"</div></div></div>
+    </div>
+  </div>
+
+<!-- ── STEP 5: TWO COLUMNS ── -->
+  <div class="workflow-step" id="process-step-5">
+    <div class="step-num">5</div>
+    <div class="step-header" onclick="toggleStep(this)">
+      <h3>Contracting & Close</h3>
+      <span class="step-stage">Portal Status = Closed Won</span>
+      <span class="step-chevron">▾</span>
+    </div>
+    <div class="step-body">
+      <div style="padding:16px 24px;background:var(--surface);font-size:13px;color:var(--text-secondary);border-bottom:1px solid var(--border)"><strong>Goal:</strong> Each AM drives their own contract to signature. Both SOWs must be signed before implementation begins.</div>
+
+      <div class="step-columns">
+        <div class="step-col elmo-col"><h4><span class="col-dot elmo-dot"></span> ELMO Actions</h4><ul>
+          <li data-num="5.1">Drive ELMO Order Form to signature</li>
+          <li data-num="5.2">Coordinate with Datapay AM on contract timing</li>
+        </ul></div>
+        <div class="step-col datapay-col"><h4><span class="col-dot datapay-dot"></span> Datapay Actions</h4><ul>
+          <li data-num="5.1">Drive Datapay SOW to signature</li>
+          <li data-num="5.2">Coordinate with ELMO AM on contract timing</li>
+        </ul></div>
+      </div>
+
+      <div class="centred-callout-wrapper" style="padding-top:16px;padding-bottom:0;border-top:1px solid var(--border)">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px">
+            <div class="step-unified-dots"><div class="dot-elmo"></div><div class="dot-datapay"></div></div>
+            Shared Actions
+          </div>
+          <div style="display:inline-flex;flex-direction:column;gap:6px;text-align:left">
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-secondary)">
+              <span style="color:var(--text);font-weight:700;font-size:12px">5.3</span>
+              Confirm both SOWs signed before implementation
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-secondary)">
+              <span style="color:var(--text);font-weight:700;font-size:12px">5.4</span>
+              Agree who sends customer confirmation email
+            </div>
+          </div>
+          <div style="height:12px"></div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px 24px;border-top:1px solid var(--border);background:var(--surface)">
+
+        <!-- Drive Your Contract to Signature -->
+        <div class="action-card" style="cursor:default;margin:0">
+          <div class="action-card-owner">
+            <div class="owner-dot elmo"></div>
+            <div class="owner-dot datapay"></div>
+          </div>
+          <div class="action-card-icon" style="background:#fce7f3;color:#db2777">✍️</div>
+          <div class="action-card-body">
+            <div class="action-card-title">Drive Your Contract to Signature</div>
+            <div class="action-card-desc">Each AM owns their contract — negotiate independently</div>
+          </div>
+          <span class="info-tip info-tip-right">i<span class="tip-content"><strong>Key rule:</strong> Do not negotiate on behalf of the other side.<br><br><strong>Timing:</strong> Align so both are signed within the same window.</span></span>
+        </div>
+
+        <!-- Confirm Both SOWs Are Signed -->
+        <div class="action-card" style="cursor:default;margin:0">
+          <div class="action-card-owner">
+            <div class="owner-dot elmo"></div>
+            <div class="owner-dot datapay"></div>
+          </div>
+          <div class="action-card-icon" style="background:#d1fae5;color:#059669">☑️</div>
+          <div class="action-card-body">
+            <div class="action-card-title">Confirm Both SOWs Are Signed</div>
+            <div class="action-card-desc">Implementation cannot begin until both are executed</div>
+          </div>
+          <span class="info-tip info-tip-right">i<span class="tip-content"><strong>Key rule:</strong> Neither SOW alone triggers implementation.<br><br><strong>Action:</strong> Confirm both signatures before notifying delivery teams.</span></span>
+        </div>
+
+        <!-- Send Customer Confirmation -->
+        <div class="action-card" style="cursor:default;margin:0">
+          <div class="action-card-owner">
+            <div class="owner-dot elmo"></div>
+            <div class="owner-dot datapay"></div>
+          </div>
+          <div class="action-card-icon" style="background:#e0e7ff;color:#4f46e5">📧</div>
+          <div class="action-card-body">
+            <div class="action-card-title">Send Customer Confirmation</div>
+            <div class="action-card-desc">One AM sends a single email confirming both timelines</div>
+          </div>
+          <span class="info-tip info-tip-right">i<span class="tip-content"><strong>Key rule:</strong> One unified email — not two separate confirmations.<br><br><strong>Action:</strong> Agree who sends it before contracts are signed.</span></span>
+        </div>
+
+        <!-- Update Partner Portal -->
+        <div class="action-card" style="cursor:default;margin:0">
+          <div class="action-card-owner">
+            <div class="owner-dot elmo"></div>
+            <div class="owner-dot datapay"></div>
+          </div>
+          <div class="action-card-icon" style="background:#ccfbf1;color:#0d9488">📋</div>
+          <div class="action-card-body">
+            <div class="action-card-title">Update Partner Portal</div>
+            <div class="action-card-desc">Set stage to "Closed Won" with actual revenue</div>
+          </div>
+          <span class="info-tip info-tip-right">i<span class="tip-content"><strong>Key rule:</strong> Both AMs update their own portal entry.<br><br><strong>Action:</strong> Set stage to "Closed Won" and enter final revenue figures.</span></span>
+        </div>
+
+      </div>
+
+      <div class="stage-gate-wrapper"><div class="stage-gate"><div class="stage-gate-badge"><div class="stage-gate-num">5</div><div class="stage-gate-label">Gate</div></div><div class="stage-gate-title">Dual Contract Execution Complete</div><div class="stage-gate-outputs"><strong>Outputs:</strong> Both SOWs signed · Customer confirmation sent · Portal updated to "Closed Won"</div></div></div>
+    </div>
+  </div>
+
+
+  <!-- ── STEP 6: IMPLEMENTATION ── -->
+  <div class="workflow-step" id="process-step-6">
+    <div class="step-num step-num-final">✓</div>
+    <div class="step-header" onclick="toggleStep(this)">
+      <h3>Implementation</h3>
+      <span class="step-stage">Portal Status = Closed Won — Delivering</span>
+      <span class="step-chevron">▾</span>
+    </div>
+    <div class="step-body">
+      <div style="padding:16px 24px;background:var(--surface);font-size:13px;color:var(--text-secondary);border-bottom:1px solid var(--border)"><strong>Goal:</strong> Once both contracts are signed, the 4–6 week implementation begins. Led by implementation teams — the selling AM stays informed but is no longer driving.</div>
+      <div class="impl-phases">
+        <div class="impl-phase"><div class="impl-phase-num">1</div><h4>Scoping</h4><p>Agree plan, timelines, data. Joint kick-off.</p></div>
+        <div class="impl-phase"><div class="impl-phase-num">2</div><h4>Integration Setup</h4><p><strong>Datapay</strong> creates test replica. <strong>ELMO</strong> configures.</p></div>
+        <div class="impl-phase"><div class="impl-phase-num">3</div><h4>Testing</h4><p>End-to-end SIT/UAT. Customer validates.</p></div>
+        <div class="impl-phase"><div class="impl-phase-num">4</div><h4>Go-Live</h4><p>API enabled. 2 weeks post-live support.</p></div>
+      </div>
+      <div style="padding:16px 24px;background:var(--surface);border-top:1px solid var(--border)">
+        <div class="action-cards-grid">
+          <div class="action-card" style="cursor:default"><div class="action-card-icon" style="background:var(--accent-light);color:var(--accent)">🔄</div><div class="action-card-body"><div class="action-card-title">Hand Over to Implementation</div><div class="action-card-desc">Provide customer context, qualification notes, special conditions</div></div><span class="info-tip info-tip-right">i<span class="tip-content"><strong>What:</strong> Clean handover — context, qualification notes, flags, special conditions.<br><br><strong>When:</strong> Within 2 business days of both SOWs signed.<br><br><strong>Your role:</strong> Stay informed. Implementation is led by PS.</span></span></div>
+          <div class="action-card" style="cursor:default"><div class="action-card-icon" style="background:#dbeafe;color:#2563eb">📊</div><div class="action-card-body"><div class="action-card-title">Stay Informed on Progress</div><div class="action-card-desc">Check in with implementation leads at key milestones</div></div><span class="info-tip info-tip-right">i<span class="tip-content"><strong>Milestones:</strong> Scoping done · Test env created · UAT started · Go-live confirmed · Post-live ending<br><br><strong>Issues:</strong> Route to PS lead — don't solve implementation problems.</span></span></div>
+        </div>
+      </div>
+      <div class="stage-gate-wrapper"><div class="stage-gate"><div class="stage-gate-badge"><div class="stage-gate-num">✓</div><div class="stage-gate-label">Gate</div></div><div class="stage-gate-title">Customer Live on API V2</div><div class="stage-gate-outputs"><strong>Outputs:</strong> Integration live · Post-live support completed · Customer self-sufficient</div></div></div>
+    </div>
+  </div>
+
+  </div><!-- /process-timeline -->
+</div>
+
+
+<!-- ═══ TAB 3: PRICING ═══ -->
+<div class="tab-content" id="tab-pricing">
+  <h1 class="page-title">Pricing & Commercials</h1>
+  <p class="page-subtitle">Two contracts, one coordinated commercial outcome.</p>
+
+ 
+<!-- PRICING: cleaner summary version -->
+
+<style>
+  .edp-pricing-summary {
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfd 100%);
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--accent);
+    border-radius: 14px;
+    padding: 28px 32px 24px;
+    margin-bottom: 28px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.04);
+  }
+
+  .edp-pricing-summary__title {
+    margin: 0 0 14px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .edp-pricing-summary__lead {
+    margin: 0 0 22px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .edp-pricing-summary__tiles {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .edp-pricing-summary__tile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 16px 14px;
+  }
+
+  .edp-pricing-summary__label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .edp-pricing-summary__text {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .edp-pricing-summary__close {
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .edp-pricing-summary__close strong {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  @media (max-width: 980px) {
+    .edp-pricing-summary__tiles {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .edp-pricing-summary {
+      padding: 22px 20px;
+    }
+
+    .edp-pricing-summary__title {
+      font-size: 18px;
+    }
+
+    .edp-pricing-summary__lead,
+    .edp-pricing-summary__text,
+    .edp-pricing-summary__close {
+      font-size: 14px;
+    }
+  }
+
+<style>
+.pricing-tile {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.pricing-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+.pricing-detail {
+  display: none;
+  margin-top: 16px;
+  padding: 18px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.pricing-detail.active {
+  display: block;
+}
+
+.pricing-detail h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pricing-detail p {
+  margin: 0 0 10px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+</style>
+
+<div class="edp-pricing-summary">
+
+  <h3 class="edp-pricing-summary__title">How Pricing Reflects Value</h3>
+
+  <p class="edp-pricing-summary__lead">
+    Two platforms. Two pricing models. One coordinated outcome.
+  </p>
+
+  <div class="edp-pricing-summary__tiles">
+
+    <!-- ELMO -->
+  <div class="edp-pricing-summary__tile pricing-tile elmo" onclick="showPricing('elmo')">
+
+
+      <span class="edp-pricing-summary__label">ELMO</span>
+      <p class="edp-pricing-summary__text">Fixed annual HR capability</p>
+    </div>
+
+    <!-- Datapay -->
+   <div class="edp-pricing-summary__tile pricing-tile datapay" onclick="showPricing('datapay')">
+
+
+      <span class="edp-pricing-summary__label">Datapay</span>
+      <p class="edp-pricing-summary__text">Pricing reflects payroll complexity</p>
+    </div>
+
+    <!-- Together -->
+ <div class="edp-pricing-summary__tile pricing-tile together" onclick="showPricing('together')">
+
+      <span class="edp-pricing-summary__label">Together</span>
+      <p class="edp-pricing-summary__text">Commercial structure matched to real work</p>
+    </div>
+
+  </div>
+
+  <!-- DETAILS -->
+
+ <div id="elmo" class="pricing-detail elmo">
+    <h4>Why this matters</h4>
+    <p>This isn’t usage-based or variable — it’s a core capability.</p>
+
+    <h4>What it means</h4>
+    <p>ELMO provides always-on HR governance — visibility, conflict management, and integration monitoring, as a consistent, predictable platform capability.</p>
+
+    <h4>How to position it</h4>
+    <p>“HR doesn’t switch on and off. This gives you continuous visibility and control, not something that changes month to month.”</p>
+  </div>
+
+  <div id="datapay" class="pricing-detail datapay">
+    <h4>Why this matters</h4>
+    <p>Payroll effort scales with employees, data movement, and compliance risk.</p>
+
+    <h4>What it means</h4>
+    <p>Datapay pricing aligns to the operational reality of payroll, where complexity, support, and risk increase with scale.</p>
+
+    <h4>How to position it</h4>
+    <p>“Payroll gets more complex as you grow. This model reflects the real work being done, not a flat structure that breaks at scale.”</p>
+  </div>
+
+  <div id="together" class="pricing-detail together">
+    <h4>Why this matters</h4>
+    <p>Trying to force both into one model creates compromise.</p>
+
+    <h4>What it means</h4>
+    <p>Each platform is priced based on how it delivers value — while working together as one coordinated solution.</p>
+
+    <h4>How to position it</h4>
+    <p>“You’re not paying for a bundled compromise — you’re getting two specialist systems, each priced for the value they deliver.”</p>
+  </div>
+
+  <div class="edp-pricing-summary__close">
+    <strong>ELMO</strong> owns HR. <strong>Datapay</strong> owns payroll. For the customer, it works as one joined-up outcome.
+  </div>
+
+</div>
+
+<script>
+function showPricing(id) {
+  document.querySelectorAll('.pricing-detail').forEach(el => {
+    el.classList.remove('active');
+  });
+
+  document.querySelectorAll('.pricing-tile').forEach(el => {
+    el.classList.remove('active');
+  });
+
+  const panel = document.getElementById(id);
+  panel.classList.add('active');
+
+  const tile = event.currentTarget;
+  tile.classList.add('active');
+}
+</script>
+
+  <!-- ── Pricing Cards ── -->
+  <div class="pricing-side">
+
+    <!-- ELMO Card -->
+    <div class="price-card elmo-price">
+      <h4>ELMO Pricing</h4>
+      <div class="price-sub">Contracted via Order Form</div>
+      <p style="font-size:13px;color:var(--text-secondary);margin:12px 0 16px;line-height:1.5;font-style:italic">ELMO provides the always-on integration platform — two-way sync, conflict management, and monitoring. One annual fee, no surprises.</p>
+      <div class="price-line"><span class="price-label">SaaS (Integration)</span><span class="price-value">Fixed annual fee <span class="gap-tag">TBC</span></span></div>
+      <div class="price-line"><span class="price-label">Professional Services</span><span class="price-value">T&M — est. 10–15 hrs <span class="gap-tag">TBC</span></span></div>
+      <div class="price-line"><span class="price-label">Contract Vehicle</span><span class="price-value">ELMO Order Form</span></div>
+      <div class="price-note">Includes: automated two-way sync, conflict management, integration monitoring, error notifications.</div>
+    </div>
+
+    <!-- Datapay Card -->
+    <div class="price-card datapay-price">
+      <h4>Datapay Pricing</h4>
+      <div class="price-sub">Contracted via SOW</div>
+      <p style="font-size:13px;color:var(--text-secondary);margin:12px 0 16px;line-height:1.5;font-style:italic">Datapay builds a secure test environment, maps the customer's data, and walks them through a live pay cycle — so they have peace of mind that nothing changes adversely when the integration goes live. Here's how that breaks down:</p>
+
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;margin-top:8px">Implementation — Fixed Price</div>
+      <div class="price-line"><span class="price-label">API Test Environment (up to 200) <span class="info-tip info-tip-right">i<span class="tip-content">Enterprise: $3,500. Standard: $2,375.</span></span></span><span class="price-value">$2,375 – $3,500</span></div>
+      <div class="price-line"><span class="price-label">Enable APIs to Test</span><span class="price-value">$190</span></div>
+
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;margin-top:16px">Implementation — T&M</div>
+      <table class="tm-table">
+        <tr><th>Role</th><th>Hours</th><th>Rate</th><th>Est.</th></tr>
+        <tr><td>Enable APIs to Live</td><td>1</td><td>$190</td><td>$190</td></tr>
+        <tr><td>PS Functional Consultant</td><td>10</td><td>$190</td><td>$1,900</td></tr>
+        <tr><td>PS Lead Consultant</td><td>3</td><td>$210</td><td>$630</td></tr>
+        <tr><td>PS Principal Consultant</td><td>2</td><td>$275</td><td>$550</td></tr>
+        <tr><td colspan="3">Total T&M Estimate</td><td>$3,270</td></tr>
+      </table>
+
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;margin-top:16px">Ongoing Monthly</div>
+      <div class="price-line"><span class="price-label">API Usage</span><span class="price-value">$1.00 / emp / month <span class="info-tip info-tip-right">i<span class="tip-content">If already charged for another API, may be $0.</span></span></span></div>
+      <div class="price-line"><span class="price-label">Test Env Hosting</span><span class="price-value">Tiered ↓</span></div>
+      <table class="hosting-tiers">
+        <tr><th>Employees</th><th>Monthly</th></tr>
+        <tr><td>≤ 200</td><td>$100</td></tr>
+        <tr><td>201–500</td><td>$250</td></tr>
+        <tr><td>501–1,000</td><td>$500</td></tr>
+        <tr><td>1,001–2,500</td><td>$1,250</td></tr>
+        <tr><td>2,501–5,000</td><td>$2,500</td></tr>
+      </table>
+      <div class="price-note" style="margin-top:16px"><strong>Notes:</strong> Fixed price invoiced monthly. T&M in arrears. Valid 15 working days.</div>
+    </div>
+  </div>
+
+  <!-- ── Typical Customer ── -->
+  <div class="divider"></div>
+  <div class="section-title">What Does This Look Like in Practice?</div>
+  <div class="card" style="background:var(--accent-light);border:1px solid #99f6e4">
+    <h4 style="color:var(--accent-dark)">📊 A typical ~200-employee organisation</h4>
+    <p style="font-size:14px;color:var(--text-secondary);margin:12px 0 16px;line-height:1.6">Expect roughly <strong style="color:var(--text)">~$5,835 upfront</strong> across test environment setup, API enablement, and implementation consulting — then <strong style="color:var(--text)">~$300/month ongoing</strong> for API usage and hosting. ELMO SaaS and PS costs sit separately on their order form.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;font-size:14px;padding-top:12px;border-top:1px solid #99f6e4">
+      <div>
+        <strong>Datapay Upfront</strong>
+        <div style="color:var(--text-secondary);font-size:13px;margin-top:4px">
+          Test Env: $2,375<br>
+          Enable APIs: $190<br>
+          T&M: $3,270<br>
+          <strong style="color:var(--text)">Total: ~$5,835</strong>
+        </div>
+      </div>
+      <div>
+        <strong>Datapay Ongoing</strong>
+        <div style="color:var(--text-secondary);font-size:13px;margin-top:4px">
+          API: $200/mo<br>
+          Hosting: $100/mo<br>
+          <strong style="color:var(--text)">Total: ~$300/month</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ TAB 4: TOOLKIT ═══ -->
+<div class="tab-content" id="tab-toolkit">
+  <h1 class="page-title">Toolkit</h1>
+  <p class="page-subtitle">Everything you need in one place.</p>
+  <div class="toolkit-group"><div class="toolkit-group-title">Customer-Facing</div><div class="tool-card"><div class="tool-icon deck">📊</div><div class="tool-body"><h4>Joint Pitch Deck <span class="gap-tag">Finalising</span></h4><p>Co-branded slide deck — value story, pain points, integration walkthrough, timeline, support.</p><div class="tool-audience">Step 3 — Opportunity Validation</div></div></div><div class="tool-card"><div class="tool-icon handbook">📘</div><div class="tool-body"><h4>Customer 101 Handbook</h4><p>Technical guide: features, data mapping, sync, models, troubleshooting, FAQs.</p><div class="tool-audience">Step 3 — Customer Due Diligence</div></div></div><div class="tool-card"><div class="tool-icon demo">🎬</div><div class="tool-body"><h4>Demo Recording <span class="gap-tag">Gap</span></h4><p>Recorded walkthrough of the API V2 integration.</p><div class="tool-audience">Step 3 — Opportunity Validation</div></div></div></div>
+  <div class="toolkit-group"><div class="toolkit-group-title">Internal / Seller</div><a href="https://leighrobinsonnz.github.io/sales-motion-app/" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;color:inherit;cursor:pointer"><div class="tool-icon qual">🔍</div><div class="tool-body"><h4>Seller Qualification Tool <span style="font-size:12px;color:var(--accent);font-weight:400">↗</span></h4><p>2–3 min. Returns Qualified / Caution / Disqualify.</p><div class="tool-audience">Step 2 — Lead Qualification</div></div></a><a href="https://datacomunity.sharepoint.com/:b:/s/SaaSProductsGTMC/IQCO8LRr4u4kTYtbQkMIbnu_AUQr3FUEjHSr8lzFcEp1O5c?e=KzyXYu" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;color:inherit;cursor:pointer"><div class="tool-icon sow">📄</div><div class="tool-body"><h4>Datapay SOW Template <span style="font-size:12px;color:var(--accent);font-weight:400">↗</span></h4><p>Standardised API attachment SOW.</p><div class="tool-audience">Step 4 — Solution Proposal</div></div></a><a href="https://datacomunity.sharepoint.com/:b:/s/SaaSProductsGTMC/IQCokLDfbeQORIlpByg9hqzMAYc-8UFJWzr8pY6bLM1x4a4?e=Ql2pkM" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;color:inherit;cursor:pointer"><div class="tool-icon playbook">📕</div><div class="tool-body"><h4>GTM Handbook <span style="font-size:12px;color:var(--accent);font-weight:400">↗</span></h4><p>Master playbook. CVP, ICP, pricing, Portal, process, escalation.</p><div class="tool-audience">Ongoing reference</div></div></a></div>
+  <div class="toolkit-group"><div class="toolkit-group-title">Partner Portal</div><a href="https://datacom--dev.sandbox.my.site.com/SaaSPartner" target="_blank" rel="noopener" class="tool-card" style="text-decoration:none;color:inherit;cursor:pointer"><div class="tool-icon portal">📋</div><div class="tool-body"><h4>Partner Portal <span style="font-size:12px;color:var(--accent);font-weight:400">↗</span></h4><p>Joint Salesforce instance for all API V2 opportunities.</p><div class="tool-audience">Every step — log before pitching</div></div></a><div class="expandable-header" onclick="toggleExpandable(this)"><div class="exp-icon">📖</div><div class="exp-body"><h4>How to Use the Partner Portal</h4><p>Creating opportunities, naming, pricing, stages</p></div><span class="exp-chevron">▾</span></div><div class="expandable-body"><h4 style="margin-bottom:16px">Creating an Opportunity</h4><p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px"><strong>Search first</strong> to check if one exists.</p><div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px">Stage 1: Create Record</div><div style="display:grid;grid-template-columns:140px 1fr;gap:6px 16px;font-size:13px;margin-bottom:20px"><span style="color:var(--text-light)">Opportunity name</span><span>Datapay – ELMO Mutual Customer – [employees] – API V2 Attached – Expansion Revenue $[figure]</span><span style="color:var(--text-light)">Account name</span><span>As in CRM</span><span style="color:var(--text-light)">Close date</span><span>Expected delivery date</span><span style="color:var(--text-light)">Payee headcount</span><span>Employees to be paid</span><span style="color:var(--text-light)">Lead source</span><span>Who identified the opportunity</span><span style="color:var(--text-light)">Delivery region</span><span>Must be NZ</span><span style="color:var(--text-light)">Description</span><span>Qualifying info</span></div><div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px">Stage 2: Add Partner Services</div><ul style="font-size:13px;color:var(--text-secondary);padding-left:20px;margin-bottom:20px"><li>Partner Deal → Datapay or Easipay (Managed)</li><li>Datapay and ELMO mutual agreement</li><li>Add Implementation costs</li><li>1 pay group (PEPM)</li><li>Datapay SaaS: $1/employee/month</li><li>ELMO SaaS: fixed annual rate</li></ul><div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px">Stages</div><div style="display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:13px"><span style="background:var(--accent);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">1</span><span>Prospecting</span><span style="background:var(--accent);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">2</span><span>Qualification in Progress</span><span style="background:var(--accent);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">3</span><span>Qualified</span><span style="background:var(--accent);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">4</span><span>Proposal Preparation</span><span style="background:var(--accent);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">5</span><span>Proposal Submitted</span><span style="background:var(--accent);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">6</span><span>Contract Negotiation</span><span style="background:var(--success);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">✓</span><span>Closed Won</span></div></div></div>
+</div>
+
+
+<!-- ═══ TAB 5: WHERE TO GET HELP ═══ -->
+<div class="tab-content" id="tab-contacts">
+  <h1 class="page-title">Where to Get Help</h1>
+  <p class="page-subtitle">Clear routing. Know exactly where to go.</p>
+  <div class="section-title">Question Routing</div>
+  <div class="help-card"><h4>🔧 Product Fit / Technical</h4><p>Edge cases, eligibility uncertainty, Qualification Tool gaps.</p><div class="help-routing"><strong>Datapay:</strong> Krishan Sharma — krishan.sharma@datacom.com</div><div class="help-routing"><strong>ELMO:</strong> Anupam Kaushal — anupam.kaushal@elmosoftware.com.au</div></div>
+  <div class="help-card"><h4>⚙️ Implementation / PS</h4><p>SOW scope, timelines, testing, post-go-live support.</p><div class="help-routing"><strong>Datapay PS:</strong> Via SOW request (through Datapay AM)</div><div class="help-routing"><strong>ELMO PS:</strong> Morgan (Head of Professional Services)</div></div>
+  <div class="help-card"><h4>🤝 Partnership / GTM</h4><p>Process friction, assets, things that need to change.</p><div class="help-routing"><strong>Datapay:</strong> Eli Nana (GTM Manager)</div><div class="help-routing"><strong>ELMO:</strong> Jay Zeman (Head of Strategic Payroll Partnerships)</div></div>
+  <div class="help-card"><h4>📈 Deal Velocity</h4><p>Slow deals, need help from the other side, pricing delays.</p><div class="help-routing">Speak to counterpart AM first. If stuck:</div><div class="help-routing"><strong>ELMO:</strong> Rochelle Coad — rochelle.coad@elmosoftware.com.au</div><div class="help-routing"><strong>Datapay:</strong> Adnan Siamwala — adnan.siamwala@datacom.com</div></div>
+  <div class="divider"></div>
+  <div class="section-title">Team Directory</div>
+  <div class="contact-grid">
+    <div class="contact-card datapay-contacts"><h4>Datapay</h4><div class="contact-entry"><div class="contact-name">Adnan Siamwala</div><div class="contact-role">Account Director</div><div class="contact-email">adnan.siamwala@datacom.com</div></div><div class="contact-entry"><div class="contact-name">Eli Nana</div><div class="contact-role">GTM Manager</div></div><div class="contact-entry"><div class="contact-name">Jacinda Rennie</div><div class="contact-role">ARM</div><div class="contact-email">jacinda.rennie@datacom.com</div></div><div class="contact-entry"><div class="contact-name">Michelle Peterson</div><div class="contact-role">ARM</div><div class="contact-email">michelle.peterson@datacom.com</div></div><div class="contact-entry"><div class="contact-name">Pratishma Payal</div><div class="contact-role">ARM</div><div class="contact-email">pratishma.payal@datacom.com</div></div><div class="contact-entry"><div class="contact-name">Krishan Sharma</div><div class="contact-role">Product Manager</div><div class="contact-email">krishan.sharma@datacom.com</div></div></div>
+    <div class="contact-card elmo-contacts"><h4>ELMO</h4><div class="contact-entry"><div class="contact-name">Rochelle Coad</div><div class="contact-role">Head of AM</div><div class="contact-email">rochelle.coad@elmosoftware.com.au</div></div><div class="contact-entry"><div class="contact-name">Junior Falelima</div><div class="contact-role">Regional Director (AM)</div><div class="contact-email">junior.falelima@elmosoftware.com.au</div></div><div class="contact-entry"><div class="contact-name">Jay Zeman</div><div class="contact-role">Head of Strategic Payroll Partnerships</div></div><div class="contact-entry"><div class="contact-name">Amity Reece</div><div class="contact-role">Payroll Strategy Manager</div><div class="contact-email">amity.reece@elmosoftware.com.au</div></div><div class="contact-entry"><div class="contact-name">Barry Campbell</div><div class="contact-role">Payroll Solution Architect</div></div><div class="contact-entry"><div class="contact-name">Matt Reyes</div><div class="contact-role">Integration Lead</div></div><div class="contact-entry"><div class="contact-name">Bree Roberts</div><div class="contact-role">Solutions Director</div></div><div class="contact-entry"><div class="contact-name">Allan Kent</div><div class="contact-role">AM (NZ)</div><div class="contact-email">allan.kent@elmosoftware.co.nz</div></div><div class="contact-entry"><div class="contact-name">Sahil Mehta</div><div class="contact-role">AM (NZ)</div><div class="contact-email">sahil.mehta@elmosoftware.co.nz</div></div><div class="contact-entry"><div class="contact-name">Morgan</div><div class="contact-role">Head of Professional Services</div></div><div class="contact-entry"><div class="contact-name">Walter White</div><div class="contact-role">Solutions Consultant</div></div></div>
+  </div>
+  <div class="card" style="background:var(--surface)"><h4>📂 Full Directory</h4><p style="font-size:14px;color:var(--text-secondary)">Available in the shared <strong>Datapay + ELMO Directory.xlsx</strong>.</p></div>
+</div>
+
+</main>
+
+<!-- Floating Step Navigator -->
+<div class="step-nav" id="stepNav">
+  <a onclick="scrollToStep(1)" id="step-nav-1" class="active"><span class="step-nav-dot">1</span><span class="step-nav-label">Target</span></a>
+  <a onclick="scrollToStep(2)" id="step-nav-2"><span class="step-nav-dot">2</span><span class="step-nav-label">Qualify</span></a>
+  <a onclick="scrollToStep(3)" id="step-nav-3"><span class="step-nav-dot">3</span><span class="step-nav-label">Validate</span></a>
+  <a onclick="scrollToStep(4)" id="step-nav-4"><span class="step-nav-dot">4</span><span class="step-nav-label">Propose</span></a>
+  <a onclick="scrollToStep(5)" id="step-nav-5"><span class="step-nav-dot">5</span><span class="step-nav-label">Close</span></a>
+  <a onclick="scrollToStep(6)" id="step-nav-6"><span class="step-nav-dot" style="font-size:10px">✓</span><span class="step-nav-label">Implement</span></a>
+</div>
+
+<!-- ═══ CONVERSATION STARTER MODAL ═══ -->
+<div class="modal-overlay" id="conversation-starter-modal" onclick="if(event.target===this)closeModal('conversation-starter-modal')">
+  <div class="modal-box wide"><div class="modal-header"><div><h3>Start the Conversation</h3><div class="modal-sub">Casual opener for health checks — not a pitch</div></div><div class="modal-close" onclick="closeModal('conversation-starter-modal')">✕</div></div>
+    <div class="modal-body">
+      <div class="modal-section"><div class="modal-label" style="color:var(--accent)">When to use this</div><p>During routine health checks, QBRs, or catch-ups with customers using both ELMO and Datapay. Gauge interest — don't sell. If curious, move to Step 2.</p></div>
+      <div class="modal-section"><div class="modal-label" style="color:var(--elmo-purple)">What to say</div><blockquote>"We've been working on a partnership between ELMO and Datapay to connect HR and payroll more tightly. Instead of managing data in two systems separately, there's now a way to sync employee records automatically — new hires and pay changes — all in real time. It's early days, but for the right customers it can save a lot of double-handling. Would it be worth a 20-minute look at how it works?"</blockquote></div>
+      <div class="modal-section"><div class="modal-label" style="color:var(--warning)">What to listen for</div><ul style="font-size:13px;color:var(--text-secondary);padding-left:20px;line-height:1.8"><li><em>"We've been talking about that internally"</em></li><li><em>"Who would I need to involve?"</em></li><li><em>"What data does it sync?"</em></li><li><em>"We've had issues with duplicate entry"</em></li><li><em>"How long would it take?"</em></li></ul></div>
+      <div class="modal-section"><div class="modal-label" style="color:var(--danger)">What not to do</div><ul style="font-size:13px;color:var(--text-secondary);padding-left:20px;line-height:1.8"><li><strong>Don't pitch pricing or scope.</strong></li><li><strong>Don't demo or go technical.</strong></li><li><strong>Don't commit to timelines.</strong></li><li><strong>Don't oversell.</strong> Not interested? Revisit next quarter.</li></ul></div>
+      <div class="modal-section"><div class="modal-label" style="color:var(--success)">If they're interested</div><ol style="font-size:13px;color:var(--text-secondary);padding-left:20px;line-height:1.8;margin-top:6px"><li>Log in <strong>Partner Portal</strong></li><li>Run <strong>Qualification Tool</strong> (Step 2)</li><li>Only then schedule validation call (Step 3)</li></ol></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OBJECTIONS HUB MODAL ═══ -->
+<div class="modal-overlay" id="objections-hub" onclick="if(event.target===this)closeModal('objections-hub')">
+  <div class="modal-box wide"><div class="modal-header"><div><h3>Handle Customer Objections</h3><div class="modal-sub">4 pushbacks · Click <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--warning);color:#fff;font-size:9px;font-weight:700;vertical-align:middle">i</span> for detail</div></div><div class="modal-close" onclick="closeModal('objections-hub')">✕</div></div>
+    <div class="modal-body" style="padding:20px">
+      <div class="obj-hub-card"><div class="obj-hub-top"><div class="obj-hub-icon">💬</div><div class="obj-hub-content"><div class="obj-hub-q">"CSV works fine — why pay more?"</div><div class="obj-hub-a">Acknowledge it works. API V2 removes the human effort around CSV.</div></div><button class="obj-hub-toggle" onclick="toggleObjDetail(this)">i</button></div><div class="obj-hub-detail"><div class="obj-detail-section"><div class="obj-detail-label why">Why</div><div class="obj-detail-text">Working CSV — often years old. Real cost hidden: reconciliation, errors, key-person risk.</div></div><div class="obj-detail-section"><div class="obj-detail-label how">Approach</div><div class="obj-detail-text">Don't dismiss CSV. Shift to what's changed. <strong>No pain? Say "not yet."</strong></div></div><div class="obj-detail-section"><div class="obj-detail-label say">Say</div><div class="obj-detail-text"><blockquote>"CSV has been solid. API V2 is for when volume, compliance, or double-handling creates real cost. If that's not you yet, we'd rather wait."</blockquote></div></div></div></div>
+      <div class="obj-hub-card"><div class="obj-hub-top"><div class="obj-hub-icon">💬</div><div class="obj-hub-content"><div class="obj-hub-q">"API doesn't cover everything CSV does."</div><div class="obj-hub-a">Be honest. If gaps create more work than API saves, don't push.</div></div><button class="obj-hub-toggle" onclick="toggleObjDetail(this)">i</button></div><div class="obj-hub-detail"><div class="obj-detail-section"><div class="obj-detail-label why">Why</div><div class="obj-detail-text">~60% coverage vs CSV. Informed buyers spot gaps — good sign.</div></div><div class="obj-detail-section"><div class="obj-detail-label how">Approach</div><div class="obj-detail-text">Find where covered fields = bulk of pain. <strong>Don't force a square peg.</strong></div></div><div class="obj-detail-section"><div class="obj-detail-label say">Say</div><div class="obj-detail-text"><blockquote>"API covers the core lifecycle. For some, that's 90% of value. For others, gaps matter more. We'd rather be upfront."</blockquote></div></div></div></div>
+      <div class="obj-hub-card"><div class="obj-hub-top"><div class="obj-hub-icon">💬</div><div class="obj-hub-content"><div class="obj-hub-q">"We're too busy for another project."</div><div class="obj-hub-a">4–6 weeks. Live payroll never touched.</div></div><button class="obj-hub-toggle" onclick="toggleObjDetail(this)">i</button></div><div class="obj-hub-detail"><div class="obj-detail-section"><div class="obj-detail-label why">Why</div><div class="obj-detail-text">Perceived effort, not actual. "Integration project" = disruption in their mind.</div></div><div class="obj-detail-section"><div class="obj-detail-label how">Approach</div><div class="obj-detail-text">Pay runs <strong>unaffected</strong>. Replica test env. Customer = validation only. 2 weeks post-live support.</div></div><div class="obj-detail-section"><div class="obj-detail-label say">Say</div><div class="obj-detail-text"><blockquote>"4–6 weeks. Live environment never touched. Heavy lifting is on our side."</blockquote></div></div></div></div>
+      <div class="obj-hub-card"><div class="obj-hub-top"><div class="obj-hub-icon">💬</div><div class="obj-hub-content"><div class="obj-hub-q">"Why two contracts / two vendors?"</div><div class="obj-hub-a">Specialist accountability. Coordinated behind the scenes.</div></div><button class="obj-hub-toggle" onclick="toggleObjDetail(this)">i</button></div><div class="obj-hub-detail"><div class="obj-detail-section"><div class="obj-detail-label why">Why</div><div class="obj-detail-text">Two vendors = complexity fear. Managing a boundary.</div></div><div class="obj-detail-section"><div class="obj-detail-label how">Approach</div><div class="obj-detail-text">Complexity <strong>behind the scenes</strong>. "All-in-one" = shallow NZ payroll.</div></div><div class="obj-detail-section"><div class="obj-detail-label say">Say</div><div class="obj-detail-text"><blockquote>"Two specialists, not one generalist. We coordinate so you don't manage the boundary."</blockquote></div></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ JOINT PROPOSAL CALL MODAL ═══ -->
+<div class="modal-overlay" id="proposal-call-modal" onclick="if(event.target===this)closeModal('proposal-call-modal')">
+  <div class="modal-box wide"><div class="modal-header"><div><h3>Run the Joint Proposal Call</h3><div class="modal-sub">Both AMs · One coordinated conversation</div></div><div class="modal-close" onclick="closeModal('proposal-call-modal')">✕</div></div>
+    <div class="modal-body">
+      <div class="modal-section"><div class="modal-label" style="color:var(--accent)">What</div><p>Single call. Both AMs present together. One proposal, not two pitches.</p></div>
+      <div class="modal-section"><div class="modal-label" style="color:var(--warning)">Before</div><ul style="font-size:13px;color:var(--text-secondary);padding-left:20px;line-height:1.8"><li>Confirm both pricing docs ready</li><li>Agree who leads each section</li><li>Review customer flags</li><li>Agree cross-pricing handling</li><li>Confirm attendees</li></ul></div>
+      <div class="modal-section"><div class="modal-label" style="color:var(--elmo-purple)">Structure</div><div style="display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-size:13px;margin-top:8px"><span style="background:var(--accent);color:#fff;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;height:fit-content">1</span><div><strong>Confirm scope & data</strong></div><span style="background:var(--accent);color:#fff;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;height:fit-content">2</span><div><strong>Present ELMO pricing</strong></div><span style="background:var(--accent);color:#fff;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;height:fit-content">3</span><div><strong>Present Datapay SOW</strong></div><span style="background:var(--accent);color:#fff;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;height:fit-content">4</span><div><strong>Q&A → next steps</strong></div></div></div>
+      <div class="modal-section"><div class="modal-label" style="color:var(--danger)">Rules</div><ul style="font-size:13px;color:var(--text-secondary);padding-left:20px;line-height:1.8"><li><strong>Don't negotiate for the other side.</strong></li><li><strong>Present as one team.</strong></li><li><strong>After:</strong> Independent negotiation. Update Portal.</li></ul></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PARTNER PORTAL MODAL ═══ -->
+<div class="modal-overlay" id="partner-portal-modal" onclick="if(event.target===this)closeModal('partner-portal-modal')">
+  <div class="modal-box wide" style="width:780px">
+    <div class="modal-header">
+      <div>
+        <h3>Logging & Tracking Deals — Partner Portal</h3>
+        <div class="modal-sub">The single source of truth for all API V2 opportunities</div>
+      </div>
+      <div class="modal-close" onclick="closeModal('partner-portal-modal')">✕</div>
+    </div>
+    <div class="modal-body">
+
+      <div class="modal-section">
+        <p>The Partner Portal is the single source of truth for all Datapay × ELMO API V2 opportunities. Customer conversations, stage changes, and outcomes are logged here so both teams have shared visibility and can coordinate effectively.</p>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-label" style="color:var(--accent)">When to Create an Opportunity</div>
+        <p>Create an opportunity in the Partner Portal as soon as you identify a potential mutual customer, or when a customer expresses interest.</p>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-label" style="color:var(--warning)">How to Create an Opportunity</div>
+        <p>Before creating a new opportunity, <strong>search the Partner Portal</strong> to check whether one already exists for the same account.</p>
+        <p style="margin-top:8px">If an opportunity already exists, <strong>do not create a duplicate.</strong> Contact the AM who logged it and align on next steps.</p>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-label" style="color:var(--elmo-purple)">Stage 1: Create Record</div>
+        <div style="display:grid;grid-template-columns:160px 1fr;gap:8px 16px;font-size:13px;margin-top:8px">
+          <span style="font-weight:600;color:var(--text)">Opportunity name</span>
+          <span style="color:var(--text-secondary)">Datapay – ELMO Mutual Customer – [insert number of employees] – Service (API V2 Attached) – Expansion Revenue $[insert figure]</span>
+          <span style="font-weight:600;color:var(--text)">Account name</span>
+          <span style="color:var(--text-secondary)">Add name as it appears in CRM</span>
+          <span style="font-weight:600;color:var(--text)">Close date</span>
+          <span style="color:var(--text-secondary)">Expected date when the customer wants the API V2 delivered</span>
+          <span style="font-weight:600;color:var(--text)">Payee headcount</span>
+          <span style="color:var(--text-secondary)">Expected number of employees that will be paid</span>
+          <span style="font-weight:600;color:var(--text)">Lead source</span>
+          <span style="color:var(--text-secondary)">Organisation that identified the opportunity</span>
+          <span style="font-weight:600;color:var(--text)">Delivery region</span>
+          <span style="color:var(--text-secondary)">Must be NZ for API V2</span>
+          <span style="font-weight:600;color:var(--text)">Description</span>
+          <span style="color:var(--text-secondary)">Any qualifying information captured</span>
+        </div>
+      </div>
+
+      <div class="modal-section" style="text-align:center">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABCYAAAFUCAYAAAD4eT1SAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAMHXSURBVHhe7P1nkBzpned5fl2EVhmRWiKhdRUKpSWrWKwiu9lNNrt7dvrmZmZvd2Zvze7MZu20nS47u311Zmu7N7c2Nzt7uz3dze7hTJNN0SSLpXUVtEwkUmsRGVpHuHruRSRQQJYCyAJQQP0/ZmlAuHtEeHhE+PPEzx+hKaUUQgghhBBCCCGEEHeAvnWBEEIIIYQQQgghxO0iwYQQQgghhBBCCCHuGAkmhBBCCCGEEEIIccdonzbGxP/5//bfbF0khBD3jFAoQCqZ2LpY3AHFcpVatb51sRBCCCGEuMf9l/+P/+Lq/z81mNi+98Wti4QQ4p7RkYgyPNS/dbG4A9Y3smQyha2LhRBCCCHEPW5u4pWr///UYGLb7m9tXSSEEPeMjkSM4WEJJr4K1tNZMpn81sVCCCGEEOIetzD12tX/yxgTQgghhBBCCCGEuGMkmBBCCCGEEEIIIcQdI8GEEEIIIYQQQggh7hgJJoQQQgghhBBCCHHHSDAhhBBCCCGEEEKIO0aCCSGEEEIIIYQQQtwxEkwIIYQQQgghhBDijpFgQtwWmq4TCPkxDQ0AIxgk5De3bvaVp5tBevp66UmG0dsv5Y4wfSYjI0P0RIJbV91BGsFgiMBd+L7eDNMfpKs7RSzs37rqS6frJh2pJMlEGP0Onq11n5++gR6SkXv7vRVCCCGEEHfGHazqiq+TeFcnT3/rKUb6OwDof+6bfPfwCHfTzxxfqpfv/U//Af+n/+1/xv/lf/+f8odP79q6yW8tdfgh/ujIbnxbV3yGQCTCM88/xeFt/Rx8+gmeGui541/mQDjJi3/0p/zgqYPEtq78koV7ennyqcfYHr69wUwo1s8P/uH3+Wf/8R/zj//BCxze3ol5kwFVcNdenj40Smjrii00f5jHvv0d/vn/7I/5T//Jd/nG0R0EzS/jXdZJdQ7z0AOjdES2rvt0ZjTOg08cZXdXiO6enTz+0BD3eP4khBBCCCFuI+Oll156aevC//pf/sXWRUL8ThLdvTz59IPUNlbJlhqMfvs7PGlnGS9oPP6NZ/jOs0cY7Q2TSZfYeeARvvXcQzz54CFGh7u4//FHeXT/AK1SHifWz4vf+QbPP3mQqNlibb2Aq7Y+25fPCEZ58QffZb9Z5L/7Vz/kw3mL3/vB8/hbeXp2H+Sppx/hmQf34bfLFIwwDz79KC888zAPHdmNW1ih6oY5+sgTfPfFh7l/Ty+5lTTx/gN8+7tP8MiRvRz9xjf4waEBShbEEt30dSsKeY37H3uEuLZBx74H+fZzj/DUo0cYilpMLuSpmibhYIjn/uQPeKY/hRHT6RzZgVkrYnf08fiBPsrZIs3bcYCAgZ2H+U/+2XMkYwarC3OkqxqPfeMbfPeFR9k3FKVcbNC5bTffffFZHjsygler4AZSPPXU03znWw8wmPRTzFns3LWDiL9JsZLihed3YbsW+59+mhefPsojD+zGLqwz+NBT/OPvP8dgwGG5WKRUaW7dnc8VDAZIJG4yPtEjfPfPfp/Exln+zb9/l6zjoyNq4sZ7ePC+3RzaO4Lm6ux54H4efWAXXWGPTMHi4MMP8dTDexhK+qg2XY5850W+c6CfRqOGHovz0IMP8uDhIQyrRaFUw9t8um0Pfovv7VX8xb/9O86tt3j2+SPUFgt07d7Hgwd3cf/hHXSYLtkiHHzwPh44sIv779tOFJt8xWHv/ffz9GP3sXMwSrNWI9zVz0P37eeBo/vZNbKdRx/bSdhwUUQYHe5gPVth245h4tEoie5hHjq8l6MP7qM/bpDJlbFcRTnncPSZZ3n28X5cL8BQXzeqUsYKxdm3bxinkKfhbjluX6Baq1OvN7YuFkIIIYQQ97j/1b/4p1f//2VcfhPiC2maRiKZ4oknH+YPfv9ZnhzpwvQHOPr4Azy4P8rZ8SV2f+s7vHBoN489/jT7Bz0WSj7+7M+eJ1BaotU5yreeeJI//OZzPL09TrkW5A//5LscGbw9l22DQZPRDoeLs4uslBusLk5yet1h/8GH+YPvPMVgK8fUhsb3/vQ5Dj2wnedfeBTSayxXu/inf/oMD9+/m28/v4fF+UWsHQ/xp88e4b59D/LMkRRzly9xea1AJZNjYbHM0LbDPPXgMCF/gqef/w7374xy8InHeajHz/yGzQvf+za7olH2P/04uxNBiuUa2cVVFtZK7Dz6EM89dZBHH3ucB3f14N3k1fzfmmay86Gj1KYnKLXC7Ns+RM/B+/nT3z/E/NQUdrCbPYcP8h/92bOo4iyXsrD30E6e+dajPHwgzPFzC+z65nd44cEjPPnQQxzY2YGuD/OD7z/Ozj29PP3iE5iFHKWOHXz/ufup5wvkChVW5tdvOpT4rSW76I7B2KlZWs0GMxfOc/z0NJHdh3jx/iGmxpboGd3HI7u7sVp+nnnhGxwaSDHYn8RRfh588mF6OiNslGpUSyXyVY/7nniIoU6NghPjW999iv74xy1Adu3rZHJshnTFZmMtzWzNx4jRwdFHH2dnV5O1ksV9TzxAX6qXR556jJGOOmtlj8OP3M+eh47wwtO7WVlYQO/axWP372H//t1848F+pi5NsZStUC4XSW9s4O8d5MlH92H4fOw5sItdO3ew6+CDPH4gwPLiOtsP3ce+/f0cevR+dvs08tkqlWqRtXSZ7p17efj+YUZ37eOJQ0O4V1IVIYQQQgghboIEE+I2UbiuR7Vcp1AoU3VdTMNPdyTA6tIMJ4+f4N20w30dCZxmhksTZ3nrlXnW1xb54PR5zi3lCMb7GO2KYdsN6rUiMwtZvrA9/JfE8xQtVycS8uM3wO+LkAgYNGyLRjbNhfOXOPbOGRrBDlIpk/LiGmNnL/HWa+OERwfZ1helVlrm1MlT/PrCMnv7+gnbFWZmxzh9cYrZ9SLljQ3mF9M0Wg6goZs6pq+dLNjFMjOnx3jnzDh5PUzv5n7VqzWypQqZpRUmppYZOz1J/8FHeHZviLGLc1RbN3n5+rfkSw3y4pPb0QjQ1d3N/n3bOLijBze3yGvvneXlV95iYa1Fn6/AG8cvcezNN3jzo2XifoOZ2SnOnzrJR6tN9qSStEdu0DCCxuY4Hh6lpXUuHjvHryYW6UuksLI5NrJFluZXKJZv09V228V1IRgJoqERTyQY6k0RMCF7dorJjRIqFMWntWjUSiysliHh0rItTN0lEPChlMd6oUK1UKBUrJEK+qi2FHYtz8pGDf81p+RGyyUcaY/L4vP5CZtQUx6ObTEzM8658VkqnkHIH8CzG0xMjnP+8hwVpbN9sBdVWufE+Vkuz+fwR0NEA4rlpUUuTi6xvlGmWCyytp6lbDkA6JqGpl15fp3l+TNcuLxGPt8iGNsMAO0WuUyZcrnAytIsZ8YWGNi+nf0Hd7I2MUHZvj2tc4QQQgghxL1Fgglx21RKBU6cPMNrb3zI8aU8jmOxVqwzOHqAF7/9PM/26pzO5lEouNqg/RqNMsurOfzROLF4ENWqkk7fnh9CrUaTMxM5dh86zPd/70m+90ffYZde4OzcKkZPP48+8Qgv/v4T+CsZMjmHxOgIjz3zKN//oyMUJ+eYWS4TjI/w3PPP8qdHh7m4uETlmtfplVrE9+/k8af2EYo4dA4f4FsvPsLenZvdDRQot/3vdVwPq+ox8Mghnn1iB7PT01S0CF1anem10m3p5gIaO448SDh9gb/95bv88s0TeMkuDKuB1jnKH3/3ab7/B88y1G2wWI3zB998jG9/5wWefXCAfNVi1+5DPPet53iy38eF1UWKmsHuAw/yve8fJh68vkWMg0IDVMvDH0vy4DePMDqYRLsdLUMqWS5NZzn83FM8/dhRXnj+cQ7t7MVnaOCAsluU8zksI0Q0EUazK9TcPg7tGiEZCuHzh+nvjqNZHh0jI+zaM0i1bhOPBgj5gri1PFnLuvp00+cmSe4+yDefPsqzTx+l1y0wU69h+AIcOHiUJx86QELZVJstjECUw/c9wJNH9xFTNtNzy7ixAZ578j7u391Fo1zh44YlHq7XIhzv58jhg2gtGzPWxTMPH2L39iECm6WC4ppQ6+rxVbiqSaJzO/ft3UljY4200cPuZIOLM5lPfDyFEEIIIYS4ETLGhLgtXNuhmM2zurJBo+VglcuszS0yvpCm2tDoiOjMnj3D+xdmyBQKLC2nyRWr5HJpZhezVEpV0iuLnJ+eZ63lEcBh9vI0M8s57E/JML5synPJbeQoNByinR1YuSWOfXia6ZqPB3YMUc+XKVezvP/uSVa8KAdG+nFKRbL5Zd584yQTi3kyeYt4LEBlYZI3PrzIWqHI6mqa9EaDVr5MK2BgV9cZm1qg3PLhV0XOn73I+YvzrK0XWV1bJ1Msk0+nmVtaYyNfYHVxlaXlNMQC1AtpltIWvb191Dem+PDcPNbtSSYwdMXs+XOcHJtnYXmddKbMytQsc2s1YtEQ5cwKly7NMTGzQSAUx+eVGb88y+XpVcpVjVTCZPr0aT68MMlyroIRCOLVV/noxCXGJ1ZZW8mwurpBpVQmu7LK7FKGWquF0pusLKcpVT/+QX8jfqsxJnDIZbI0bYhEg+Q30kxMLbGxkSe9sUGmWqVaLVNouBiuzfrSKrNz61QbLUqVMvNLG1TyGVbnMygF1XKW8Ykl6k0NkzpzcyukcxW8zbesUSyQqzmEAgGcZpHzZy6zlLE58MBB9Oo0G/kWU2OTLK5ZHHpoN63cHPlik6mxSaZnVsgWW0QiQcrpeS6OL7KaLbORzpEv1bHtJi1Pw2pZrMwskanahAIGq3OLTM4skt5YJ72eJVeyqFYrpNezbKzmWNvIk29WaSoDp14nt1EmObQPY/UY749lPy1O/EIyxoQQQgghxNfTtWNMaEqpT/xy2bb7W1sXCfE70zSNqx83TUNDoRTouoFhaHiui+spNE2Dq+s0PE9tbg9KKXTDwNQ13M3tbydN1zFNAzwXx/UIbD/IP/vmfVx87Q0+WsliOS4d9x/hTx7dx5lfvsb59QKO46Ku3NfQUZ6H43rXvU7Q2o+rPFyv/Rp1TeF5Cs/1QNNAtduS6LqG2jwmKIXS2veNhAf5z/6Xf0qouc6v/+7vOTVXum1XsK9/LZu322/gda8ZTcM0DDQUjuteff9N45r3c/P1aErheh6eUmhsfnY0DR3wNj8Hhk77+N7kC+1IxBge7t+6+Ibouo6u6yjv4/3VNt8bNt9nQ9fwPA/PU+iGTvvTy+b7C4ahAx6e195e18DdPB7X0jStve3msVCqgx/80z+ieO4veXcMPNfFU938o3/+ArPv/4iTU1eWgabpGIaGUh6ue+U79PF7pG++D57rweY+K0/hKY/NI077kGuozSVXP4OGQWffIE88fIB9ozF+/Oc/Z7rYun7nb9B6Oksmk9+6WAghhBBC3OMWpl67+n8JJoT4XRgm0YAfq9W42jpB8/kI+U2sRhPnNgYnmuYn1RnDsxqUK/Xb1I3j7vS7BBN3lkYwHMKz61j2lWU64XAQx6qzOVzEbaEbJpFICEPZlCrN3zoEk2BCCCGEEOLr6dpgQsaYEOJ34TpU6/Xrukwo26Zea9zWUAJAKYtcNkehLKHEvUvRrF8bSgB41Ou3N5QA8FyHSrlC8XcIJYQQQgghhECCCSGEEEIIIYQQQtxJEkwIIYQQQgghhBDijpFgQgghhBBCCCGEEHeMBBNCCCGEEEIIIYS4YySYEEIIIYQQQgghxB0jwYQQQgghhBBCCCHuGE0p9YmZ3v7sH/9vUErJFHBCiHtSLBKiq7tz62JxBxQKJYqlytbFQgghhBDiHqYBP/rhf/Xx7U8LJqZnFvA8j09ZJYQQdz1D1zFMY+ticQe4rovrelsXCyGEEEKIe5imaezZvf3j258WTNi2LaGEEEIIIYQQQgghbgm/33/1/58aTHieXL0SQgghhBBCCCHEraHrHw95+anBhBBCCCGEEEIIIcTtILNyCCGEEEIIIYQQ4o6RYEIIIYQQQgghhBB3jAQTQgghhBBCCCGEuGMkmBBCCCGEEEIIIcQdI8GEEEIIIYQQQggh7hgJJoQQQgghhBBCCHHHSDAhhBBCCCGEEEKIO0aCCSGEEEIIIYQQQtwxEkwIIYQQQgghhBDijpFgQgghhBBCCCGEEHeMBBNCCCGEEEIIIYS4YySYEEIIIYQQQgghxB0jwYQQQgghhBBCCCHuGAkmhBBCCCGEEEIIccdIMCGEEEIIIYQQQog7RoIJIYQQQgghhBBC3DESTAghhBBCCCGEEOKOkWBCCCGEEEIIIYQQd4wEE0IIIYQQQgghhLhjNKWU2rrwsyilUErhed7WVUIIIYQQQgghhBAAaJqGrrfbQmiatnX1dW44mFBK4TgOjUYDy7K2rhZCCCGEEEIIIYQAQNd1gsEgwWDwakDxWW4qmLgSSsRiMQzD2LqJEEIIIYQQQgghvuaUUrRaLWq1Gh0dHV+YH3x+bLGFUgrTNL/wQYUQQgghhBBCCPH1pGkagUAAz/O4kbYQNxVMCCGEEEIIIYQQQnyRLxpX4loSTAghhBBCCCGEEOKOkWBCCCGEEEIIIYQQd4wEE0IIIYQQQgghhLhjJJgQQgghhBBCCCHEHSPBhBBCCCGEEEIIIe4YTd3I3B2bU4XW63WUUkSj0a2rP6YUSimqhTWOvfsm56fThHp38L0/+C6DSf/WrT+fUly7c583qqdSCrua4c1XfsmFuSKDex/kuacepicRRNM1PvueN+m6fdL4nF36mFK06hVWVtZJ9G8jFb1yHG7w/kIIIYQQQgghxF0mk8mQTCYxTXPrqusYL7300ktbF34W27YB8Ps/O2BQKPIrl/jrv/xr6qlDfO/3nqUvohPq7MOwqzSaLWr1FqbPxKqVyRfLuOj4fSbKtSkXCxTLVVx0DNXk2M/+hvfWWvSlOgj5DWrVEoViBaX78Jv61bCisnqJf/Nv/hK3/yg/+L2nqc8d563jl+nctp2I4VJvNqmUijQsF9PnQ1cOpUqdVrNKuVIH3cBnGijPoVwsUKrUUFp7mWs1qDYtmtUKtWqWN//9j5i0AnQlYuhuC8vT8Jk6Vr1CwzXQlU2tWqVWq1Ku1jF8AZx6gcnJafRIhNN//+ecK0ToiQVxXAfT70NXHtVyGc8MYOqSVgghhBBCCCGEuLvV63VCoRC6/vmdNb70YALlcfnYq8y0hvmzP32R3mSCnv4BjFaJN3/255ydzrKaqxKiyofvvMPp85dYSheJdfbib2V57+03OX76HHNrRYIBl/de+TXnF7O4vjgprcR7b7/N2bMXmUvX6R8eIOI3AYfJ42+yoI3yJ7//DD2pDoYGu1ievExFT+EufcTP37nAytQFzo7P4Qbi9Ghp/vVf/IKNzDJnTp1ltWjT199Dbvokr7zxPhfGJ1jN1Uh0dlKe/oC/e+M86cVpFhfn+Oj4CRazZcxwkvLccebrCbb3hZl++yd8VOymw13k7//2p0wtrXDh3GmyVoT+pI/F2QUc6rz7m9eZ3aigrBaz4+PERnYRaqX56Y9/TWzHAVIhY+tRFUIIIYQQQggh7io3Gkx8/trfgsIlk0mT6BslGfj4B7bnWCzOTKOntvP8M4+yfPZtZqxO/uh7z2NWFzl5ZgLPl+DI0y/wR9/5Blp2ipVqgH279/HUd37AHz25l7EzxygY/fzh91+kMPYOZ+czm4/eIper0N07TCjgAzT88RSdCT+NSoVSboHpDY3f+5M/48iwn7NnzlMuFpifnqH/gW/xxy8+SGbyIpPLi7z1y5eJ7f8m/5M/+TZedpozYzNUihkmplfZ/+QLfPf3n+fw3sO88Ef/kOfvH6SUT5OvtgCo51ZJly3qlSLL62UOP/Ei3//WPk6+8R65apNcNkdscBv7d+3jm9/9h/zes4cJO1kuXl5jbWGKhYaP3vDVQyaEEEIIIYQQQtzzvvRgAjT8Pj92q45z3WKdcKqXHTtGiYd0VuZnya3O8Pqb77NWtvGbHivzE5x4/z1ee/NdFtaL2LZ1dTwH17bYWJ1nZuoSb7z9IQ3Ph1Lu5loDv8+g2ayjvM17uDaW7aIbJprmZ3TXblLxGP393TgtC8tyiEQHGd3eQ/fAIKmQR6mwwkLGY8f2bcSTA/R3RqhXCzieIrVtP3uGuvCbxmeMV+HheR4Khe4L0Ds4TF9XknhXFz6nhXtlV6/hjyQZ2j5CfvY8Z8cWGNm+g4AhrSWEEEIIIYQQQnx9fOnBhIbO0PAgudkzTK6WcBwH27Jx0dBNHz7TRNMMUt299G/bw2NPPMMf/sEf8ujBTt5/4z20xBAPHjlEd8zXfjwNXMdBM3Q6OvvYsWMvjz72BH/yj/8Rj+zo3XxWP8Pb+llfGGc1W8ZxbDLzM6yUXHr6u/EbNul0FstxqFfqmD4TwzSwWlkKhSataoW6pRGKdpKKKQrFEo5do1K38PvDGLqGPxDAuJJIKIXjuCgFmlI4Tgu7WWN1o4DjKjRNwzCMdnOVT08xcF0X9ABdvcPo5QnOTlcY3TaE8QVNXIQQQgghhBBCiHvJlz/GBBrRZC9efppXXn+bS2PjjE2t0Ts8zMbCZbp3HKWvI0iyM8r4sQ+YWFxhbT1HJNWLKi4yPrdMPrNBrqaxY89BRjtt3nv/FCUV5b7tvcxcPsulmUXmV7MMjOwkGQ20n7Ozn0Bljl+//jZjFy9y4sIs2w4/xuNHdlOYPclbH1witzHL2Gyevfc/zN5uj5//6n3y1Q3On7qA3reHJ48eZVvK47VX32DswnlKdPLo4w/jry4zX43z6KER0A2auVk+PH4ONzrAQNjm2HvvcXluibWlWcK7nmJ30mJ1vczO/Qfwk+fc2VX2Hd5Ffm2Nnp2HSNgbfHTyNCrSz/bhDhYvfMSab5jnn3qQeNCUmTqEEEIIIYQQQtz1bnSMiS9/ulDaLQpsq0mxkKfWsDFDEbo7k7RqZfzhBEG/AcqlVi6SKZQx/WGSqSSm2yCbL4EZIhoO4vcHCPgU2UwG24zSl4pQKxUplqtogSg9XSkCvuvHscjnMlQbDoFIjFRHgoDP4Mwv/r+8W9/Pnzw+ih6Mkkp24M+d5f/4X73LP/3f/UdEW5BIpoiFAyjXppjLUG0pEskU8WgYp1mmapuk4u0BIJxWlY1MHjPaSSqsk89maSofsZCOFugg7HNpNCwi0TgaFsVCnWg8QqvRwB+OYnpNspkceriTuFHj5Z//Et/oEZ5/4gGC0pNDCCGEEEIIIcQ94EanC701wcRXzPnf/FtOuUf4T37//o8Xbpzjv/zXJ/nn/9d/xpUOIbdbo5Th3KljjK81ePzpZ9k30r11EyGEEEIIIYQQ4q50o8HE57enuEcMHXqCp+4bvn5hbJg/+MOniV+/9PbSIBjv4tHHHme0P7V1rRBCCCGEEEIIcc/7WrSYEEIIIYQQQgghxO0lLSaEEEIIIYQQQgjxlSfBhBBCCCGEEEIIIe4YCSaEEEIIIYQQQghxx0gwIYQQQgghhBBCiDvmpga/LJbLrJdK6P7A1tVCCCGEEEIIIYQQV+mtJqODg/i+YPDLmwomFtNpfnz6DOl6A8Mwtm4ihBBCCCGEEEKIrzmlFI7n8vTQEN8++gABv3/rJte5qWBifn2dH586wwO793H/8LatmwghhBBCCCGEEOJrrmnb/PTUcXr9Bt975OEvP5j4yemzPLTnAEdGJJgQQgghhBBCCCHE9Zq2zY9PHqPb1G4omJDBL4UQQgghhBBCCHHHSDAhhBBCCCGEEEKIO0aCCSGEEEIIIYQQQtwxX/IYEzf0UEIIIYS4J2hbF1xD6gRCCCHE18Mn6wM3O8bElxxMNNH1AprmbV0hhBBCiHuE8vx4Kgl83pzkdQyjsHWhEEIIIe4hygvgqc5PhBN3NJjQ9QIB8yKaZm9dJYQQQoh7hOt1YNn7UYS2rrrK0Nfx+8bRpOWEEEIIcc9y3E4s5/AnRom42WBCxpgQQgghxFVKKRzHw7al9aMQQgjxdddqeXjerb/IIMHEHaKUotGwqdVaOI7LjbVbEUIIIW4tq+UxN2ORzzm3pSIihBBCiK8epaBSdpmfaVGpuFtXf+lufTDhqfbfna7bKIVS6isRANi2y8R4hp//3Rg/+8kYH36wQLnc/ErsmxBCiK8vx1bMTlusLlmUCh7pNZtiwcFxvhrlpxBCCCFuj0bdZXa6RWbDJZtxSK/ZlEsunntrKgS3LpjwXLxaDevlCzQ/XMKt2SilsJstFqfWOHV8jnMXMzRsD6UUntduItIODxSe1/67clt57W2uve06LpVihXzZ+nj5lr8rj2s1LWbGV1hNl8nmarQs52pQ8fH24Lku6bk1ZldrOK0WS2tlLNv9xPO396/92J6n8K55LM/zrt6+ltpsJfHGq9P8ux+e4eL5NFMTWX79iwl+8h8ukF4v43nSdFYIIcSd0Wx5FEselgO1ukch7zI3Y3HxbB2r9duXT8rzSC+luTyVx7m2rLyuXN1aD7j+9ta/j9d7VAo1iqUmzpWy3LFZXcywsFzFdh3WZ/PU1ZW6xLWPcW1ZfqXsvubxP6UsF0IIIe51ylM06h7ViodtK2pVj2zGYWayxdREk3rdRX3JBaTx0ksvvbR14WcpVquMr60z0NlNX6Jj62o0rYmpb7Rn5XAd3Ivz2K9fxp3MQl8XZm+Q9MIGi+kGye4oVjbDStVH2LBJL5XJF+u4uonWqLG0WqWUr2MpHb/usrpUIJurYysN07VYWqtQyDdZmVxkvqCIBqBScwkEdCrZCi0PitkS6Y0apXKLYDQAjkuzVOHC5Q1szcRwWjRdE6/Vot5y8QVM8DxmTk4xnnfoiphML1fpTgUpbpRJZ2rYno7pWiwulyjkahSLDYr5GtWWIhQyyK/mWc/UaViKYNCHaXw8OqlSisWFIh++v0C51KJ/IMbItg420lVKpSbxjhAjIx3o+ienWxFCCCFuNZ9PJxbTsVoevX0+RncG6Ow0KBZcWi1FR9JE00CpIK7XDfi2PsRVulbFMLJogPIczr1/mZUNi+RAEp/TYm21SC5Xx9VM7EadtdUyxYqFP+SnslFgLV2l3HAJ+mFjrU4w7qdRaVCtWhRzFTKZKoVSE9PnMX12hYW1BtHOCGG/jnJaTF5c4vJik/6BMIsn1wnsSNBMF1nbqGIpA8OzWFrMUcg3KBTrlAp1KnWXYMigmC6yvlGjYUEoaGJcU5YLIYQQ9zpN0wgEdQIBHcfx2DYaYHibn2hMJ5d10XWNaNRA0zQ8Fcb1ej8xK4fjeYyvrhDRNfYODmIaxnXrt7p1wYRuoEX9KDS0VCe+p7ZhaA7LSyV8iSS7d3eRSulMnl6n6TRZmq+irDrzRUW4luHsfAvTbZIu2phOjYnpMthNMoUWWr3MqZkakYBJeSNPyfOTMFpMLbbo6QmxeHaBiq6zMpOh2IKN+XW0RIJmvkitYpHO1vBHQhiNCgsbDnatRrkJqVQQXSnK63nqPj9aw6Jk6wx2BVieybI4nyFf9wjYVU5cLuP3WkxP59FNj/X1Jok4nHhngXytSTbXIJqKEg9/PJWa6yoW5gpcvpzBarn0D8RIdARZXirhuYpEIsi+fd3oxq1ryCKEEEJ8Fk2DQFAjFjPwB3T8fg3T1HEcRang0dXjQ9dvPpiwywUuzln09wdoNDWsUpGFtQbKs7EsRXGjQLrk4LRsAhE/M2fmqSpYW60RCinOnMgyuDdJdiHD6lqFlfkcdUeRXVjHjsapruYpNRVdgx3EQyZ4LpVqk1rFxvPpNDNNEtsTFOfSTM1kydc0wm6NUxcy6J7FwlIRV9dJLxcIxUNcPjVNOttgLWeR6o4SCZmfMkO7EEIIce/SdY1QWCcc0QmGdHw+HUPXqFY8NA3iCQNd//KCiVv7CzgYwvf4PvzPbEM3NdB0DB1aLRvX9WiV62ihEH7ToGeoi4O7O6g1bDTNoKM3xb69nRiuS6XSINbTzcG9XQR1j4at6B3t5eD+boZGUmzf0UN/TxgDhfJcmi0HT0GsK87+Q8MMdfmoN1w0TSfeEaFvuJsDe7oZGO7GK+Qo1B0SqQg+vX04DJ+PoeEOnFqN9VwTp9Wi0lJ090Tx6x6uMunb1suBQ330DHRw35F+usI+3GaDmuVneFsnfT0RfFuusGga+Pz61Ssv4YiPzq4IPl/7TQoGza3vpxBCCHFbaZpGNG4Qi7evhDSbHrmMQ7xDZ7OYvDmew9KldWoo8rkGuUyRbNGma7iLQ4f6iRsKB4NtewfZtzOJoXm4BNh3cIBk2MR2PHTPw/U8bMvG8SCSTLD/8BCjXQa2EaC3v4MdO3vpTwWvtjo0/H6Gt6VoZIvkShaObdNoQqonionC83QGdvRzaG8v20aS7D40RFdM0Wy6WC4MjKTo7Q5/oiwXQgghvi4MQ6MjaRIK6Xieol73aDQ9/AEN7UsuHn+bKsYN0/x+9EQIozeGbmigm/T0xWhk0rz2q/O8d67M7sPd+Dyb+bFF3jy+wUBvBDyH9bkV3v1gBT0coq8/RXlxgdffX6JlBOhM+ImGTHRDI2DqzI0tsph1MRpF3n1zmvWKi8+nEwr58Zk6voAPv6lj+gyCYT9Uy3x4fJGW5iMZ1mlikuwIXD24ZsBHLBmntzeC6bkoxyOzmmN2vsB6ukq5bhMK+TAMnXAkgGEY+AMmRijOYNJmYnydUt0j4L8+FdJ1jb7+GD09UTQNlhdLnDu7hut6dCSDjO5ISTcOIYQQd5zrKNLrNuMXG0yONzFNjb4B329VCXGbTZabIZ59apRD+3tJREyiYR8r44u89voUWdcg7FNc/GCc906u4SiTcNDmvdcnyTRcook423s83vzVZSbmqphBk1DYj2no+II+/IaBz/SYuTjPzGoNd7PPq2GaxFIxdvSFaCjAccis5JifL7K8VKRmKyJhP4ZpENrsehkI+giGfSQiPqYnNqhZHqbPkGsGQgghvrZcV7G82OLShSZzMy2iEYPkZtfOL5OmbnDUCqUU8+vr/OT0WR7ac4AjI9u2boKuFwiYF9E0e+uqq5Tn4Tgulu2hGzo+n2JpNkPLCjG0PUbAp5ObnmPF7OHAYAjDZ+AzwLIcXBdMv4mpKzzarS88x8VyPAzTRHMdLA9MQ8c025mLpmso10NpOppSaBo4toMD1PMVlpcKhIb62TMQ2ew3q/BcDwwdzfOwXfAZGrbl4HoKTdcxDQ3NMDD09htlGBquq9B1Ddd2sG0Pw2/i8+noW94xz1MsLRZ55+1Z5mbyKAXJZJAnnhrl8H19+AMm2pf9LgshhBA34epVkbqHz6cRjuj4fNrV8sn1OrDs/ShCW+96laGv4/eNg3JxHIXpM8BTuJ6HBjiOh+uqdrmnPCzbBU3H7zdRbrss1UwTv0/Hc5zNeoOBaWqAhm5oKNdFaQZ4Lpbl4QuYV8d28jwFmoamFLbjYZoadsuhPYTn5uvRdQytPXnYlfqCpuu4Tvv5ddPA7zc+UZYLIYQQXxeep6hWXFpNhT+gEYnoGObHdQLH7cRyDn+izUPTtvnxyWN0mxrfe+RhAn7/deu3uu3BxFZKOZSLTTx8JJIBNKWoF0rUzAg98c/uu/q7U2TnN8ipAKPDcQKbQcbtoDZn51hdLePaHp3dETo6gpjm5/e7EUIIIb4KbiaY0O74fOFCCCGEuFW+rGDi9v0a/wyaZpJIRkkmA+ibfVsjqY5bHEoAaHSN9rJ3e8dtDSXYfI3hsJ9du7rYu7+Hrq6IhBJCCCGEEEIIIb6WbkmLCbDxPA2rZeA48oNbCCGEuNv5/Q4+v4uu33yLCc+FZiOA2+5HIYQQQoi7lK6Bb7NOoGlfXouJWxJMKM+mWo3RaPag6xEZM0EIIYS4iymlwCsQjmwQibZuKpjwXKgWY/j9wxi62Z6iSgghhBB3H6VwPRfLKhCMbOAP2LjeVziYcByXfG4Y3TeEbtzqLhlCCCGEuNVcu46m5ujuydxUMGE1DFqN7SQ7BuVChRBCCHGXU0pRr1dpOVPEEqWveDBhe+Ry2/GHh7duIoQQQoi7kOfaePYMPb1rNxVMNOsmytlHIt69dRMhhBBC3IVarRaV+jjxjvyXFkzc3lEfhRBCCCGEEEIIIa4hwcRdTCmF8pRMxHYXusGGStdRysNTit/irneAQnneDb9OpRSep/Bu4j63lVLt79tXcNc+T/u4fkWPqRDikzbPNV81X8V9EkIIcW8xXnrppZe2LvwsxWqV8bV1Bjq76Ut0bF2NpjUx9Q08T9FoJDF8ia2bAGDXi6ysLJHJFMAfIuD3fWIsLOV5uK4LaLenT6rnUsmnWV5ZIZfLUq1bGLpHvdHC5/Oj6xqe51DOZ6lbDn6/H+W0KOYyOHqAgAHVQprFpVUcI0Qk+HFTFeV5lDIr1F2DgN+Pa1dYXS8QjobRt7w25Xl4rge6zue/aoVVK7I8s0awO8mVkTyU51ErbrC8vIKt+QgEAp94jq08z8H1FJqmf+J9uJWU8mhW86ytrtL0DEJBP8qxyKzOU6jZBEJhDF2jnl9laTWDHggRMKGUXWN5dY1a0yUYDmPqt3GnNynl0ShnWVpcoqlMQsEvPs5XKNdi9uI5vHCKcMDcuvpTKadFen6GXFMjGglSL25Qd0xCARO7UWp/n7IF9EAYn+5SKVfRdAPT0HHsFtVKGWUGMXWNZiVP1QavWWJ1dQ0bH8GA/7r9t2pFCtUW/oC/PaK+57b3Q7m0P55f8FqdFlPj42jhOOHAF48zU09PMpdtUl2fp6qFiEWCX/D5/5hrN0ivzLOe3qBQKOJgEAgE+aJdvBnNUpqF5Qz+UAS/z7ihfVPKpbC+yMraOtWGjT8YwjS+6Hv9JVKKZjXP2OmTlD0/yXgMXYN6cYMWAUxscull1vM1wtEIpt7OqT3XppheYiVXJRSO4DM0rHqZlaVl6o5OJBxEuRa59AobhSqBUBhTv73nDnFnKOWhvAKRaBWlgrheN1wtfT5J16oYRhbH1sHrIhiIbN2kTXk0qiXWVlepOjqR0PXno68Pl9zCFGutAB1hX/u8e5vL5U/jOS1mL0+ixRKEfJ8905pnNUivrZApNgmGgmhOg/X1NdKZPDYm4YCfZq1MqVLH9LfLlnIpT72lCF1TZxJCCPHV57oulp0lEGygVBjX64UttVzH8xhfXSGia+wdHMQ0PrsM4U4FE/nLb/Af3jhDrZDl4uljNALdDHTHca0WLctG03XKaxOcPjuGF0wSC/tx7RYt20XTdfBcbNfBbjVx0TEMHeXaNBtNXE1Hx8Nx2tu6jo2HdgM/pOp89PMfc3xpjUaxQM3SMJ0sJ87PMjg4SNDvw7WqfPjzv+b9qSy7du+ktTHBj3/0Q6yuw4SKF/nFy+9iNStcPHMcNzZKTzKMroHnWLzxV/9PTmwk2L9rhNzEq/y//uodnnzkKKamUJqOcl08z6O8eI5XP5iif6QPTXmgQNM0XMdCaQaeY9Fs2WiaTr2wyKm3LtL9wH6uVPfKyxf4+5+/QqaUY2xsgmiql3jQhzIM8Fxcrz1Xm91qto+n5rB47l3GV6pEE0lCPh2r1cB2XHS9fR/bsbFbFp4Cz7GxHQfdMACFY7WwbAdd10G5OI6NbTug6V94zJuVDMff/jUXJ+c4e3GagZERytPv8Jv3JlhfnaVi+0kZeX76k5cp1grML6yRTKY49psfM76UZmPxMss5m96BPpTdwPHag727roOm6yjXwfYUKA+r1cBVGrpuoOHSbNRxXDDM9mu0Wk1sx8MwzBuqBDbyc7z681+RrlaYvHwJX6SLzkQE22pgOx66bqBcB9exaVk2yvNAN8FzcGyLjeVFgp0DhH0arVYTV2kYuoby3M3boOt6O5RTisrGEmfOTxDp6icVVvz6b/81k+kIe3YPUp58ix+9epJaKcflS5fQfD4ujY8RTnSRiIZpVfNcPHuMmtlDd8LPhdd/yKLby9zxv2d8dpGxyUUGh4aJhoLt1+41ufTWr3n5+GW279mNV17n9IkPaBhximNvcDYbpD8VxgBarSaOB7qhAx5Wq4njeGhundd/+Wt8vcN0BAPohoGugevYNBpNNN3A0LX28Wm2yF56lROFBL16jqmFNJ39w4R8N9agq5Gf48c//HcUmh6lQgEjGCcWiaDrGspzsG23/RmwW9iOi7Hls6vpOprmYbcsbMfC9cDY/Dw363U8dLxmiUyxQawjiV/3aDWaKE1HN8CxLBzbaT+WYXz8g8qt89qP/kcurBVYm7nIStGhv78fQ9k0Wha6puE4zmb4qnBtG+/Kfl35/rkOLcvGsS2UpqFrCst2MXUdd/OcoWlsfmc9DN24GuQ6rSLv/uzf8cHpM0zOrhJL9dFaPcVf//Av0YcfxV0+y0dnzrM2fZrpSoK9o91oKJbHP+DNjy5SWBnn0prHnqEIJ955nYm5ZS6cPEZ0ZAfN1Yu8/8FpluYmWKxo7Bzqw/iC77u4+92KYEIpj1J6gffefZeVfJHJ8+dxIv30p0Kb3wUHXdMBF6tl4zjOZllktcspw8BzN8sey9n8nmh4roPVslFae1ozx7JxHBvH8UBTuK6Hpmko5eHY3uZ5ABzHwXEcLMsCTcfQNRzbptVqoWlGu5xzHWzbwlU6mrJptdrnEV0Hx7FotWw03biuDLxybne89rkd5dFqNnA8HcO8Elh6VDbSVLQwbmGBi2PTBJO9hHzt77VSqn3OtG002uctp9Uukx1XoRvtOo/jutiW3Q412idems0mHhqmoeE6Dlarhafp6Chcx8Wy7XbrS8+h0bTQNL19HgSU67C2skoo2Y1f87BtC2fzPHnlfOM5dY69/jJn57OUV6eZSTfpMMu88uaHZAtFZi+doRocwlk6zk/eOMng6E4ius1rv/hrpksxDu7ovXqshBBCfPXdM8FEefZ9xtzd/PHvf4v+cIuLp85hRIOcfPc1Th/7gNWKRm3hGD/+8a9YqOoMxF3e+dXfc/L8GCXLT7I5xr/9uzeYn5lg7OIEoY4Oli59xHvvvsOZ8+OEkgkuH/8Qf6qLs2+9QSvRQ3csvNn1wcP1vM3mzaDpWvsQeg1Ovf4Bqcee4Yn77mN0dAS9ssiJy2kO7NtDKOjHdRosT5zko1Mr7DxyP5WpdzkxvkRqx26WTp6l/8g3eOqJh4n6m5w9eZqBnQeI+HWU53Dhjb9gujbIjp2dzL77KsfSLs/et52Jj97H6d1JaeoEl5bKzL//l/zwF8fxxaKsrc5Tdw1S0RAnX/tLKmYPlz58hfffe4vJgsaOLh+zY2sMP3yoHUx4Td79ux8RPPx7/N4zj9Df00k0ZnLup6/g7tyFszHD+YlZmvkl3vzNb7hw+SLpUoPJt3/Kqx+OUQ900dma4Rcvv87E5cuUHT9GZY6/+csfMrcwx+nj7zM+PcXZY6dRsR4C1Vle/vkvOXNpjIobItBa4t/9j3/OStEi0d1HPBwA5eF57R9Q3mYoAu0Awd6slB1++FHyJ87gbEty6advcPgf/c8Z1UtML65RmDhNY+QJvvPoHtamp2g6MDs1w4FvfIe9g0lmpk6RTWe5cPJDPjx+Fl80zvS5E+jRLrIXXuVSOULhwq955d0TzC6uEY5HWT//Nr9++32mZ6dQ4X4q88d5/c23OHNyjHD/DrriQdhsfeJt/vjzPNX+smntz0t27iTvzlu8+Pw3GezrJhHvoDB7jJ/98jdcnprHMWLkLv09f/vKR2TSKyxPT9CIjuAsnuL4ZJrcwjj+zj5Wxt7n7Xff59L4LIm+YRZP/JJX3/yAS/OrJDv7iEeDKM9lee4yuYbL3v0HsTMXePvkPGFVxNe/H3/mFGcbg3zvuceopy+SzjXIlYr0DY7S1RFD0xTrC9NkCk16w0V++cYKjzx9CL8d5cHH7mfy7Dgd27bRk4iiAfXsHO9dWqCeWcLXOUJt+l3+/Y/+PTNLOS69+0s+mEyjzABaYYq33nid4xcWGRgdobZwgp/99Ndcmp8HzWDx/Ducm19meXKcbCNIR8Tm/Vd+xrGzZ5mezdDT38HFd1/m3Q+PceH0e1gDT/PE/h6W5ubRAyk6k9HrWj0o9fH7cW1LqmZpiQ9PzfGt7/0xe3fvpL8nzqUPXuFS2qI6+xHnZjMsnX+bYydOc/HcSQp0ElcF3n3tZ7z//mkavgQ9ySL/5v/+33J5fY7xyUU6UnHmP3iFV48dY25xHb9PY3Y5S0c8yEev/piT58aYW1olmurk+N/+97x95hKXL52h4CTYPti5eU5pcuL199n+3B9wqD/M/GyORNjmjV/9hDNjE2xkcsxfukzNFyXud3jnN78kVypx/N1XOHPiLLVAF/719/hXP3qFpcmLzGw0GIxa/OiN8xzZu42ZsWMsZQrUV8f59a9fY2L6Mk0jRV93B7oGjcwMvz41w4Gde9m2fZSB/gjry1Xi5iL50B6aS5eJ9x/mG8/s4p2/epXhJx8jphX56LUPSO55hMeObufcL17F6PazuFbi8FPfZdS9yGuTTczSNMb2p3nmYCfvfniM/QePEPR/fmEj7n63Iphw7SaTY6cpe11887ln2DHSjc8IUMtM88ab73BpfIK8HSDmS/OX//InzGYWuHD2DNNzc1w4N4Yb7qK5PsZvXnuLqekpxueKdPWlmDz2Ku98cJqFbI2e3gCv/f/+PSeWF5icmKRWbzA5MUsk1YmVPs97F8qMbOvB1FxmT7zJT17+gPm5SZYyNWIRH2ffe4eT504xnXFJUuD1V17l/NQMZ4+fYGJ2jonxKaqOj0SoyZu//A3nL19mMduir7+XgNn+cT9/7h1efus403PLhBIJMpdO8taxU0zMLBLp2UYybAIeaxffZrIeY/3MK/zqrZNY4V5G+rsImjr1Uobj777BRx+dZKVh0J9y+cm/+vdczi4xNj6LLxole/J1fnFqnIWZCZZydTpjPi68/xbvn7nE/MoagXCM2bPHOH7iGGdmigwmfRx75ee8f2EJn8/j/PG3OXt+grWcRf/wAH69feHm+LHj4DM49dprnJmY5MKFCaK9o3RG/YCiMPEO762FeeGbT7Nv1w6SYT9eI8tkRvHoE48xFChybs6jO5rn9IcXCO84TI8/z29+/i7+kYMc2dW39aMhhBDiK+xWBBM3dknyFtB0A7/PTyLVSchXo1RRdA+NMtCX5PKlkySHD3D0saf4zvPP0Z1K0Deyg06fw9LEFKXaBulmhGe+9R22JVucvTxLONrFjj37cNZPMp3Vcd0Kl08dZ77cpGOzwuxadVbmL3P+7CnOnz3FxNQS9nV7VeD9X/4tP/m7v+PyQg71KZfOfYlhDvc7TM3OMz0+Q//OHRjNAmUvRDyZwOcLEI6k0CnRtK48ukaso4P+Lh+TH73LqtFLfzKI61iUM2u0XEWtUiBfanDooWc58MBTPP/MI/jcOpVaA89zKKwv0fRMUn1DjPbGOXX+HN7WLp+uQ7bq0dWVxBcI0dM/SEcsSH4lTdP1aDWr5IsF1pYXKRNh+8h2evpG2HfwMI9+49t865HdnHn3PNsf+z2efGA369NTZFYXWG/G+fbzT9Fhevh67+OBbQHOj08zefJ1Fhs+UhGYvDBGPrtC1orz1DeeoT8ZQQOcRompS6fbx/z8eZbTWZzNH/mheBd7Dz2Am18mGw3R51Nkyz46kgGi0Qim7lHMVQknIviDESKRALpqoVpFzp98n7PnLxJK7qavt4dtO3ZhFuZZWC9geHWmLh7n7FSN7sgGr/3iFNH+Psq5FSbOH+fX7x4n1TNAUKtx+dRxFpZX8Mwow9sG8F/Ts6JeWOXSxTOcP3uKixfH2MhXuBKtdAweZG+kzH/4m7/grQ/PUSxmeff113CjvUT1KtNTY8wvLWF07+OF55+jp8Ng9uxxzk7MEIlGyK2vsbK4yPJagwef/QO++dj96KrM8Xdfw0j10VyYYWY1jasAHFqNGoYWwG86TBx/A7drP4ZmMT8+he0pcgtjHPvwA9K1AIND/R+/CDQMX4iu7h5qlXVOfnCSjsMPMtLZw4GHDlLdWMINB+kIhQANpVyW5xZo1iyGOzROnZ2kd/eDPPjYo3zre/+AF556gKPPfp8XHruPUDTJ9p1DNKYmWS4XuPz+K/Q/+Se88MxT9KfiaCrM4Se+zZOPHqa0eJLLF85wfi5Lb08vjZUPefv902zUXB558QccHu0HV8PnDxPQPexGlesHT1E0K1nGz53g+PEPWcpVrl1JYfECP/7RX/DqWx9Rsv3s3D3M+bf+ijdPrbN9Wy/5Uo2hA0/y4rNHmfjgVaqej66BbfQGCozPLdOwG5QqFo889TxBv012fZFLs2t0D+9isLcLrBq5XJG1ubMs5Lv4zve+QxcNJi/Nsra+zuCBZ3j88A6WJ2dpXbNfzfo677/8H/jbn/waFU9RmPmQS+saA0kfa6tzKK3KubEZVmZOsJyFjYUx0iWdnkSLtz46T7NawPMP88Qzj9EorlArZVhK5wBFrZKnmEvz3juv4kS6iZkWM2dPUdzcgUBiiPsHIxw/9iHTS+tYKsrRZ56mNxbAs1s0LQ8jGMYf76UzUKXhAHadWkPDHwoSiHbQFWmRLdbQlEk4HKWrO0WlXqVVaxEORQlHO/D5TVzpfy5+W8rDajQIRFL4A34SqT66OwLMTU0RGz7Ci9/Yz/L5SdKFLBUrwKNH70fDo3P0MA/ti3P+xAS5YhknkOK5F3+PQHWCqdUSkUQXIwMdrK4tkyuXyK6vsevoc+wa7qJYqaJXMkysrDF+8jzh4aH2D3CgXlzDiW3nuaceRGtmWC40SXQNsK2/i7mLl8iVstS8APc99jyd9ipu9z4e3NtLbnmOsdMfcDHr0Z1KkpsdYynfuPoyfcEIoyNDNCtZlpYWmV3OEOkaYKS/C0PTrp7uWsUNKl6YPfcd4aGjD/LE0UNEg+3wR9MNUt29DHX6GZ9ZoNmqUSyW2ffws+yNGyyurJFfm0D1HuXpR45gF1eZPHecD8aX6OvrxiuvMzWxTDDZw+jIEKsTl1gvFajUW+w88hgDMcXKRoPhkRE6Oz6ebUVTHrmNLJVqiZqtcfCR59iTbDK+VNjcwqOULxBNpoiGgoQiMXr7+whoLpnlSd58+af8u1fH2HVgBL8Z4ciBFHMzKyyc+Qhz51HCfjl/CCGEuIPBhFUvk8tuMD8/R0NLoFcXmZycYn1jg1qtgdJ9+Hwatm1TWpvi3NgkmUyWSq2G5bgoBY5toZsmXqPM7Mxl5heXKZUquJqPnq4e5i6fJdYzRDS8eZVGebSaNSrVMpVqmXq9efWHZluCR1/4Pn/w+7/PaE8E13FxW3UK+Rz5fJ56o4XCx8i+A+RP/4J5bR97+iNooRS9UY+15UWy2TQba4vogd7r+taboTh9PZ3MjV0i2tlDIhJoN82kRT6TIb22RsOy8YciGJrX7h6hXCrlIrmNJdIFi0p+nanxC6yks5SLJVqOh+M026/DU2D4GexLsDQ3x8bGGmPnzrG8UcL02WTTWTIbG1SrDbqGRumNasxMXGRqcgktGADlYFkOyqdheA6W46D0dvCV6O6nIx4lkeqkI5EiETOpVFsopaiVM5TrHj0DfQR8JtFUN4lo5GoipjyXeq2yecyrNC2bK8N1ek6LpcnTvPPeSXpH9pDs6KW/22N2eonVbAbP8NM72El2eYmNjTVKtQZmMIpuBugZGObgg9/ghWfup7g8zcT0HLlimaYyGBzqZ/HiGRrJfgYTMVzVoLCRxR/qIJlIYKgWmUyahhukf3iY4eGdhHWLufETXF7OXX3PPMeiWm3ve23zc3eFa1kMHXqaP/7D7+ArLXF5ZgHHdShmN6g7Prq7+wgGgnR1dRONd9I7uANr+T1WahG2DfZd7S7SbtHr4uoKx7FxbZt8LoOZTJGMt1swgAY6uMqikZni+FST/ohF03LJrs1TbtiEEt2M7NzD87//p+wb7rq6n2xWZvsH+jAaOY5Nljm8ux/PabJw6SPeP36B/uGdxGNh0MBtVVhdXaZWr6PivTRmj7FYBZ/PxHE9/EE/yrNp1CosTF1kcnaZQrFAuV7D8QLouovntFuYeME4A11dxGIJQgEPz9OwGlU2NjIEOnfSEzFQqt2sWPeZaDooz8HxFJr+ybE3PKdFpZAnn81Sb338XgAkhg7whz/4M55+7AhBZWG7GqlgAMcXBdcC2l18PM/A8GsUMotMjF1iI5ulXK5iu4pYrIuuriTBUAT8EQ4e2k11dZ7J8Yusrhfan1rlYfp03FYTd/P984fCdHV3EY0nCBj6dXlKINTNkYcfZ//u3SQ7ohg6NKoFcqUmia4RDj7yOIHsOd5+4wy7n3qCsO5SKWbJNX3sHupBM/3EU710pRKEQgaaYWI2yqxn02QyWeqtdtPrUj5N1TLpHhoisHlWd1sN9NgADz9wmGZmmvHpeex20oXmCxEMaJTza6TnLpP3d+Fr5VjL1gmFoZBZZ2N5noyKM9CdwLPrpFcXmVnI0d3VTTgSJJ9eZmV1BUeFrjb5FuJmabpJNJagUVonk80yPznG5cUsaGCgsCwHTQdN04l3pEgmokQSKToSCeLxEM1aDc9rt+ZwXBvTZ+DaLaYunWclnaNcrtFq2fj8Mbp7EkQiIcxghPsPDzFz7DgTrV6OjsauqQz56ezuJB6NEgr5qeXXuDw9y3o6T61epWHZROIJEokOookEXakUkZCB57SwLYXTqJArVol19xPfDBTAY/7yOeZWNiiUKjRsjR07hnEreWanJlhaK1xXF9F0A38ggKG57e5eChSKWrnA1MQl1rIFyuUqLdsFpeFudklrdx3xUK7Cc10M00DTNTy7QS6bQwt2kIi4zM9Ms7i6Qa1Sod6y8YVCJJJJYok+dm/rYmVxjqmZSfL168+zYBCJxujoSJBIhFFX91on2T+EXVhnLb3Bxuo8l8cnqNg6nf07eOjBBxjo6SIRNlFoJLYfpiN/jjcv2hw92H/nKqJCCCG+Uu5IVw67lmNmboFcepViU2fXfQ/T66uznCnjD0QwNcXQ9r241TQreYtkyGN1o0g0EcMfiJDwVTg1sYHPqVCzfezbs5NmOUfd1gkHDMzkKPt7dOaWM2w7/AijvUl0TUM3A6R6Bhkd3cno6E4G+ru4+vNHORQzKyytr5NbWyVbqhEKhyivL7OeXmN1bQ38MYI+k1TfCHo1S/fRpxmOKozkLnb1BVien2Jxbo5i1WP/g08z2B1H19oVpmoxS2r0MD7dY2jbLkxTZ8/OnTiNDJMTc5QrdXq27WHbQJy1uRnqWojuRJDMygKr6xkIhBkaGqGSWUHzxzC8FkO7D2GXVmgFOuhJJTBNk1g8yPL0OPML82TKFn1DI3SGm4yNz1IqlIh2DtEbNymW6miaSap/O8O9QZYX5imbXRwc8jM5PslGoUbP6B6GeyI0vAj7tvdRrTUIpQZIBVo0zG4O7xvBalj4QwmGt++lN2FStQLs2T2KsVnTMPxh+od2tI/5tm10dsSv/oix6kUuHH+D6bUqfkMnNbybwS6P82cuUmp4jO45zIF921iZPM/yeo5AcpB9e3fSatjsf+gxdg314dNsVhcXKNYsorEQur+Hgwd6WZxZpHv4ELt27SBm1ml6AZLdA+zas5feeJCaDbFYkm279+Nr5cmXKig9wMCuAwx1xgAIRJMMj2xndHQnIyPDJKKhqxWoZiXDpbOnWFjLoAU72H3wMDv7kzSaDpFEipHtu4n6WvgSI2zrTeEzNAobWTq2H2Tv9gEq+SyDuw8QdgvMTs+wlq3QPbyb7riJ5RjEu4fYu2s78XAAjfaAlau5An5Pofcd4sVvPMaOwV50DfwBP4GefTzxwEESkSDKblKq2/QPDBKPhAEN0x/CLuWxA0nuO7Qfw21w5t1fMZ+1CGgBukeHSAQDOI0ipbrF7qPPcvSBB+gPVyi5XQTsHBs5m96eGKsrqzS1EAGnQMnSiYYMfIlt7N6ZZHrsEulMgUC0A10p+nfsIu5XtGybwR0HCHo2mmEQ6xrl8P17aOZXmZtZoFyp0rX7QXqNEkvrBfp37ScV2xzzAgANXzDO4PZd7N6zj+546OOxFKw6y1MTZEsl1tZWsTWTykaa+K7HGI0UyDWgsj7LWrZEqZCnb8/j9EcdVlc3CMbioAfZNjqEVXTYcXg3rUaDZEcMq1qk0vIIhqL0DwzgD0YZ3bkDOzPFzNIali/B3vv2o9fLdG7bT9zv0nL8DI/2t88ryqGYKTP64OPs7AlTKNYY3LYD025ihmL0Du1g+86dhKxFlutDvPjsEcK+9ng5hj/B6IHD9AQdalonO4cS1Bo2fUOjGLl5ppbTVGo2/dv3snu4n5blEYkmGN6xn4Hu9iCXntti7tJpLl6eItA1wpEjD9CTjNMqpzG6DjMct1lZmGJ+IU3//Y/RQ5oTF5cZ3DZAdnmapZUNkvse4qH9O2gU08xNT5Cph3j8qSfoiZosTY+zvFFkaNcRdo/0yhgTXwO3oiuHpusE/D7K2RVmF5dYz5RJDYzQFzdZXZxjeb1E547dbB+IUasY7NjZS71p09nVS9RnU2v5ifhqTEzPYzdqWL4uDu4ZIb88i+uLYxqQ7O3DZ8HAgT34nQaaL8zw9h0sHXuN0P3Pct9Q5+a5RlEvF1HRHoa7w9SbDsGAn3KhhBnwYxoa8WQXsXgHfX39uNUsoZ5RuoIeLeVjeOdufE4D3Regs2+YHcM9+E0dUKzNjlN0QkT8GuF4BwFDo2nZmD4//cM76EmG0FA0ilm85A6GYor15UVqRoK+rg58pkazVmZlZQU90A6tewY7mXj3FI2Qj6YF23dtx12+wPmcjt4oEEz0snf/XqKmwsEk3pFicKCHSj6DjUnQB6GOXpKxAKm+bcSMButrWWw0wrEUI6MjRHw6eA65XJGuwUH8ukn3QD+mXUGF+xjqjAAa/kgCr7TO7Pwia+sbEEzS0xnBNWLsO3iA/nCLdNlHKm5ihLvpj7lUIjt4YHsCz4gw0pva+tEQQgjxFXYrunJo6gbngFJKMb++zk9On+WhPQc4MrJt6yboeoGAeRHH9sjltuMPD2/dBACnWSGbL2DZHsFoB8mOOJrTIJvL47g6Pp9OJN6BWy9RtjRS8TCVQg5HMzDNAM7Cq/z5xSj/6LnDROIdpBIxGtUC5UoD02fQsqqsXrrEhhvh0ae/QW/iBkb4Vy61coF8qYpSCtMfJh4L06qWqbUsNN0gGk8S8OkYhondqKOHIhheC1cPETQV5UKOSrWJP5KgszPJZtfSzdknSmiBKE6rgenz07IsopEIdqNMLldC8weJxTsIBzQKmQyOESIRC1IrFWg4OtFIgGAoQq2UpWUp0BTRVA+qXsQxwiQTMYzNmUOq+SylWhN/pINURxzNqZHeyIERIBKPEzIVxXwBW+kkOrsJ6Ta5XA7Pn6A77iOXyeBofjqSnQR0h1pLEY8GaDYaKDOIT7VoOAaRoE4xl6FuQSLVRdjnUWt6xGLXjw3wWVzHopzfoNKw21dcevoJGTbZ9AauGSaV6iTo1yhl1yk3PGIdKRLRILVKFX8kQsA0QXnUynmK5Sqa4cNp2RTXLzKVdrjv4efYOZDArhXI5kvogRipVALDbbCeyaEbQZLd3ehWlXwhj6OF6O7pJvg5o45f0T7OGYrVJr5QlFQqhUmLTDqDq/tIJLswvQaOHiQaCqA8h1qliuYPEgr6qZVL+MNRVKtGvlBC88fo7urAaZbJ50vgD9OZSuL3mWhK0axmOPvRMbTOHezZs4uOiH9zkLIWKBdb8xMLB9uDvjk2tWaTYCCEz3clelO06u0rddFYBM1zKGbWqFke4KOzr4ew34dyLZotCzMQxW9q2M0KTVvHs6rUmopEIkSpWEQLJYgZNqVqA03TMAJxOmJ+itkNXD1IRzKB22rhD0cwNY9Wq4U/GKJZLlAoV/FHU3QlozQrBYrlOqbPhz8QYPXyaYqBAR44vI/wDQ5+6Tkt8pk0dcsFzSAci+PTwB+KoLt1smuLnDj2IbHho+wZ7aOzpw+fapHP53CUhqaZJFIJnLpFJBHDajUxTBO3USFbrBEMRUkkIli2SzAYoFXOUag2CUY6SCajtCpljFAcE5um5bVn29n83tdKZXzRGD4canWLYNBPtZil0nSIJjrpiEdwGmUqlkFnIoJjNygV8tQt6Nj8btYdk0jIoNlsEQiGsCpZsqUW/mCQWCJOQPPIZrO4mCQ6u4hujm6vlEe9mGVhYYlgspfBgX78PgOrXsQxYwRoUcy3n6uzu5PyyhgT6xpHjhzAqeZo2JDs7iUSMGjWShQKJfDH6O1OoZwmxXyWhqOT6uomHPDdntmTxB3luTaePUNP7xqu14Fl70fxcZP/rQx9Hb9vnGbdRDn7SMS7t24CV1rWVUuUKnV0f5jOVAeaZ1EqFGk6Gh2pJEGfolZ1iEQDNJstTH8AQ9nUai1mJ05zabXBMw/dRyieIhkLUilkqVsumqYTjEYxHJdgIg52i0ajTH59lWMfXOCxP/6HjHZcmRFC0arXsDU/Yb9Oy2oPAlkvl2huDpzr8wfx+30EgyHsRgXlC+PXHFq2iz8QpFnJU67ZhOIJOqLhqwNg1kvt84au6/iCYUKGolSpYfiDJFMp/IZGe7atCpYRJmi4lPI5HF+EzkQMc3Ow4GIxj2UrlKYRCFX56b98mSP/5E8YigTo6Ahx8W//Gy4N/RnP7wwQiSeIRYLY9TLZYg1/IEw8EaVVKVJt2ui6jukPEwpomIEIfs2jVMhTbdmEox10xCPtstxzqVRrmH4/nuPiD4VQdgNbCxC5OrOUwm7WyOVLuJqPjmSSoOFStzxCoSCaa1FrePj9GgoNXTm0XIOQT8PyNCKhwNXPgxBCiK++VqtFpT5OvCOP63ViOYc/0Rmjadv8+OQxuk2N7z3yMAH/58/AdEeCic9yZVc0tHbgoq40+m8X2Fe0MlNcyIU4snsAn3nlR6SifXdFNb/IuXMz9O46zI6h7tt6JU8pdXMV9KuvsT37RnvR5qvW2jMyqE9Zt7kBmy/6+ue85rhpW47jlc2ue44tt7eu+zw3s+2NufI+fvq+fbqP79Mo5xg7d4pQ/wH27BjCZ2hoN/n6b9gXvXc36Pr7fPL1t7fxsGpVbMNPKBC82iLldvnE50O79rhe0d7/K9t9lqv3b9/afL3tGUma9TrGZsX/cx7iJiisWomllWViXdvoTkY/8V5d8Wn7rJT6+Hz08cJPfJ5uxtXnvXoMtviCx/+0z9inLbuyXG2ek7au29zg6nvouTaOp+H3+dA2O1x93nNsvS3ufbcqmGj75LnvRj5jynXIbKxRaunsGO5H19uf9c/7freqWS5dvIzZuYP9O/u/eMrp6851n/69vNaV79zWZde6so9bt7vWp73+ax/HcytMnF1g8P5DxE3QNJf05TNUuu5nZ+f1YeF1z/U5r+fTnvNmtO//xcdICCHE3e2eDyaEEEII8dV0a4MJIYQQQtwtbkUwcYuvu95Q5iGEEEKIe5rUB4QQQoh7Rbttw5dbtt+yYELTXDxv64jOQgghhLgbeZ6Lpl0/l9WN0DSF6zpbFwshhBDiLuX+lnWCz3NLunJ4rkO53EGrOQBGGE27ZfmHEEIIIW45hfLyRMKrxOL1m+rK4dpQLacI+EYxDPO3Hr9ACCGEEHeWUgrPc2lZefyhFYKh1pfWleOWBBNg49g6rVYQz706IacQQggh7lKmzyIQbGIY3FQwgVI4to7VCoPS2TqdmBBCCCHuFu0uHIbZwh+w0HS+2sGEptlXR9cWQgghxL1D024umNCumXFDCCGEEPcOTQPH/YoHE0IIIYS4N91sMCGEEEKIe9OXFUzI4A9CCCGEEEIIIYS4Y6TFhBBCCCFuyo20mNC0Aj5zUUaUEEIIIe5hrhvD8UY/0ebhZltMSDAhhBBCiJtyI8EEuGiatXWhEEIIIe4hSumA/xODW0swIYQQQojfmlLtwSo12qNafdrsnjcWTIjPopTCtm3qtSqtZpNYPE4gGELXdZlOVQghxD3hZoMJGWPiU7TnZ1VYlotlOXjeDWU3QgghxF3PdRTpVZtC3tm6SnwJXNdldWWJX/38x/z5f/ff8lf/w7/mb/78v+f4B+9Sq1a5wetFQgghxD3lFgcTCmU5KNv9jIJW4bkuluXibV11hyilaNRtpqcyfPTBAh+8t8DUZJZGQ1qBCCGEuLe5jmJlyWFmukU+55LPOpRLLrblfUY5foOUAs9FFfN42drV6UOdVoNSsUC5UsV23C9l/g7HqmO7oDwXy7Jw3RurYXhug8xaFtu7se0/i/I8HMf51OOllCKbSfPem68ydu4sttUiHImQTq/x/ttvcP7sKVzX3Xo3IYQQ4p5364IJpVCehzu1gbP2cSXEcxw2ljKcP7PI5dkStXKNpZkCza33vxHKo1GqMHZ2gdOnl1neqON+SuuGRqVG6wYv/Fgth9OnVvj7n43z2m8mef2VKX7x00ucPLFM60YfRAghhLgLWbbH6opNs6loNDyyGYeVJYuFeYvf5feyUh7e+GncX7+O+4v38daLKA/yixc4e/4iU5fHWVzNYDsenvvpFyvarRk9PM+7GmB4rou3JQDIzp5mtQJus8Li4iKVerN9X/eacMXzcK+5rTwPxy4weW6ahuuhtj6P177/Z1Fee9+UUliNMivLK9jOJ7f3PI/ZqQkWF+ZRyiOe6GBweATDNGk2G5w58RH1WnXr3YQQQoh7nvHSSy+9tHXhZylWq4yvrTPQ2U1fomPrajStialvoGkeuDbuhTmsn53BGd+AeAdGT5DcSpbZ5SrheJDGRp4aJsW1OqltcexChdXVMk1PI2hCKVdhLV1D8/swNY+NlQL5io3p9+EzdTSlKKTzzCw2SKZ8LExn8cfCmHaT1dUKltLQHIvT749TJkTQr1MrVkln6pgBH35T/0Tf2cWFIi//aoJCvkH/QIJw1E8uU6WQb9DTEyHVGZL+n0IIIe5Juq7h80Gt6pFMmQwM+QiFdbIbDiiIxQ0AlAriet2Ab+tDfDoFFNKoUxfATKDv344WDZCfP0sxMEJvyCJbbuKWVxm7dIm1TAnPsSnkc/h1m0tjcyg7y7kzZ1lJFwlEopQXxzh9/hIbuTKheIpQwEQD0pfeImPuIOZlmV1OE4snyM2e59z4FPlSDZ9PY378HJfGL9PUo/jtPBfPnmZ2cZ6NjGJwW5zJ4+8xObeCgw+fleP06dMsLCzSVEGs8irFhkeYGifH5/FbWU6dOcv8zCx1I05t8STvHT+HY4SJxxP4fcbV4cAajTrnz5xmbWUJgO079zA0PMLSwhyObdNqNtm5aw/Jzq7rDp8QQghxt3E8j/HVFSK6xt7BQUyjXYf4LLeuxYRhondH0TpD0DIxhmOgbPL5OoF4nB27ejj4wDBdwfbmTrPG2NlV1tIlLp1eYHImx8TlNGsLGRazTcpLq5ydKLAwk2ZmoYBlt69jeJ4iGIuwY28f2xOK+fUqK3NZ1peyTExukC202FgrksvXSK/kmLiUZn1pnbMXclif0rpidblMqdjENHUGBmMkk0E0TaNcbrK6UsFxPnkfIYQQ4l5gGBo9fSZ79wdIdRqEwjodSYPuHpNsxvmty0BN09A6u9Huewz94V0Q9qNp4NhNps68y7nLC/iCUaKJLvr6uimllyiWK5SKedYXFijbNmtzc+CP4JbSrC1Pcn58lUgiQbO8wXp642rLTNd1WJufYGZmlnypildLMzaXIxaPUsmvs5GrkuwZIG62mJlbJJfNYiT6OLBrFL/PpF5apm70s3//PjqiBosLKySHdrFrxxCV9VlW19KUKzU8q8bKeoZ6tY4Z7WPvaJL15Q2i3SP0Dw4xum2YUMC87jjo2pYLIkrR2d2DP9CuDCml0M3Pr7gJIYQQ96JbF0xoOlpXCv8/+Sah/8XDaDE/GqDQ0PR2qaxcD9trF8RuqUornuTQ/SNs6/DI1xxwXGq2h+t4ZBYztGiPDm7Z7qd02dDQ9PbjB0MmuDbFYhNCUQb6Yuzc1YvfbZGtOximD6fZxPnEY3w8y4njeJimQTweRNO1zdHJt2wrhBBC3GN0XSPVZdKRNDbDA6iUPUJhnS+42PH5uobRX3gM/YF9aNEAAL5AmCPPfJ8/+uM/5oEDA6yMnWB6rUI0FiIYihHSYGY1zdDIAJpSaJpJsm8b/T0pTEDTfXT1jdDblbpaRBtmgO0HH+Tw4UP0dSUxdAV4GL4AvQMjhFWJcxcu4JghTK/JlR4X2mY9op1wbM5GstktFbTNOoDCMA2sRo1CoYBtOZjBEMmuHhIdUTTXxRcME/CZaBqfaJUZDIUY2baDSDQKQLPVYHbqMvrmhgNDw/T2Dlx/JyGEEOJr4NYFE4AWCGLE/BhdMQyfBrqPZDJEo1hidmaDsTNL5C0NTXeouwa+Ro2lhSzZhklXKkR3X4KUz2E106SjL0nQNIglwvR2R/Gb7UJc1zValRpzU+vMFzVGOgwWF4t4po+gDyzbIRTyk1svoswgqagPX8jPwHAHAeOTScPgUJyOjiCmqVMsNiiXm5vNV4MMDMYwN59XCCGEuBdpmoZS7e4cmQ2HlWWLRs1lYND323dl1LR2q4lr/gBCHf2kYv7NZQbxzh78XoOmpWi0LDpCCj3UTUciwciOndAsUm600AJdHNjXTyWfodawMMx2EAAQ7RqhI6hh+EKkUimCyWEOjnZSyGxQt1yC4QSpWJhmy0ZXLXyxTpzSGpdm0nT0dJBIjRD2Vrk0Nk6h7rJt+zD5pUmmZpaI9e1k2/AgVmmNy4vr9Pb2EIrEiYeDmIEYPd0JguEoEdNlYXGJeuv6gTk0TWP7rt3s2XeQUCjMzOQEH773DuVSkc7OLh567AkCwc2mpEIIIcTXiKY+bdjoT6GUYn59nZ+cPstDew5wZGTb1k3Q9QIB8yKa9tkzWLi2zcZagXSmQTCZYMdgmMxqEcJh/HaT1Y0aka4kg11+MqsFchWHvm09dEUUC1MZavgYHE6RivnRNY96pcb8bJ6Gq9E91MlAZ4Dsco6NooXmM+nsSRCyayxlLPqHU7QKRTIlh+7hLga6glevUlzRatqcOL7M8Y+WKBYboBTxRIhHnxjhkUeHCWxplimEEELca1xXUcg5FAsuhqnR1WUQjRtXAwXX68Cy96MIbb3r70Z5uB7omqJezrE0PYPWs4Mdgz2YersuAqBtdonwXBc0HX2zJeZnUcpDeQp0HV3T8K6ZeUPXddTmQJdXHvfqbV1H2+w2ilLoRvt6jtfeyU/UIaDdyuLKgJy6/unXf3LZLOMXz7G6vIRltehIptixaze79uzHH2i3JhFCCCHuZk3b5scnj9FtanzvkYcJ+P1bN7nObQ8m2hTqSstITbumoqFtVhzaXSc+3jUNTVNX+49+0RWbz3pJ1z7Xldtbqc3pQpeXiqyvV1Ceom8gwci2DkKhGxzkSwghhLiLKaXwvHavBg3QjevLzFsWTFylsBo1ypU6kUSSoN/3iW4RdzOlFJbVol6r4dg2oXCEYCiEYXwc/gghhBB3s5sNJj49yr/l2uNMXCl8r23WeXU8h2uWt1dd3/zz83x8v082G916eytN0wiFfeza081jT4zy+FOj7N7TJaGEEEKIrw1N0zAMDdPUMMzPLjNvHQ1/KEpXTw+hwL0VSrB5fAOBIMlUJ929fURjMUzTvAPHWQghhPhquCUtJqDdYkIpDaWkkBVCCCHudpqmNv9ussWEUqjN7hRCCCGEuPtp7a4P7f9/Rqh+sy0mbkkwoZRNqxGi2UihvCAynYUQQghxd9PNMqFwnkDQualgQnkerUYN5TTbfUOEEEIIcffSAM3EF4ptDj796b/1vxLBhOu61Er9RMIjBAKBzxz8SQghhBBffUopqtUyLXuWRKpwU8GE3WrhNMt0pZKYpgwgLYQQQtzNPM+jUqnQdDQCkdiXFkzcksSg3X0jSDAYlFBCCCGEuMu1x0QIbbaCvDme5xLw+yWUEEIIIe4Buq4TCATw1PVTYv+ubmFqcCcGyxJCCCHErdAu03+7cl3qA0IIIcS941aU67cwmPjdKaWu/t2Im9lWCCGEEEIIIYQQd96dCSaUolWvUSyVsT0FSmFbTcrlMk3LubqZ1ahSKNdwHZd6pUyl1sD1Pg4e7FaDpuWgNh+zUSpSqrdwHYtKuUS90cJTCqU8GrUK5Wodx/Xa84c3a5RKZSzHQynwXJtquUSt3pKxuYQQQnwtKKVwnHa563keruve3oBfKZTn0qhVKVdr15TRdcrlCi3bRan2AJq1SukT9QAhhBBC3BuMl1566aWtCz9LsVplfG2dgc5u+hIdW1ejaU1MfQPPU9itJOFwYusmgKJV3uDs2bNMTs9SbulEAorpsfOMT06zmi7R2d9PQHOYv3ye5bKDV1rhzPlLLK1m8cwQqUQYp17k1Idvs1yNMdQXB6fB+eMnqfmClJYmOD82wcpGkUA0gVWY5/jJ8ywup7F1PyFV4czZc0zNzJOveqTifpZnLnNh7DKL6wU6uvsI+42tOy6EEELcMyzLYmNjg7m5Ofx+P5lMhrW1NXw+H4FA4BPNND3Po9kqEAxXUCqI63UDvuu2+TSuY2NoHsFgYOsqlFKUsqtcPHuGial57GCchK/FyQ8/Ymp+iWLDoSMRo7R0mWOnLrKykUOZIRKxMPotaEYqhBBCiC/mui4Ny8bnD36ivnCF43mMr64Q0TX2Dg5iGp//+/qOtJiw6lXM1CD7d/Vx+q03mJieYWolx869e6lOvcfp5Rp2Ncdqpk40rHHmjffwj+yn06gydm6Mqm0zc/4EEwtzLCwW8IBmOcNyuUVHQGc9W2Z0zz7c7CwTc0scf+c3NOM72dbhMnHxPIvLy9SMHvbvHGD61EdMTo5z9uIs/kQ3QdOi3rC37rIQQghxT1lYWOA3v/kNv/nNb/jVr37Fyy+/zMsvv8ybb75Js9ncuvktoZTCtl2i3X0k3Qznp1fJTR/jzLrOrtE+ZiYvsba+wPuvvU9oxyE6TYuxC5eoNKWcFkIIIe4ldySYiPSMsn+og5mx8wR7hnFaTcLRCD19Ixzc1cnyWpFMJodrBOiJOaznw+zeM8RQfx8RrcnCxBgTxQCH942gXAfPc8gszhPuHiKZ7OLoY08y3BkAPUg4pJNNV9ixaydDg/1EgkBqD089tJ+Q4UIojFWvk02vsbqywPLiCvlyA2/rTgshhBD3kEAgwPbt23n44YcZGBhg9+7dHDlyhJ6ents2o5am63T2DTPQEWQlWyIWDlJcniI2epidw32EI2GcUpqpcojDewfp6+4ljIflfLkjgQshhBDizro9NY9rKUWjVsfTQ+w5eBRVW6HSsPE8hee5NGpNfDoUikX84SjxeBifbmNZLrbjYDeqjJ05wbmzx3jlN29x/OS7TE3PM5dpMdjfQzDgx0eLC2fO4MQG2DM6RCigsGwb23bwPEUwHMUrzPHOh+PseeQx+hMmvng3B+57mJ3dBjMzS0gXViGEEPeybDbLzMwM8/PzzM3NXf2bmprCtm9TiwSlaDUaGKEkh3b1k84W0Xx+rGYDx3FRrgemn6Dn0nQ9HNfBRX1ms1EhhBBC3J3uQDDhsDF5kh//9Bd8cHoMLdrNrm1D2LlVfvXTv+HtuQBHt/nJ5fN09I/iCwzz8ENR/v6Hf8NrJ8cJbDvID/7sP+b/8L/+L/gn//APeeaJbxDX6tj+MN2dcTS7xns//yE/fvUsG/k0KxtV7rv/Pt752V/xizdPQ7ifWH2C//f/518zV6iTmZvH6NrGcKfJhePvcXYyS89Q/x04MEIIIcTtUygUKJfLjI6OEo/H6e3tJR6Ps7KycnVAzFvNc23mxj7k737yCz4cXycejzDwwLdQZ/+Ov/rZq7Qcg+Tgfr71UIAf/Q8/4q1TYwQ6e4gHv3hsCyGEEELcPTR1g8NvK6WYX1/nJ6fP8tCeAxwZ2bZ1E3S9QMC8iON41Mvb6eoc2boJAJ7TZGN9g1rTIdU3QCJkUinmyRUrBDu6ies1ZqcyjD54mLih4TSrrK2t4/lidHd3Eg6YANitGvWWRq24StnSGd22Db/ukd9IU6q30HSTRGc38YDGxvoaFkG6e7oIqCZrmRy242EGQnT39KC1Kmxk8hCI0d/Xjd+QqzFCCCHuXa+//jofffQRg4OD1Go1fD4flmWRy+X4F//iX5BMJq/b3rZtiqUZOrpWcb0OLHs/itB123yaVqOOX3PoSMS3rmqPMdGqk93I0HRNuvu6ifhNitk1ijWHeGcXyVgEnDory2sof5Su7i7CARMppYUQQog7o9Vqka/UCUU7PrMVY9O2+fHJY3SbGt975GECfv/WTa5zR4IJIYQQQtxZb7/9NsePH2doaOgTwcR//p//57clmBBCCCHE3edWBBPSY0EIIYT4Gtq+fTv3338/nZ2dDA8P09/fz8jICI8//jih0BcHDkIIIYQQXxYJJoQQQoivocHBQZ5++mmefvppnnnmmav/PvbYYwQCga2bCyGEEELcMrcomFCAwvM8brCniBBCCCFuI8MwCIVCn/gLBAKfaJapVLtM57ecTFvqA0IIIcS94Wqd4Esu1m/JGBOe61Cr9OA3h/D7g5+o4AghhBDibqKoN0p4apFYR/mmxphwbAurViaZiKLrt+h6iBBCCCFuC6UU1VodV/PjD4U/87f+zY4xcUuCCbCxmj5azRjK84MmFREhhBDi7qXQjRrBcAWfT91UMKGUwmo28OwmoD6zAiOEEEKIr7ar0YHuIxAKo+nGZ5brX4lgQtNsbuxRhRBCCHG3uFL3uJlggmsrMkIIIYS4J3xWIHHFVyaYEEIIIcS96WaDCSGEEEJ8vdxsMCF9LIQQQgghhBBCCHHHfKktJjStSMC8jKY5W1cJIYQQ4h7henEsZzd8bosJF5D6gBBCCHFv0wETuL5rx822mPhSgwlw0GiiaTf0kEIIIYS4CylloAgAxtZVV+laFp85x5c+n5gQQgghvjJcL4Hj7v5EZ4w7HEwIIYQQQoChr+P3jaNJMCGEEELctTxPoWmfPdil43ZiOYd/52BCxpgQQgghhBBCCCHEdRzbI7Ph0Gh4W1d96W5JMKGUwrFatFotvJu8UJKePsFa5ePbrtWkmM+RzxdoOe61mwohhBBC3FGu61EqNpiZyjFxeYNcro7r3voKnBBCCHErOY5ibdVhdcmi1VBYLYXjKG6sv8XNuyXBBMpjY3WemZlpbBdA4To2zUajHVZ4Hq5t0ajXsW0Hz/OwWy0ajSbZpQkKzfbDeE6TufHTnD59gotnPuL8xWnqlkOrUafZbOG4Hp7r4LoeynNxHBfPdWg1m1itFrbdolFv0LIsPKVwrCbNRgPLdmVOdSGEEOI28RyHZtOm1XJwHO9qGXzl33qpynq6Qr3WYnW9greljFZKtbe9ZvHVZVsopXDsa57PbW/X/rt+O+Up7GaTfK5K3fJA8YkK1+c+j+MyO53nP/zoAn/9l6f50Q/P8dd/cYoL59ewbfcTjyWEEELcDZRSFPMO8zMtMhmH8bEG58/WmRxvUszbeK73pZdxxksvvfTS1oWfpVitMr62zkBnN32Jjq2rP6YUlUKGesuls7sXU3NZuvgR7x87wcLSBr5IlPTkaU6fPcvSRpVYxGDi7DEuT06ztrZE1+7H6Y6AazVYXl4m1DHA8LZtdHVEKa/PcPrkCaYmJ2kYUbzcHAsliGk5zo2vg73Ee785Rk3ZpBfnGBu7yPJakUQywqUPXuHsxctsVF26uzrx+z570C4hhBBC/PZ0rYphZNGA5WOn+dt3NlhfzlOqe8Q7wpieTbHUxHGhmiuwtNEkEtRZXK3RmQyg0MFzsFxQtkWp1MLxwDChWbOoVS0cV6GZBsp1sR0P3dBQjsP4R+O88f4iS4sFGrqfVNxHrVSnYSkMU8dtWVQqLXLpEvW6Q6XcxAgH8RotKjULdAMNj0a1SaXawkHH7ze2jDcO+VydX/39OPOzBTqSQUyfTiZTJ7NRpbcvRjIZ+sw+uUIIIcRXl4ZuaLRaCk2H3XuD9A/6QMHaqoM/oBMMaWiahqfCuF7vJ2blcDyP8dUVIrrG3sFBTOPzf3vfumCimKNhe+1gQjUYO3eR1LY9xHwK3dDACJHs7KRWWEMzw+APc//RB3DSM/iGHqA70h5gw9ShXi2T21inVC7RcDS6Rw5xYMjP+HKZrqBDxYvQGWyxtNEiHnFx/ds4tCNBoeGy58gTjHYFaNlNVuZWGNqxnaYN3d1dhAK+rXsuhBBCiC/BtcFEcX6J6NGHeGJPiPXlIspnkF/MMD1fIJdr4LguDjpdHX4qTRevVqPYBLdUJlt32JhLM7NYJFdoohsec2PrrBcaWOUaRfzt7coO0VgQHY/cepnoUC87uzXWSxB2Kpy/lCGdreMBmZUMqxsVpi5uEB/sIGCA27KZnsqQyVQo1BwM12Lq0jrrmRJr6xa9Qwl8W9qZzszk+eC9BTTggaODhMN+0usVbMsjFg8wPNKBad6axqlCCCHEraJpYJoa0aiB6yoiMZ143CQY0qiU28MrxOIGuv7lBRO3rLR0rSar8xOcO3WcscllwmEfmdUlao5GNGiwODnG7MIK1VqVesvGLmeZvDxOvrbZjwPwXJtqpYzleGiaR73eQFMemaUJJmbXiERi+P1+SqszjE/OUW9aaKaPcCiEGQiiWVXmLp9jdnEdpfvQNYv1dI5wJErAb163v0IIIYS4lTQCIT/BgIlTLnNpsUY8GUZz260hFKAch2KlhalrbCzmWMpb+OwGlxerJDvD/P/b++8wO/KEvvd/V9XJ+Zw+nbvVQTmNNEGauLtsZGB3MWADy7V9fz/wJVxMMMaYn7mPzeB7AT8P4V4w+BJNMsHALhtm2TA7O1lZ6pZa6qzOOXefHKrq90dLGqlHo5EWaTSz83k9Tz06Xd9v5To6dT6nvt8y7AqrKzmKrofOnQ001PlZGJxhZrmAY3nxXLnmqVYqzI7Nc2kkR006zOr4LJVAGL/psr6SZWExS7lYxevzEfZDPptnZmQNX0MN+/fVU1xeY3m5iBkMse9QE878MmuVrdsDpWIV91pv5RCN+eFKD+blso1zpx1tiYiIvEMYBgRDJp3b/cTjV747X/1Yc+/+3YD3KJgwSDW0smv3fmpqUkRjCbYfeJg9u3bR3tZOsqae/Q8+wt7dO9n/wCO0tbbQsX0HNckadj38IZqjm3MxPT6StQ2ka2pIN25j78GH2LFjO9taG0k37+TAzm2kGjvY1bmNdPMODu7rpCbdTltbDb5wkm0dO2ioSVJTW0ciVsOBRx5j5/YdbGuqw6dfMERERN4WrusyP7nAwMAi60WbaDJM1ONSLNv4wwGSUR/FjSLZYhUMg2RNBLOUZalgEIuHiXoMCiUHf9BPLOonFPYTCngJp+J4KjlWMlBXG8S80mzC4/PS2FpDS22AcqmKJ+CnWqzg8XuIx4L4PRblsk1yW4qwxwBMAiGLzHKW+YUMZUw8Pg+hiI9g0IfX4qadeadrQ0QiPgzDYH29RKlYxbQM/H4P6XQYr5qMiojIu5hhgGEa5PMOK8sVZmYqVMoQjZnc7ZaKhnuzHp1uwnVdxubm+My5bh7ZtY/D29q2Vnmd626GKVf/NQyMK/MAY3MjrpQZV8o3q7tX2mJeqbOl06lr7TSvTvtmf1+ZpeteP0+AzY6vrv6tdp8iIiL3hmXO4fP2YeCyNjFDz0SBQMBHXXOSxtogG7NLjEznCcXDNKQDLMxsEK2N4GDSWhdieWGNnO2nuTFMZnaR4ak8oWSE5qYwlbxDPBnEMhyGLk6S9YR58EAdHtPAsW1WFzZwgyEiZpnZVYdkGEYvL+MEAtSnAkxeXsD1ebGqRaxkA20NXnx+D7MjS2TKLjVNKdIRi3LVJZ7wMz+yTLyjnuh1LUBd1yWfr/D1rw1z5uQkhmFgmAaVss2efXV8+yf3qI8JERF517NtmBwvsrbqEAwa1NV7iSU2m3EYBlTtGsrVg2+456FYqfDpMyep9Rh8x9Ej+H2+G8q3ujfBhIiIiLynXR9M3BNOhdGBOZazNu27m0nHbq/fqHI+x8DFeUpeL55ykVhnG521t75YupVioUJf7wJDg8tUbZu2bQkOP9xMOPyNz1NEROTdQsGEiIiIvGPd82ACl0K2iG14CIW8mLd9Y4JLpVQhky3jC/iJhG8v0LgV23aplKs4rovf78Gy1FxURETeG97xwcTmbG985riIiIi8SxmbjwW7XdcHE5tNK7fWEBERkXejq5cD7/imHK7rUimXsMsFTNzX11xERETefVwXx7Dw+kN4vLd3h8HVYALXpVjwUCnWAJYuCURERN6lNpMDB8PKEgrnMC0X23kHBxOOXaWczxAKePF5vXf0C4uIiIi88+TyBUpVCEbjW4tu6mowUS2bZDN1xMLtmKaeUiEiIvJu5jgOheIqhmecUDj/zg4m7EqFanGDdCq52Uu1ggkREZF3tVKpxMp6hlA8vbXopq4GE8W8hV3eTSJep+sBERGRdznXdSkWi+SKfcQSa3ctmLinvTOZpqmLEBERkW8CpmluPuL7jhm6HhAREfkmYRibn+t3O0q4u3MTERGRdzXHcZieniaXy20tEhEREbknFEyIiIjINSsrK/zRH/0RXV1d2La9tVhERETkrnvbggnHrjIzcol/+Nzf8aUvf42zly6TK7/xgqdazjE7O0fljUUiIiJyD1UqFT7/+c/z2c9+lr//+79ncXFxa5W7yrVt5sYHOXXmHBvFCvmVWS4NjLE4NcwLX3mWL3zhC/zPT3+O/qmlrZPewC5m6TnxKgOzS9iOzfr8FH2XRsjbJcb7u7l4eZbZ4W4Gp1a3TioiIiLvAG9bMIFjszA7yVLOpqUhxfCJ53n5whiVYpbhS+c4dX6AjcwqF177B37nd/6Al85cZGFpmf7uU5zqHqRQqbC2vMDQwCVOnzzJ5OI6tl1ldW6UkydOMza7xPL0BJOLGexqmcW5WVbWsnpuuoiIyG1yXZempiZ++Id/mMcee4zb7B/7G+a6NiszQ7zw3FfoGZ5nfXmWvuEJApEk7Z07aUv7mJ1fpuq8Pk0pu8LkzALFsn3lM95lfWmOge6X+fKxIcoVm/X5SS729DM6cIZXuscJBn3MXu6mb2btuqWLiIjI9fL5PIuLizcMS0tLb8sdlG9fMAG4pod4bSO7DzzIh57ay+DFi8yN9tM3Psnwsa/wYvcYnmAUj8dPKhFmbrSf6aUs/ce+wLMv9nP5/Ct84WuvUnHKfPav/obe8QUudHUxNznEV55/kdnpAb709VMsrsxz9uQx5nMO32BPXSIiIu85Pp+Pp59+mh/90R/le77ne2hsbNxa5a6zgnFaGhNMDfYws7BOteoQiqeoS0eYmd7gsQ98iN0tNdfqZ5dnGRoeJVuqbI5wKkxNjhHoOERkqovLi1kcu8TIhdf4y3/oYtfhh2mrjeLYVWzn3gYtIiIi72ZLS0v86Z/+Kb/xG7/Bb/zGb/Bbv/VbvPDCC5TL5a1V77q3NZi4ynVtcrkShteDNxAi7PNSyC2zXoR0cwtN9fW0tzSRTCTxGlWKxSKZTIaqGaSxbRcPH3mU7U0m67kSsWgUqgVWN/L4GnazzZ7g3KUhSp56mmojyiVERETe0QzSze3UBSsMjY5TrNqU8xsMDQ5h1bexp70Rr/n6p3myeSdPPvogybAfcCltLDI5PsnCUhnD3KB7YBzXtXF9YdrTUWamZskUr4QYIiIi8qaam5t59NFHCQQCuK5La2srR44cwe/3b616172twYRbzjPae5bnnnuO430z7Nu5g8nB83T3TeAPB1hbnqdYMSisTnH+QhddZ8/RMzhNIBphdXqafKXIzGgfr7zwdWYyXkJWiVPHXma5ZGBWsyxmYM++Vi6eOEf93r3EfW/r5omIiLyrlctlTpw4wbPPPstLL73E0tKt+3a4W7yBOIcf3EthfoqlQoXJvtN87fnXmJ6d48SrxxmeWb5WN7s4yfmLA5thg2uzOD9P0QixZ28Hhx86xOrQMEUzQMeuh/nkd34UY2mQiyPzVEsFBs69yle+8hVeOXOJTKGi5p4iIiLXsSyLhx9+mMcff5z29naeeuopWlparjwe9N6ynnnmmWe2jnwza9ksfbNzNNXU0hBPbC2+xnUcnGqJcCj0+kjDwB8IEYtGicQStHTuYf/OVuLxBMlEkrqmNloam2hubCKdihCJ19O6rZnadIK6pm20NtXi2jnWixa72lvZtmMf21sbqKlJk0o30NrcRF1tmoBbYmbD5YlHDxPy3vsdKCIi8s3Ctm2ee+45fu/3fo98Ps+RI0eIRqNw5TGihWIJb+C6z/ZbMI0slrVEtWKCkybgD2+tAhj4AiGSqTTJdCP1tTU0t7VTm4gSTaSpr00RCUdIpWuIhjZ/rbHtKo7hJR6P4bVMDI+PuuYOdu/opKm5mdpYjJrmJurra0nX1VOfihGKJqmvqyUWjRKNRojEE6QTMTyWiaFbK0VERK7xeDzU19fT1tZGS0sLPp9vaxVs26ZcWcIfKOC6IWynnq19KFQdh76ZacKmwe7mZjyWdUP5VoZ7mz1bua7L2NwcnznXzSO79nF4W9vWKtfYlQrV4gZ16dfbhL6ZWy3eAK6WOtUSF7tPM1sM8bEnH8QwDAyD13/tcKpM9J/i5VMj7Hrsgzy8pxmPrjZERERum+u6jI6O8gu/8At853d+J5/85CevXZBUKhWWV9cJxtNbJ7spy5zD5+2jmPfgVvcQj9VurfINef26YfM6QERERN5epVKJTL6PWGIF26mhXD34hsYYxUqFT585Sa3H4DuOHsF/k4Djevf9loLNgOHmA9e9Nj1+Dj70BB994vDr5VxX3/TQuucxPvUvPsWR3c1YuloRERG5I4Zh0NbWxi/+4i/y0Y9+FK/Xu7XKfff6dcLWEhEREXm3uu/BxO0yDAPTsrAs60oo8YYKmJaF1+vFNA11eikiIvINsCyLzs5OYrHYzT9vRURERO6yexpM3KqZhoiIiLx7uK57rXnlnXJdZ+soEREReZfa/J7/jV4V3Ny9CSYMA9eFYrGI4+hiRERE5N3MdV2KpRIYd37ZYFoO5XKOarWqHyxERETexVzXxbZtiqU8lnV3H8V9Tzq/dByHaqmIXc6D66CGFSIiIu9eLoDpwRMI4vUFthbf1NXOL13HpZAPUCk24LrmG3rtFhERkXcLF3AwPRlC4TU8XvuudX55T4KJq7N0Xee6x2aIiIjIu5ZhXtf59Fu7GkwYuLguOI55t+/6FBERkbebAYbhbg5A9Z0cTIiIiMh72/XBhIiIiHxzqtp3J5i488aiIiIiIiIiIiJ3iYIJEREREREREblv7mpTDsPI4rUmAXtrkYiIiHyTcNwQVbsZ8G8tuk4B09xQV5ciIiLfxBzXh+sm3tC59Z025birwYRpruL3XMQw7u6jQ0REROSdw3YSlCt7cQluLbrObV1eiIiIyLveG3+GuNNgQk05rnBd99ogIiLyXuU4LoW8Q6Fg/yM/Ew0NGjRo0KBBw3ti+Md7zwcTrutSLldZWc4zPbXBwkKWYqGip5yKiMh7jutCNmMz1F9kcb5KuexSrSq0FxERkXvrngQTrutiV22KhTKFQoVK1fmGL2rsUpGl1dJNpnex7c35FnIlstkyjrO1zq25rkuhUOHihTm+/MV+PveZi3zxc32cPjlJJlO8yTJFRES+eZVKDsMDJRYXq6yv2UyMlZmaKLO+9o+9e0JERETkzd2TYALXZXlmmVOvDnDm1BjdF+YpVFzAxXE2h81qLo7tXGuF6l5XBuA4DtVCkfnlwmYd18VxHBwXqJYZGVih5LrkMgU2MkUcF1zHwXGuzQIc500DC9t2uDy8wksvjDAwsESl4jA2usJrr4xxvmuGYrG6dRIREZFvWoYBPp+JYYA/YBKNWgCMXS6RzVz/4SoiIiJy91jPPPPMM1tHvpm1bJa+2TmaamppiCe2FmMYRTzmAmCzsrDORtmhvbOW/Mw8a1YYK7vKmROjjMyViIVNBrvHON+7SNnyEbbznD4xSt/QIkYoTGZ2jq4zsziuw4rtJx0qcvJrIwyMLrJWdLFXFviHrw6TrYBrGng9BqXVdU6eGmdkIkMgGWB5dI5zp8cZGF4hWBMnFtq8wLoqn69w7JUxRkdWiET8PHCogbnZLNlsmWrVYdu2BNFY4IZpREREvllZFkRjJtUqhCImjc1eIlGLfM4hm3FIpjwYBrhuANupBbxbZyEiIiJC1XHom5kmbBrsbm7GY934XXyre3PHBGBYJuFoiHR9gqamAAvTGaYnlzEiUYzVDUbGlhiaydG8LUXcYzMyuk6yrZHHjjbjKZfI5CokGtK013rZyFepVorkChYHDzWSXc/hj0Vpbqrj4SPNxH0OuUyB4ckNdh5qY1+rl5HeRZbXStS0NbOn1c/lsbWtq0ilbLO6msd1N38hqm+I4fd7AMhmSuRy5a2TiIiIfNMyDINgyGT33gDNLT4MAzyezZCiWHTV/5KIiIjcE/csmHBsm1wmz9LCOjMzBZK1QQzbJpcr40tGaGxMcmhvmtmhGS71L1LEwK1UKZUNvH4Lf9BPIh7E67mul0/HpVKxcR0wfR58hku+UN1s2gFYBpRLVUr25oZ5ggES8SChoIVzQ/uOTV6fRTIZwjDArrrk8yW8vs1dEon6CYdv/UgTERGRbzaGYWBa4NguhbzL6nKV+dkK6XoPb/Fjh4iIiMg35J4FEwG/l2q+yOWheex4DXvbItS31JIIgOn3EvQYFEs24VSUhpYUbY1hsisbDA8vkitBJBYiHPaAL0BDyocBFAoFxsfXiCbChKJhtjX4mB5bw/X6SCQjtDREWJxaZm6lStOOFOlkiHDIIhgJUZd8Y5OMQMDD/gP11NaGKRQqnDoxSWajRCzuZ+++OlKp0NZJREREvuk5Dqyv2UxOlJmbq5JIWtTVbd5RKCIiInK3Ge5tdrPtui5jc3N85lw3j+zax+FtbVurYJqr+D0XMSjjOM7m0zgAj8fCMg1cx9m848Ew8XpNnKqDbbtYXguPCZWKjeOC1+fBwAUMTFyqLpTyq/RdqLDn4Rp8HguvZWBXbKoOeLwm5majVyqVKq5h4vNZ4LhgGBi42C54rBtzGNd1KRYq9PUu0Nc7z9paiWDQw45daQ4/2EQ06scw7s5zWUVERN4tXNelVHQplRwsyyAYNDGtzbspAGwnQbmyF5fg1klFREREKFYqfPrMSWo9Bt9x9Ah+361bI9ybYMKobC36R6tWymQzLrGU/67e5uG6m81DMhslCoUKPp9FLB7A7/eiTEJEROSNFEyIiIjIrbxjgonbm+uduDrDe5UWXL/C92oZIiIi726GoWBCREREbu0dEUxABbtqUioFcGzP5lWMiIiIvDu5Lh5PGV+giGUpmBAREZFbe0cEE45TIbeRwqQJny+sfhpERETexVzXpVhcxfROEYnlFUyIiIjILb0jgolq1SG/0UYy0YqlZ4uJiIi865VKRTayl0nUzCuYEBERkVu602DibvYjuYWJad7D2YuIiMjbxjQtcPVjg4iIiNx99zQ5UBMOEREREREREbmVexpMiIiIiIiIiIjcioIJEREREREREblv7ksw4dgVCvkc2VyWXC5PuWJvrXLXua57bZB7x3UdnG90F185Ps5tHKP8xgq5UvWGca5rk1lZofiG08mhVMixsZal+tazvutcx6aQy5DLV7gPi78Jl2qlwMZqjjfsKtelXCyQy+WxbWdr6Q1c1ya3sUEuV7pyzF0qpSLZTJbqLSYt5TdY3chvHX17HIfM2gqFYpncRoZypUJmfY1i+Q1bckdc16VSKrCxnsN2XVxn81ysFnMsr2W4xeZ8A1yq5RLZTIbKN/xmeXts/p/p3NH/m261xOp6Ftu2KWRWyRWrr5/3rotdLZPZWKdUyLGynqFy5WRx7Sq5bIZCqUBmaY2SbVPMZ8nmCjj3+P/v19+jRe7RIsB1cd7hx1tERETkfrkvwUR2dpDnX3iR1147zskzXUwublwrqxTWmF9Y5S2+E92hzYvh+ekJltcKWwvlrrFZGO1jbuPGwOB2ubhk5i4zupDbWvQGsyN9zK8Vb/ii79gl+o8fY6F03UgAbJamhzl/boD8P+776y25jkMus8LyagbnuvPXrZZYnp5geinzxiDgCqdaZm5mnlL1zWrcXbmNabpPDFDcWoDL8uwUA0PjFN7qy76bZ7DnAkOjC9hXgomNxWkGegfJ3uIUWBrr4viF8a2jb4tjV7hw9hhTc8sMXOhleWONqZFhFjNvOOibXJdqqcDK8hKFUmVr6Q3ya4uMjk1RLqwxMj5DrlQlMzvEy6f6ufWUd8olvzzH4MU+1u7ujO8u16VUyDExMU6u9BbnwnWq2QVOnO+lVCqxODnM3Gph833qOmRWZplbWGZybJSlmRFe6+pjPV8GwK6WmJ2cZHF1ngsvnmGhVGJ1cZLJ2SVW52eYml/Fvkdf7B27wtL8JDMLa1fO5buvmlvi4sjM1tEiIiIiAljPPPPMM1tHvpm1bJa+2TmaamppiCe2FmMYRTzmAo7jUiklCYXiW6sAsDp0nOMzFof37qA2nSIRDbE2N0p393nOnjqHv2k7dfEQ5i36zrTLOfovnOF87yhlw4dRXGJ6vUo04GFmaICc5Wd1apBz5y6wXLDw5if4i7/+W4bmsiTiEVbGB+juHWC9YBAPOPQN9DM02M/w2AzZjRX6+wbIVj0kohGWJ3s5dbaH5WyFqB8Gh4e43HuRdTNFXTwA2CxPj9HVdY6xuSzReITlyUHOdl9gMW+QMDN0Dy6TihkMD16mYvhxlgYZ2AjQEA8AsLE4QXfXOYbHlwjHIyxNjdJzqZfLQyOUrChBq8hA13n6RwYZn1kjmkji5pfo6TrHwOgMZiCCJzvJpSWTGl+Zqakpqh6D0bM9DE5cZnhsBk8oQZA8ly50caH3MmYgjsfOMtDTxaWhSaxQDCszyYtnepkZH2VpZZWpkWEGJhZI1jZg55bpu3CO3qEpPKEY7sYUx7ouMXH5MmtFE09llr/5oz+ke9EkEY9SEw9jGAaLw6c4dnGMmYkJVlaWGRnoY3K1SE0qzurMCF3nuphcLREycnz1b/6Yr19aJ5UI4xSX6TrTzdRKjmgsxPzYEOfP97NR9VBcGaPsr6U4P0TXhT42bA/JqIfBYycJ73uYtP/6s8VhbqyX469eZLW4wUbRoDbuZ2roEqe7e8jZPuLRMAtjPZzuusRKziGeiOPzmLiuS2ZpmvPnzjI0tYQ3FCVUmORLJ/uYGxtmKecQjwSYG73E2bM99A/04000UFoap/vCRWZWitTWxlibn2bV8ZObHmJgYICBkSmsUBJvdY1L57vpOn+W6WWL9s5GvKYB2Tle6+5lfGiAiZlFVhdm6B8ew/VGCPsc+s6epGd4EtsKEqoucfriIGND/Uwv5YiEvEzPzGF6/Bh2huGBSTw+l8GeLi4MjOEJp/BUF+jtXqHjwU42d5XL2sxlTpw8y+DwBFnbQ0t9lOHeLnr6Ryniw+sWmZxcIhwJUVi8zOBahbn+HoYvT7O4uoTji+ItrDA5vUx6WyuZqT5On7vIcqZCPJXAZ23moItDp/j6mTGquRXWKyaxiI+p/vOc7Rkga3tJ+itc6O1jeKCfy2PzBOMpPJU1erq66BudZGBogNqmTlanJok2pdmYmMWsSTFx5hgDE5OMza4QjsTw2xlOHD9OT+8ASxtl6hobCHhhbugisyU/Vn6R4Yk5/EE/ly/0UvLA7NwypaU+/uZzX2durUDEX+CF4z3YlQxrWYd4LIbXMjEMKGZW6L94josD4zj+KGZ+gVNdPUyMXmZhZZ258csMjs8TiifIzU/Q399H/9AwK0WTsJtncnKORNt2qouXOXOmm4n5Vbweg7nZOVyPH7O8Tu/gFKab5+L5LoYmV4glk5jlVc6dPMnw9BLeYASzuMq506cZmlokEE0SDXpfP/XtCnMzY1zoucjl4WFWMnkmhwcYnVslFE1gFJe50H2OgcvTeMMJvE6OgZ5znO8bgUCE6Quv8HfPfpmNaoio32bgUjeDIzN4w0kiIR+GATglBrtO0d0/TNH1E3KznBqcZW9nCyuzo2SMGKWFYbrOdtM9OEpNXR25xWW8VpGTFwbIbywzO79BOBJmeXkRw2cycWqIxIO7MdbnWZhbY+DMCzx3uo+C48dZm8T2p3BXJhhfKROOhDGpsjA9QtfpSyzlKxjFZc6e62J6KUskFsfNL9F15gwDkwssL80BXpaWlvAEQlSXhuhdNrCKq+TyLtn1WQb7LjKXAyM7x7muHuYyFZJxL4PHzjEwN8742CQry4sM9Q2yVvVRG/czPz5I19W6CR8Dr51hcG6c0fF5LL+X0RNf4o+fPU7AG8D0VLh86Tx9l+eIJGsIB647Zu9gjuNQLK0SCGVw3QC2Uwu8O9ZdRERE3l5Vx6FvZpqwabC7uRmPdesne92XOyZcp8rk0AVefvkVhiaXqOaWOHG2ByuSwleYY80JXwklXBzHplqtUK1WX7/F33WZ7TvLsb5lGtJRMouzzE4NMzC5QKlSZqq3h8vDvXT19OONJcgsLOL44yRjUWprG7HWBnm5Z476ulqmeo7ROzzCuROnmCr6cZYv8bmvnCLir3Kp7xJjc5M894VX8cZTLI5e4nxvP8dfOcZMxU86uhkqUFnj9KtnyBDFKK+yvJJhbaNALGhw9mQ3q+USY2deYXBsjBe/9lV6Lo9x+qXT5K7tfpe1pSWIpLBnLnCqZ4jRi11cmlwjErB56aWXWFlZpPv0GTacKKvj3ZwdnKPv7KuMrTmkrHVOnullaqSHc6NrVPPrjI8OsphZ5dwLX2ciG8AqznP8bBe9p09xeaVCY32U0cF++vsuMTyxQbS6xJeOXyIz3ccrZwZxrCovf+15lip+wsvn+FLXJJf7ehiZzhGzl3j2lQusTvZz/NwwnoDF+a4zrJe9JEMeUg2t1MbDVw83iwMnOD6wjJ1f4IUXTuCEEix0f5WuqRzrGzkCfj+9XedZLpik4wFC6WYSRobjJ7rwxGqozF/gtWO9XOg6x8R8nngswvLsZaaXNsjkCgStCifOnSdf2Pzl9WYcp0Kh6pIImLx07CTrmQ2WFjOkYha9F3sZn5nhha9+DTOaxi2sUyi//lP2pZNfZaYQJJCb4uylAdZn+nj2xV6sUICx/i76L53muRP9pFubcHLLTE1P0X1pkFAizVrP1zg5usra4jTTi2ucP/4Ko6sOCeZ56ZUz9J3vYnSxTCLsZSWTxbz6JJvsDF9/8TTFYJLZC1/ntZ5pQtUVTl4YZHltlbVMBZ9d4FJ3D8tzQ3zlpdMYsVoWh7q41DfMwMgoa7kCpfwqfRf7WF3foIyXcG6M57tHX98xV1XWeOlLL1JN1WNWc6xurDHefZIz4zkaasMMdp3kUt8w/f1jFEoVMrP9XJjYoFzMUTSCNCbKPPeZF1i98sN6YXWKF148TziZYO3yGU6PLF+7u8V1IZvJEY9aDF28yOj0InOLWVLxAL0nTrGwPMPJ104xb4cx1i7z8qkuLl7oZmatTDpiMzG79vp6m1VmL0+wks1w+oWvslz2sjQ+wvDYBKOv/S0XsjXUJoJkMhtgWICJUZrj2NleRoZ6+OrzrzIxOsgrF/qobKwyMbtMPBbGG07R0tpKEJtKsYg/GGSw5yyTC2ub2+GUGOu9yODEBnFPji++cJL16SFOnO3FCnt57StfYnTdIpAZ5OvdI8wM93Cmd5JkTZTu557l8urm+eXY67z8lWOUI7V4NsY4ebqPyZEBhibnmRo+y4WheS6dP8Nc1sVYuMQrfZOMnniWvvUQ5Ja50N3Na19/nom8l7jfYXXjxruIcKvMDF7i3MAEkYSPL/7VX7FYDVNYHOZs/xCXXj3BRNYiZmZ58ZVX6eo6x+W5DHUJmxe/fIxqpJZoJExDfQ3z51+gd9lHOmSysrx2rclWbuo0Xz43RzwSYuDiOaYX1jcX7diszY/S199Ld99lgokkC0sbmHaJ2YkpMiWb4sY6nkQD1bk+vn7iAnMLc6xs5DDYbBa2sbrI4lKBUCBMMtVAa0MNa/Pj9PYPcvHiAAtrG5vhiFthcvgSPb0zhP0VXnnuFSrRWkpLY5w5e5Zjx0+wUvGS9md47rkXmZpdZGR4jFy+RG6ul3Njq6wszbMwM0/XyZe5vFolGXA5d+xlSt4gk93djMxP0/XCl5jIhcjOD/PyqW5CcZdjX3iV6fUlzp8+QckbYvTcWUYWZjn/4leYzIUprc9ysfcywXAEI5iktSHBxMBFppez+KtFNgpvcrePiIiIyHvIfQkmAJp3H+HbP/7tPHpoN+GAB6ecZ2pyhKzVQEv8yi9xVJm8cIzf/c3f4Dd/53fpX7h6f7jLwuIKrTv2snf/Afbv30XItClXbBy7Si6XxxerJ+6HC2fOMLm+jOuP09JYT3NTE2TnSHTuYUdnOw1pPwsrGXyROvbs3MH27W00tHbywK42zFKJ1fnLdF0a5NgrL9E7tkCpUIBALQcOHqA+eSWYsCK0tsQYuXSWobE5CqUixewyQ3299PePUfLWsLPN5dXjQ9TG61iZHuR8Kcj+uuCV7XGoVErMj/Rx7uIl5laLGP4I7Z072bdvH1FPhmrVIJqoZff+A+xoraFQLrO8vkHrzgPs2rUNN5shn8tRrlSx7QqFYhHbcfEGEuw/uIe21hYoZxnLVGnv6GDvvkM8tL+V9ZlBjh8/wasXBthYXKdsmNQ272L/7k4a29rZvb2TPW1pJoZHmJoc5sSx47zSPUhmeZ2K6aWuZScH9+8lFQFPMEZTXYrm1jbSiTAmm1+yDY+Hll2H2NHaSlvHdnbs2ENT0mB6dplKYY3R4X56Lw1RMHw0NdWSbt5G2GszOdzHqy88R/fgAiU7jycYY/uOHTTXxnGdKpWqTW5tgf6+S1y6PEPZdnDZbIdeqVSoVu1r7cU93hAdnTs5eGAPoZAHp1Iml1+l/2IPw6PTlF0PHa21nD9xjJH5VQqV19tirK4s0HngQfZ21JLNFsgXy9S17eeB3R2kk0FcTMrZLGPjEzi+OsJmEX80SvuOfRzqCDI4sYHj2NiOgyccY/eefWzfuQNvxQbTYW1+mrmlHLUtjXiu3ibkOkTTbezZtZ32tiZaOnezt6Oe3Po6uXyO1eV5zp/rYnxmiVK1SqhxD4d3bWdbUy1OuUilUsF2XOxyjnyhil2tsDI3zvmLFxmdWd1chAvXvsVml+kvx3n8gf3s2bWDmpiP6YUMO3btYXt7O8mQh8zKGqVKFdd1KORyVGyHQCjF9h2d7H7gERpZYKm0uf8LG3P09fXx8gsvcWl6jWq+cK0Zi2GZdBx4mAN7d5CKBKnkcxTyG5w/e4ahsVkK1SqBWCP79uxix/YWqrlFNgplardtY9+Bh9nRtBl6uVe2wb4SWoZjcfYePExrXS0GBv5gkPnJIRY3CiSSTfg9JmAQbz9IdOwEfUtF4jUpBi/1EE13EPIYOK5JIpUiVddEW3srYb+fhvb9PHhwL7UJC9e5EljZJeZnRzh9/AQvnb7I2vI6BdNLqqGTAwf20NRUz+6dO2hrqGFldoGSAXWNrXTuPMyBhiLT65v9Njj5BdaNOvbv7mRbewvueonWznrmxwY4dnyEvYd2MDvcw7HXjtM1OMHyyiqXey5xvusYZ7ovsZSr0tLRwspwF919Y2RzeUrl8g3nvmMFaG7dzv6D+2iuibF3327qYxHWFqYZnBil+8SrvHy6l7W1DHPTI5w//SovvHqBTClLIN5AQ0M9zc2NtO85QHmii5OXLrNRKV8LitcmhrjU38Mrrx5jYn6dUtXe7AvCBceugmmRz2wwOjFNLFlPwGdiV21cINrQwd7t29m7v53VjTVs28ZxXFx389g6jg2Wj2QyRUNLKx0ttbR0bGd24DxTZYPGdAKfZQAGHn+Q1vZO2hIG/WMjnHv5Bc4NTLC2vkGm4tLR2cGu/Y/QXmvhOA6VShXbcShmc1TtzRDcth1KviQH9+4lHXPpO3OWk8ePc3ligrVCBdOIsP/wAzRv66Szo4Nd+3YRyswwtbRK77lznDhxjLGJadbyVTxWhP0PHaK9tQHLa5GqTROvbaSzo5VtDWnWZyfouXyZlWyJSqlI5V61IRERERF5F7gvwYTpC2JVNpienmRkdJSp+XX8Pi/FbIl0xw7CFK78Guel9YEn+JGf+Gl+4n//EfbUXrll1ID65nrWp4Y5393Fhb4hit4Y5ZUpei/2MLWWw3UMahrbOfTAPoqLE2SrJgGfxfzsBJVgPaXZy1zouchcxqWlvoZQKIjXsvB4A0RCfjA9BIMBfLFmHn/8MEeOPsH7nnyM3dtbiIWCm7fbX+VUMSMNPHz4ECFng4mpWaamZ4k1tLO9McLaRolEfQdmfpnOo4cws2vU1m4j5Lt6O0uF6ZExCmaUvft3YZU3cKwgAZ8Xw7QIhUJYlodgKIjHNPD4AgR9HurSaWaHL9LVM0KgJkWqsQ3m+znf28/8ahHTsAhGIvgsA8vjIxiN01kTYnZslO7z3VwYmCDZuo8nnzzCY0ef5IPvP0TIHyQa8mOZFsFgEI9lYniDRCNRWrbv44knjvDYo0/wofcfIuQNEA75MAyTQCCIZXoIx2MsjA8xs5i51lGd1x8mHLA21yHoxzQNfIEIHrfI9PQ0VqyRPe21rG3k8YRj5GYus1rysPPAYY4+9jhPPvEoB/dsJxoO4Pd5APAHI7iVDFMzc6RbdtCe9LCet/EGYHpihIs95xmemKN65Wddj9dPKOjHNE3CoSCV/CqD4ws0d+6iIREkn8sTiG/j8AM7cAqrrOdf732htr6FsUtnODc0TyoZJxKJEgtvbrffH8DEIRr2UdjIkm7bTl0iilsu0N9zhrOTNoe2p/D6gwT9XkLhMD6PiWl5CQY8uKYXqOAGa2iuCeFe7ZzC9BIJBfEYJt5AiKDfi2H5CAf9lNenGFko07lrJ6mgRbFsEAkHMAwDrz9IIBwhYtmMXR7g0sU+8paP1aVZlnM2O/bsI2rkyJUtqvY6S8uZzS+Y4RR7wwVOnDvP4PgUJduibVsN86NDXLw0QMa2qG9rwuNs0Nd7id7RRYI+L6bpMD89Ss+Zc2STbTREvBSLGYpulMMPH+bRxx/niaNH2dNZz+aRA8sXJBz0g2Hh9/txC4v0jy3TumM3rekQ+WyZQCiI1zSxvH6isTiJcJCFiVEu9JxnNevB5/NgUGJxaQ3TH8TnsQhFo3gtA5/fh89rUix7ifkdHALU1ScwrkQjHl+S2vYouWyQp/bUsbScpWVnO36fj3AogOELE3JzjPQPU7D8RMIBTMPAH9h8P2xuRIDm9t089vjme+cjHzxCxOsnEvJjGCahUBivx8T0BggHfTjVMrMTl7nYfZqxbC3bGwNUqwWWMybp0AZ9PRcZHJ0n1NpIY2M7vpUBVhP72NMUZceBIzz56FGOPvZ+PnB4B7uPPMbDDz7Ek+9/H0cP7MQfjPHAQ49QH3JZnJlhqPc8/ROLV859A58/QCjgw8AkHI1imQZeX4BgOMmuvXt5+JFHeeLJJ3jysQfZtXMfDx19gsceP8qTjz1JfdTCckpMjE+wloX9jxyhOelnYX722nsr1bafo4cf5NEnnuR9jz5Ea0MtATvHxOwqViCM33IJWA7VqknHtkYwDIKhEF6vH19pjYH+XvqGZ2luqCcQCODzBojEDSbHZ3FNH4GAn0gsTGl9hqGJeRKpOuJmjpwTIRGPX40/8fr8BAM+jEgdRw49wINHHuP9Tz7Oww/soT4WYGxkiIs9PSyu2fiDfkynwPBAL+eHFwj7Pfj8AQIBP6FQCJ/Hgz+Q5MGnnuLo0aM89eEPsaexhmg8hs8Er9dHwB/AMCxCsQjRSJpDjz/B0SNHefLDH2JvY4pQdLOux+vD7/PhCUaJ2Kv0Do1TNsLs3HuAxmCFqcUVRnrOMbmqOydERETkvevt72OiXMYqVXCrBdaXV8me74FQmI21VQLzy5TWJ5kuJdneUY9lgGGYWJaFZVlX7qIAMIgm0/jK68xvlKlv6aSzvQV/eYPVXIW23Qfo2NaAk19ncWWD9gOPsWdbDUG/l2KxQLJ1D03hKgsrORp2HGBvexORWJx0TYJIKEIilSaZjBOOxKmtbaS9KcL8/BLeUJLmpgZSqSS1NQn8Xs/mRbFh4ZQ2mFtYJtayi4cP7iIa8FCoGjTV1xCK19Ha3ER9YxNtHR00pBJs6+wkGfFjGAbgIRTyUcznCCSbaayJ07itk8a6JNFwiEg0Tk1NmngiQSoVJxwOkUikaG1uoLKxxIYb44GDe2hq2UagOEe26qdt+262NdaRSqVI19UQDgaIJ2ro7GimvLHC8nqO9n0P0dGYwqjmWcs5NLc2U5NMkEjVkE7GiEbj1CQT+EMREjX1dLSkMSp5VvMOza3bSKcSJJMpahJRwuEIiUSKRDJJZn2dcCJFMhrEMAw8/gipmlpq4mFiiSTJeJRQJEa6vpG6WJBSuUJ9Y5pgJE1beyvV9VUida3s2pZieXGZqhmmvXMbyWiMZE2SUNBPIBShob6JRMhL2fHQmE4QrWulIR0il82yNDeP44nRVJ/CMg0sb4B4qoZEMkY8GqO+vp6432W9YlFbk6Kuro6wVWJxo0xL5z52bqu71idCPFVLfmWeSrCeB/btJBVPEE/VUJ+KEgxF8JRzjEwtkUwmWJoZoRJsZFdrmrWVFUJth3h0ZyP+UJRUqob62hrS6TShUJBo2M/G6jzLeYj5ypztnWH/gd0EPCZYPiLxJHWpGOFwlFRNmngsQjSepKGxmaCTww2Eqa1rJF3XSHNTA3WJCIFgiES6npaaMCtLy1SDDRzev4Om+lqMahkjWEN9IkRtUztBfwlvIE4qGsLwhGhsjDIzMUsk3cSe3bvo2N6BJ7/CUs6mfecBdm9vJeq3WVjKUNu2m+3t22ipTeG3qqwV4NDjj9GaCFN1qoTi9exojrGwuIIZrqGt+fX9aXmDJGvSJOMRgqEINfWNpAI2uapBfXMLyWQtTS2N1KXihINB4qk62pvrKefWWc15OPDQAbY1NhDwOdgEaGxppbGxjnRNDTV1dUTDQRKJIMv9A8x5YsScPFMzi9Q2tRAL+cAwiNU00NTYRHtbE7FUM9s7GjaXlUxRU9dA2Cixka3Qsn07dTWb74dgKEIykcTv3QwMw9Eopl1gNVuiobmV+poEiVSKmniMSCROTTpFOBwmkUpgr02zmKni8QVpP3SE/W11gIPribF7ez2ri4uY0UYeOLATn1tkdHyeXQ8+REd9ilg0Sjm3RsYJ0ratifqWdtzVaXK2l/rGRlJhi7m5BXyxRg7sa2X28gAZM0FLfQKPuRlWpVIpYpEI0ViSdG0t4XCQZE0dHR1NVNZX2CjaNG3rpK25DrecZ3klS33ndhoSYbymS8n2UleXZHV+HiNcw8EHDpEK+zEM8MYaSJjrLKzmiabraGyoJ2ZVyDpBWtua8FfLLC6sEIzFmL50Dm/bA+xubaCmro66dJJqdg0ijTxyaB+peJyaVC119UFWN6q0tbZSW1tLfXMtTiFDwQiRCsF6NkOkYS+7WlNYxubdMz5/kGQqRTRRQ0tDlMXpWWxvmKZt7bQ3JNlYWWY1a2Ga67Tvf5zGmMny8jrJ1h3s6myjoSZBsqaG+vpaamtShEMhYrEo68vLWNEkzfX1JFIp0nVpIsEAyWSKeCRKJJGkoaWJmliIjeUVrGiKloY64qkU6fo0Eb+feCxOMl1HzC2wUfaSTkXJrq1ArI1HDmyjWijgi6eJB6/Gd+9M6mNCREREbted9jFhuLf5/DXXdRmbm+Mz57p5ZNc+Dm9r21oF01zF77lIteqQ3+ggXbNtaxVYX4evfQ0efBCGh+H8eYrbW5koFAlc6KfsVnF/9GfpbK/DulXvl1fWCdcFY7MzOlwXB66107/6eDnDMDYDANe9cue6gWFsPrrNMK82OLgF12VzyivLuakr87uyrNd3q4uL8XrfAW/KxXG4sh1gvMW2X/X6Nm6u2+bfYN5i+qvrthmKXN2PgGHcYvuuuLKPDW5ed3Peb7WvXrd1P10/iWEYuI4LxuvreqPNbd186V7ZeeDaFdbWN/D4w9d+7b6Zm576159Pr4+8dmu5Yd64juBSWJnhXHcPi2sFwjUN7Ny1m9aGJMb1597N2CXGh/u4ODBK1fSTqO/g0QevBBNvwb1yLm/O+U2OxZUTanP5Lu7mgbthX7H1PLjZuBvOjc3z9Ibzy3Vxrsxyc0mvz2NzHbbuz5u4dl7x5tuzZf2u/W1sPSYAFWYvdXN8cBqPFaCxvZM9O9uJBn1bK97U1mW9qbd4P2yqMtJzmmU7xb69u9jMRm5cf1wHF4NKbo3eC93MlQI8+siDpK70Y3P1fb15Pl0576/7f+LacXKrrK2tY/ojRMP+Nz33b3Dl+F09ppvLunrubp4uXNvnm+u5db7Xprn6/6nr4GBgGi6ZxWnOd/ewmK0QisQ5ePRxmuKv905743l6dSS4roNhvv5ecB0Hx6lw9sWvsO6r59CDD1Eb9d7k2G/auq6u61KtlOk6+QItD3yYprjn2v+5b3qMr+z3N/8/6Dq3UffqcTTNq++N6+rd9Dx+Z6lUKqytXyaRnsF2EpQre3G52iRRRERE5HXFSoVPnzlJrcfgO44ewe+79XX42x9MVKvw9a/DhQtQLMLTT+M+/zXsYgHnAx/EPXka7+FDmN/yAfDf8GgFkXcm16GYy7KRL+IPRYmGg7d8oszrXOxKmWwmQ8kxicXj+L3WO/7LybuF61RYXV7FNr1Eo7HNfXtfdq5LuVTEcS18ft8tzg13s4+cbA48fsKhNw/V3k1cx6aQy5IrlPGHo0RDgW/4OLiuQ2ZtFXxhoqGrd5zdPtd1KRbyeP0hPNadTSsKJkREROT2vfODCQDbhjNnoL4eWlthbAyyWdi9G8plGB+HPXvAq1tERURE3gkUTIiIiMjtutNg4q3vGb8XLAsefRTa2zdfb98Ohw5BIACxGBw8qFBCRERERERE5D3g/gQTIiIiIiIiIiIKJkRERERERETkflIwISIiIiIiIiL3jYIJEREREREREblvFEyIiIiIiIiIyH2jYEJERERERERE7hsFEyIiIiIiIiJy3yiYEBEREREREZH7RsGEiIiIvCXHcbaOEhEREbkrFEyIiIjIm6pWq4yMjNDT07O1SEREROSuUDAhIiIiN1Uul5mcnCSbzbJ9+/atxSIiIiJ3xT0NJlzX3TpKRERE3gXK5TJTU1MUCgWi0SjLy8uAPtdFRETk7rsnwYRhuECRYrGoNqkiIiLvQtlsFsdxqKurI5/PE41GMMzi1moiIiIi/2iGe5u3Nbiuy9jcHJ85180ju/ZxeFvb1iqY5ip+z0Vct0IpH6RYqMF1/YCxtaqIiIi8g1UrVRzXwbIsqtUKwXCZYGgFf6CK7SQoV/biEtw6mYiIiAjFSoVPnzlJrcfgO44ewe/zba1yg3sSTEDlyjQGuAolRERE3vUMF8NwMQwUTIiIiMgtvSOCCcPYDCZERETkm4+CCREREbmVOw0m7kkfEyIiIiIiIiIit0PBhIiIiIiIiIjcN3e1KQeUMI31K0/lEBERkW9GruvFcWOAZ2uRiIiIyB035bjLwcRtzUpERES+KaiDaxEREXmjOw0m7nJTDkODBg0aNGjQ8J4ZRERERP7x7nIwISIiIiIiIiJy+xRMiIiIiIiIiMh9o2BCRERERERERO4bBRMiIiIiIiIict8omBARERERERGR+0bBhIiIiIiIiIjcNwomREREREREROS+UTAhIiIiIiIiIveNggkRERERERERuW8M13XdrSNvxnVdxubm+PTZLh7ZtY9D29q2VhERERERERGR97hipcJnzpykzmvyHUeP4Pf5tla5wR0HE3996gzJRIqWVM3WKiIiIiIiIiLyHlexq3RPjHMglbj7wcT04iJf67nEUqm4tVhERERERERE5JrD9XW8/+BBfHczmMhkMuQLBQKBwNZiEREREREREZFrstksDfX1eDyerUU3uKNgIp/P47oukUhka7GIiIiIiIiIyDWLi4skk8m3DCb0VA4RERERERERuW8UTIiIiIiIiIjIfaNgQkRERERERETuGwUTIiIiIiIiInLfKJgQERERERERkftGT+UQERERERERuYVsscIXu2Y5PrREsWJvLX7PMIDmVJDvOtLK3uYYpmFsrXKD230qh4IJERERERERkVv43Nlp/u2fn2MtX+G2vkB/E/OYBk/tTvPnP/Y4Yf+tA4fbDSbUlENERERERETkFo4PLbGULVN1XOz3+FCqOrzYu0ChfPfuHFEwISIiIiIiInILtvNev0/iRvZd3h0KJkRERERERETkvlEwISIiIiIiIiIEQz5inrc/Jnj7lygiIiIiIiLyTWrHtjp+6CM7+L6HaqkN3tlX7mA0RHvEe8sv6r5kjO97/3Z+8mM7+J4Haqnx3vrJGHfigYc7+Eh9YOvoe8565plnntk68s1UKhUAfD7f1iIRERERERGRb0rP9cxxdnR16+g3aNnVwi9+tIGhiQ1qGxJsCxtYkSAHGiO0xiw8fi8PbU+zO+VlPVsmlIjy5K4aOqIWltfDd3/nIX6oLcRioYTp9/NQZ5rdKR8rG0UKV/qaDLXW8W8eTDM5l6OhvZ6jCYvJpQr7d6Q51ByiVCxRND0c6kxztC2GVSqTdSwe2J7mkZYIfhxW8hZP7kuzuzZC1GvRVBvjaEeMB3Y0EJ1d4eRqaeumvcFPPb2L0Fs8lSOfzxMMBjHNW0UtCiZEREREREREbul2g4kPPd5BYXySPzoxz4WJNS4vFXj6W/byiRY/ixWHw3saeaotzsH2WhqcPFa6jg/vTPJoe5JQvkptW4ptRpWJgsMj+xp4tDXGoY460qUNTs9vhgWBdIJvbwrQM75G3u/FLFaob6zhEwdStDQlebjBR8UX5MN7UkT8QXZHDDb8Cf75IzX4gwGOdESZmrb48e/aTq1ZxYhGOdoWJ+b38EhHnNmBBU68zcHErUtFRERERERE5LaYgFEF0wDD5yHk9xDwwHPdMzw/lCUd8pHJ5BldqZCutSjbNjNLRfIVC3slx1fmcvRfnOPUZJ66kIeNbJ6RlTL1ddYNy/FGAjy6t55v6wwxuF4i1hShWioxtZIjFA3xcI3FyPgcv/WlYb44tgZtMWZG5vjdY9Ms4aPD56NaKvBs9xjjrsP47Cp/+NwgX1uu3rCct4uCCREREREREZG74OzgCm3bm/juR5r41BPbeKo9it+CHJAtVlnIVAj6LLxmldEVl90dNexK+IhFPDSlAvgr0NQSZ399kELBJuS18Fg2Q7ObrReuys2v89cvjvD1sSLNMR+ZTAk8HvwmTC9mGMxCW0OCb32kgSc7ong2CtS31PDxvWnS2ExVqjiui1uxyWxUaK6P8C2HWngwdus7IO4VNeUQERERERERuYXbbcqR3SiwWHGJBDzk1/KcH19nZDHH6HyWxY0yC2tlCrbL4sIGp8c2mNsokS8VGVjKMbVeYGBqg4ppMDufoWsqS7YKS3MbnJpYZ63kAuBUqiyu5Lg0l2F0tUQmX6B/Zp3FokMpX+T08AoXZvNUHIuo5TIyl2FwYoM8BkHD4cLwIj1LORY28gzP55lfK1FxDOIeg8GxJc5MbbBYdrZu2hvczaYchuu6m1v3FlzXJZ/P47oukUhka7GIiIiIiIjIN6Wf/ctufv/rl7eOvinDMLBMwAXbccHYfO2y+dKyDAwXqo57ra7Llfqui8c0cBwXB7DM1+te/8XdNMC5MsI0wHXBNA1MA2z79WlNY3MdHPeNf98wD9PAMthc7pV1fSuX/+9PkI76t46+weLiIslkEo/n1gHGrWMLEREREREREbltrutStd1rYYJ73Rd9F6jaLpUrZY7rUrGvq+9CxXax3c3prq97vauBwtXXLpuBQ+VKKMH1f1+pu/XvG+Zxpcy+zVDiblMwISIiIiIiIiL3jYIJERERERERkVswto6Qu0rBhIiIiIiIiMgttNaE8FiKJ65qqwnhMe/e/lAwISIiIiIiInILH3+wiacfaCDkt7BM4z07eEyD9nSYn3p6F+HArTu0vBN6KoeIiIiIiIjILbiui+26OPZtfX3+pmYYYFkmhmG8ZROX230qh4IJEREREREREbnrbjeYUFMOEREREREREblvFEyIiIiIiIiIyH2jYEJERERERERE7ps7DiZc1+U2u6UQERERERERkfegO8kN7qjzy2KxSKlUIhAIYJp3nGmIiIiIiIiIyHtAtVqlVCoRi8WwLGtr8Q3uKJiwbZtCoYBt21uLRURERERERESu8fv9BAIBDOPWDxa97WCC65pxOI6ztUhEREREREREBADDMDBN8y1DCe40mBARERERERERuZvUUYSIiIiIiIiI3DcKJkRERERERETkvlEwISIiIiIiIiL3zU37mHDdO3vmqIiIiIiIiIjI7TCMzc4xr/19s2BifnGDzz13kRPd4xSK1a3FIiIiIiIiIiJ3xDCgsS7Gt31gLx95atfr428WTPzK//s1fvvPXmNpJYvjvKFYREREREREROSO+X0eOltruPDln7027qbBROOjv8DSSm7raBERERERERGRf7TK0K9de33Tzi8VSoiIiIiIiIjI2+GmwYSIiIjI7TMI+H0E/W/vZYXf7yMUsHQxIyIi8i6nz3IREZH7xAgFOPzoLp7+wB4+9kQH25sCmK93UP2Wajta+PDj29lVF8baWngbvKEghx7s5Fvfv5tvebiVurhva5XbEggm+O7vej//6mMtBL1bS+8VHx99+in+9T/bS310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" style="max-width:100%;border-radius:10px;border:1px solid var(--border);margin-top:8px">
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-label" style="color:var(--elmo-purple)">Stage 2: Add Partner Services</div>
+        <p style="margin-bottom:10px">This will enable you to add estimated pricing and revenue.</p>
+        <ul style="font-size:13px;color:var(--text-secondary);padding-left:20px;line-height:1.8">
+          <li>Select <strong>Partner Deal</strong> and choose if they are using Datapay or Easipay (Managed). If unsure, select Datapay.</li>
+          <li>Select <strong>Datapay and ELMO mutual agreement</strong></li>
+          <li>Add <strong>Implementation costs</strong></li>
+          <li>Select number of pay groups. Note — for Datapay SaaS the price is applied on a Per Employee Per Month basis, use <strong>1 pay group</strong></li>
+          <li>Hit next</li>
+        </ul>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-label" style="color:var(--datapay-teal)">Datapay SaaS Charge</div>
+        <ul style="font-size:13px;color:var(--text-secondary);padding-left:20px;line-height:1.8">
+          <li>Add number of employees and duration of contract</li>
+          <li>API is charged at <strong>$1 per employee per month</strong>. If customer is already being charged for another API then select $0</li>
+          <li>Hit next</li>
+        </ul>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-label" style="color:var(--elmo-purple)">ELMO SaaS Charge</div>
+        <ul style="font-size:13px;color:var(--text-secondary);padding-left:20px;line-height:1.8">
+          <li>Add number of employees and duration of contract</li>
+          <li>API is charged at a fixed annual rate of <strong style="color:var(--warning)">TBC</strong></li>
+          <li>Hit next</li>
+        </ul>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-label" style="color:var(--accent)">Updating Opportunity Stages</div>
+        <p style="margin-bottom:10px">To update the opportunity stages, simply select the stage as per the process below:</p>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:13px">
+          <span style="background:var(--accent);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">1</span><span>Prospecting</span>
+          <span style="background:var(--accent);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">2</span><span>Qualification in Progress</span>
+          <span style="background:var(--accent);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">3</span><span>Qualified</span>
+          <span style="background:var(--accent);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">4</span><span>Proposal Preparation</span>
+          <span style="background:var(--accent);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">5</span><span>Proposal Submitted</span>
+          <span style="background:var(--accent);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">6</span><span>Contract Negotiation</span>
+          <span style="background:var(--success);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700">✓</span><span>Closed Won</span>
+        </div>
+      </div>
+
+      <div class="modal-section" style="background:var(--surface);border-radius:8px;padding:14px 16px;font-size:12px;color:var(--text-light);text-align:center">
+        <strong>For any queries reach out:</strong> salesforce-datacom@datacom.co.nz
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function showTab(id){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sidebar-nav a').forEach(a=>a.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  const n=document.getElementById('stepNav');
+  if(id==='process')n.classList.add('visible');else n.classList.remove('visible');
+}
+function toggleStep(h){const b=h.nextElementSibling,c=b.classList.contains('collapsed');if(c){b.classList.remove('collapsed');h.classList.remove('collapsed')}else{b.classList.add('collapsed');h.classList.add('collapsed')}}
+function toggleExpandable(h){const b=h.nextElementSibling,o=b.classList.contains('open');h.classList.toggle('open',!o);b.classList.toggle('open',!o)}
+function scrollToStep(n){const e=document.getElementById('process-step-'+n);if(e){const b=e.querySelector('.step-body'),h=e.querySelector('.step-header');if(b&&b.classList.contains('collapsed')){b.classList.remove('collapsed');h.classList.remove('collapsed')}e.scrollIntoView({behavior:'smooth',block:'start'})}}
+function updateStepNav(){if(!document.getElementById('tab-process').classList.contains('active'))return;const s=[1,2,3,4,5,6];let c=1;for(const n of s){const e=document.getElementById('process-step-'+n);if(e&&e.getBoundingClientRect().top<=200)c=n}s.forEach(n=>{const l=document.getElementById('step-nav-'+n);if(l){if(n===c)l.classList.add('active');else l.classList.remove('active')}})}
+window.addEventListener('scroll',updateStepNav);
+function toggleObjDetail(b){const c=b.closest('.obj-hub-card'),d=c.querySelector('.obj-hub-detail'),o=d.classList.contains('open');d.classList.toggle('open',!o);b.classList.toggle('open',!o)}
+function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden'}
+function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow=''}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));document.body.style.overflow=''}});
+document.addEventListener('DOMContentLoaded',()=>{if(document.getElementById('tab-process').classList.contains('active'))document.getElementById('stepNav').classList.add('visible')});
+</script>
+</body>
+</html>
