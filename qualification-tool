@@ -1,0 +1,1188 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELMO × Datapay — Guided Qualification Tool v3.0</title>
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&display=swap');    
+
+        :root {
+            --bg: #F7F8FC;
+            --white: #FFFFFF;
+            --border: #E4E7F1;
+            --border-hover: #CBD0E0;
+            --text: #1B1F3B;
+            --text-sec: #515672;
+            --text-muted: #8B90A8;
+            --green: #10B981;
+            --green-bg: #ECFDF5;
+            --green-border: #A7F3D0;
+            --green-dark: #065F46;
+            --amber: #F59E0B;
+            --amber-bg: #FFFBEB;
+            --amber-border: #FDE68A;
+            --amber-dark: #92400E;
+            --red: #EF4444;
+            --red-bg: #FEF2F2;
+            --red-border: #FECACA;
+            --red-dark: #991B1B;
+            --black: #1B1F3B;
+            --black-bg: #E8E9EF;
+            --black-border: #C5C8D8;
+            --black-dark: #0F1225;
+            --blue: #4F6BF6;
+            --blue-bg: #EEF1FE;
+            --blue-border: #C7D2FE;
+            --blue-dark: #3730A3;
+            --gray-bg: #F1F2F7;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
+            --radius: 12px;
+            --radius-lg: 16px;
+        }
+
+        * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 300;
+    }
+    body {
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 300;
+            
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+    h1 {
+    font-weight: 300;
+    }
+
+    h1 span {
+    font-weight: 300;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #041e2b 0%, #0b2f3a 50%, #0f3d48 100%);
+        position: relative;
+        overflow: hidden;
+    }        
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -120px; right: -80px;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(79,107,246,0.12) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header-inner { max-width: 1200px; margin: 0 auto; padding: 36px 32px 32px; position: relative; z-index: 1; }
+        .header-badges { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+
+        .h-badge { padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+    .h-badge.elmo,
+    .h-badge.datapay,
+    .h-badge.ver {
+    background: rgba(255,255,255,0.08);
+    color: #ffffff;
+    border: 1px solid rgba(255,255,255,0.12);
+    }      
+         .header h1 { font-size: 28px; font-weight: 300; color: #fff; letter-spacing: -0.5px; margin-bottom: 6px; }
+    .header h1 span { color: #ffffff; background: none; -webkit-text-fill-color: #ffffff; }        
+        .header p { font-size: 14px; color: rgba(255,255,255,0.75); max-width: 560px; }
+        .header-meta { display: flex; gap: 28px; margin-top: 18px; flex-wrap: wrap; }
+        .hm-item { display: flex; align-items: center; gap: 8px; }
+        .hm-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+        .hm-icon.bl,
+    .hm-icon.gr,
+    .hm-icon.am {
+    background: rgba(255,255,255,0.18);
+    color: #5ee7ef;
+    border: 1px solid rgba(255,255,255,0.18);
+    }
+        .hm-val { font-size: 12px; font-weight: 700; color: #fff; }
+        .hm-label { font-size: 10px; color: rgba(255,255,255,0.65); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .legend-bar { max-width: 1200px; margin: 0 auto; padding: 16px 32px 0; }
+        .legend-row { display: flex; gap: 20px; flex-wrap: wrap; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 20px; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--text-sec); }
+        .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
+        .legend-dot.g { background: var(--green); }
+        .legend-dot.a { background: var(--amber); }
+        .legend-dot.r { background: var(--red); }
+        .legend-dot.b { background: var(--black); }
+
+        .status-bar { background: var(--white); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; }
+        .status-inner { max-width: 1200px; margin: 0 auto; padding: 12px 32px; display: flex; align-items: center; gap: 16px; }
+        .status-progress { flex: 1; display: flex; align-items: center; gap: 12px; }
+        .sp-label { font-size: 11px; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+        .sp-track { flex: 1; height: 6px; background: var(--gray-bg); border-radius: 3px; overflow: hidden; }
+        .sp-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease, background 0.4s ease; width: 0%; background: var(--blue); }
+        .sp-fill.green { background: var(--green); }
+        .sp-fill.amber { background: var(--amber); }
+        .sp-fill.red { background: var(--red); }
+        .sp-fill.black { background: var(--black); }
+        .sp-pct { font-size: 11px; font-weight: 700; color: var(--text); min-width: 32px; text-align: right; }
+
+        .live-result { display: flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 8px; font-size: 11px; font-weight: 700; white-space: nowrap; transition: all 0.3s ease; }
+        .live-result.pending { background: var(--gray-bg); color: var(--text-muted); }
+        .live-result.green { background: var(--green-bg); color: var(--green-dark); }
+        .live-result.amber { background: var(--amber-bg); color: var(--amber-dark); }
+        .live-result.red { background: var(--red-bg); color: var(--red-dark); }
+        .live-result.black { background: var(--black-bg); color: var(--black-dark); }
+
+        .main { max-width: 1200px; margin: 0 auto; padding: 24px 32px 60px; }
+
+        .opp-card { background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: 22px 26px; margin-bottom: 20px; box-shadow: var(--shadow-sm); }
+        .opp-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+        .opp-fields { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+        .opp-field label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); margin-bottom: 5px; }
+        .opp-field input { width: 100%; padding: 9px 13px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; font-family: inherit; color: var(--text); transition: border-color 0.15s ease; }
+        .opp-field input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(79,107,246,0.08); }
+
+        .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin: 28px 0 14px; display: flex; align-items: center; gap: 8px; }
+        .section-label .sl-line { flex: 1; height: 1px; background: var(--border); }
+
+        .threshold-card { background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: 22px 26px; margin-bottom: 10px; box-shadow: var(--shadow-sm); transition: all 0.2s ease; }
+        .threshold-card .tc-top { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+        .tc-num { font-size: 11px; font-weight: 800; color: var(--text-muted); min-width: 24px; padding-top: 2px; }
+        .tc-q { flex: 1; font-size: 14px; font-weight: 600; color: var(--text); }
+        .tc-btns { display: flex; gap: 8px; }
+        .tc-btn { padding: 8px 24px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--white); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; color: var(--text-sec); transition: all 0.15s ease; }
+        .tc-btn:hover { border-color: var(--border-hover); background: var(--gray-bg); }
+        .tc-btn.yes.active { background: var(--green); color: #fff; border-color: var(--green); }
+        .tc-btn.no.active { background: var(--red); color: #fff; border-color: var(--red); }
+    .threshold-card.passed { border-color: #8fd9cf !important; background: #f4fbfb !important; }        
+        .threshold-card.failed { border-color: var(--red-border); background: var(--red-bg); }
+
+        .stop-banner { display: none; margin: 16px 0; padding: 24px; border-radius: var(--radius-lg); background: var(--red-bg); border: 2px solid var(--red-border); text-align: center; animation: fadeSlideIn 0.3s ease; }
+        .stop-banner.visible { display: block; }
+        .stop-banner h4 { font-size: 18px; font-weight: 800; color: var(--red-dark); margin-bottom: 4px; }
+        .stop-banner p { font-size: 13px; color: var(--red-dark); opacity: 0.8; }
+
+        .info-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #FFF7ED !important;
+  color: #B45309 !important;
+  border: 1.5px solid #FDE68A !important;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  font-family: inherit;
+  line-height: 1;
+  position: relative;
+}
+
+       .info-btn:hover {
+  background: #F59E0B !important;
+  color: #fff !important;
+  border-color: #F59E0B !important;
+}
+
+        .info-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,18,37,0.4); z-index: 200; align-items: center; justify-content: center; animation: fadeIn 0.2s ease; backdrop-filter: blur(2px); }
+        .info-overlay.visible { display: flex; }
+        .info-panel { background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); max-width: 520px; width: 92%; max-height: 85vh; overflow-y: auto; animation: slideUp 0.25s ease; }
+        .info-panel-header { padding: 22px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 12px; }
+        .info-panel-header .ip-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--blue-bg); color: var(--blue); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+        .info-panel-header .ip-title { font-size: 16px; font-weight: 700; flex: 1; }
+        .info-panel-header .ip-ref { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+        .info-panel-close { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: var(--white); color: var(--text-muted); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; flex-shrink: 0; font-family: inherit; }
+        .info-panel-close:hover { background: var(--gray-bg); color: var(--text); }
+        .info-panel-body { padding: 20px 24px 24px; }
+        .ip-section { margin-bottom: 18px; }
+        .ip-section:last-child { margin-bottom: 0; }
+        .ip-section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 6px; }
+        .ip-section-text { font-size: 13px; color: var(--text-sec); line-height: 1.65; }
+        .ip-section-text strong { color: var(--text); }
+        .ip-section-text ul { padding-left: 18px; margin-top: 6px; }
+        .ip-section-text ul li { margin-bottom: 4px; }
+        .ip-source { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 6px; background: var(--gray-bg); font-size: 11px; font-weight: 600; color: var(--text-muted); }
+
+        .q-card { background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: 22px 26px; margin-bottom: 10px; box-shadow: var(--shadow-sm); transition: all 0.2s ease; }
+        .q-card.answered-green { border-color: var(--green-border); }
+        .q-card.answered-amber { border-color: var(--amber-border); }
+        .q-card.answered-red { border-color: var(--red-border); background: var(--red-bg); }
+        .q-card.answered-black { border-color: var(--black-border); background: var(--black-bg); }
+        .q-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 14px; }
+        .q-num { font-size: 11px; font-weight: 800; color: var(--text-muted); min-width: 28px; padding-top: 3px; }
+        .q-text { flex: 1; font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.4; }
+        .q-answered-badge { padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; display: none; flex-shrink: 0; }
+        .q-card.answered-green .q-answered-badge { display: inline; background: var(--green-bg); color: var(--green-dark); }
+        .q-card.answered-green .q-answered-badge::after { content: '✓ Qualified'; }
+        .q-card.answered-amber .q-answered-badge { display: inline; background: var(--amber-bg); color: var(--amber-dark); }
+        .q-card.answered-amber .q-answered-badge::after { content: '⚠ Caution'; }
+        .q-card.answered-red .q-answered-badge { display: inline; background: var(--red-bg); color: var(--red-dark); }
+        .q-card.answered-red .q-answered-badge::after { content: '🔴 Standard'; }
+        .q-card.answered-black .q-answered-badge { display: inline; background: var(--black-bg); color: var(--black-dark); }
+        .q-card.answered-black .q-answered-badge::after { content: '⛔ Disqualify'; }
+        .q-options { display: flex; flex-direction: column; gap: 6px; }
+        .q-option { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px; border: 1.5px solid var(--border); cursor: pointer; transition: all 0.15s ease; user-select: none; }
+        .q-option:hover { border-color: var(--border-hover); background: #FAFBFF; }
+        .q-radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s ease; }
+        .q-radio-inner { width: 8px; height: 8px; border-radius: 50%; transition: all 0.15s ease; opacity: 0; }
+        .q-option-text { flex: 1; font-size: 13px; color: var(--text-sec); }
+        .q-option-tag { padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+        .q-option-tag.green { background: var(--green-bg); color: var(--green-dark); }
+        .q-option-tag.amber { background: var(--amber-bg); color: var(--amber-dark); }
+        .q-option-tag.red { background: var(--red-bg); color: var(--red-dark); }
+        .q-option-tag.black { background: var(--black-bg); color: var(--black-dark); }
+        .q-option.selected-green { border-color: var(--green); background: var(--green-bg); }
+        .q-option.selected-green .q-radio { border-color: var(--green); }
+        .q-option.selected-green .q-radio-inner { background: var(--green); opacity: 1; }
+        .q-option.selected-green .q-option-text { color: var(--green-dark); font-weight: 600; }
+        .q-option.selected-amber { border-color: var(--amber); background: var(--amber-bg); }
+        .q-option.selected-amber .q-radio { border-color: var(--amber); }
+        .q-option.selected-amber .q-radio-inner { background: var(--amber); opacity: 1; }
+        .q-option.selected-amber .q-option-text { color: var(--amber-dark); font-weight: 600; }
+        .q-option.selected-red { border-color: var(--red); background: var(--red-bg); }
+        .q-option.selected-red .q-radio { border-color: var(--red); }
+        .q-option.selected-red .q-radio-inner { background: var(--red); opacity: 1; }
+        .q-option.selected-red .q-option-text { color: var(--red-dark); font-weight: 600; }
+        .q-option.selected-black { border-color: var(--black); background: var(--black-bg); }
+        .q-option.selected-black .q-radio { border-color: var(--black); }
+        .q-option.selected-black .q-radio-inner { background: var(--black); opacity: 1; }
+        .q-option.selected-black .q-option-text { color: var(--black-dark); font-weight: 600; }
+        .q-note { margin-top: 6px; font-size: 11px; font-style: italic; color: var(--text-muted); line-height: 1.5; display: none; }
+        .q-option.selected-amber .q-note { display: block; color: var(--amber-dark); opacity: 0.7; }
+        .q-option.selected-red .q-note { display: block; color: var(--red-dark); opacity: 0.7; }
+        .q-option.selected-black .q-note { display: block; color: var(--black-dark); opacity: 0.7; }
+        .q-inline-stop { display: none; margin-top: 10px; padding: 12px 16px; border-radius: 10px; font-size: 12px; font-weight: 600; text-align: center; animation: fadeSlideIn 0.3s ease; }
+        .q-inline-stop.red-stop { background: var(--red-bg); border: 1px solid var(--red-border); color: var(--red-dark); }
+        .q-inline-stop.black-stop { background: #E0E1E9; border: 1px solid var(--black-border); color: var(--black-dark); }
+        .q-card.answered-red .q-inline-stop.red-stop { display: block; }
+        .q-card.answered-black .q-inline-stop.black-stop { display: block; }
+        .qual-section.blocked { opacity: 0.3; pointer-events: none; }
+        .q-guidance { margin: 0 0 14px 38px; display: grid; gap: 10px; }
+        .q-guidance-block { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; }
+        .q-guidance-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-muted); margin-bottom: 4px; }
+        .q-guidance-text { font-size: 13px; color: var(--text-sec); line-height: 1.55; }
+        .q-guidance-text strong { color: var(--text); font-weight: 600; }
+        .q-prompt { margin: 0 0 14px 38px; padding: 12px 14px; background: #eef6f7; border: 1px solid #d0e6e8; border-left: 4px solid #00a9b7; border-radius: 12px; }
+        .q-prompt-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text-muted); margin-bottom: 4px; }
+        .q-prompt-text { font-size: 13px; color: var(--text); line-height: 1.55; }
+        .q-prompt-text strong { font-weight: 600; }
+
+        .result-section { margin-top: 28px; }
+        .result-card { padding: 32px; border-radius: var(--radius-lg); text-align: center; transition: all 0.3s ease; }
+    .result-card .r-icon { font-size: 44px; margin-bottom: 12px; color: #00a9b7 !important; }        
+        .result-card h3 { font-size: 22px; font-weight: 800; letter-spacing: -0.3px; margin-bottom: 6px; }
+        .result-card p { font-size: 14px; max-width: 540px; margin: 0 auto; line-height: 1.6; }
+        .result-card.neutral { background: var(--gray-bg); border: 2px solid var(--border); }
+        .result-card.neutral h3 { color: var(--text-sec); }
+        .result-card.neutral p { color: var(--text-muted); }
+        .result-card.green { background: var(--green-bg); border: 2px solid var(--green-border); }
+        .result-card.green h3 { color: var(--green-dark); }
+        .result-card.green p { color: var(--green-dark); opacity: 0.8; }
+        .result-card.amber { background: var(--amber-bg); border: 2px solid var(--amber-border); }
+        .result-card.amber h3 { color: var(--amber-dark); }
+        .result-card.amber p { color: var(--amber-dark); opacity: 0.8; }
+        .result-card.red { background: var(--red-bg); border: 2px solid var(--red-border); }
+        .result-card.red h3 { color: var(--red-dark); }
+        .result-card.red p { color: var(--red-dark); opacity: 0.8; }
+        .result-card.black { background: #E0E1E9; border: 2px solid var(--black-border); }
+        .result-card.black h3 { color: var(--black-dark); }
+        .result-card.black p { color: var(--black-dark); opacity: 0.8; }
+    .result-card.inprogress { background: #f8fafc; border: 1px solid #d1d5db; }        
+        .result-card.inprogress h3 { color: #111827; }
+        .result-card.inprogress p { color: #4b5563; opacity: 1; }
+        .result-cautions { margin-top: 16px; text-align: left; max-width: 540px; margin-left: auto; margin-right: auto; }
+        .result-cautions h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+        .result-cautions ul { list-style: none; padding: 0; }
+        .result-cautions ul li { font-size: 12px; padding: 4px 0; display: flex; align-items: flex-start; gap: 8px; }
+        .result-cautions ul li::before { content: '⚠'; flex-shrink: 0; }
+
+        .routing-card { background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--border); padding: 22px 26px; margin-top: 20px; box-shadow: var(--shadow-sm); }
+        .routing-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+        .routing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .r-field { grid-column: 1 / -1; }
+        .r-field.half { grid-column: auto; }
+        .r-field label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); margin-bottom: 5px; }
+        .r-field textarea, .r-field input { width: 100%; padding: 9px 13px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; font-family: inherit; color: var(--text); resize: vertical; transition: border-color 0.15s ease; }
+        .r-field textarea { min-height: 56px; }
+        .r-field textarea:focus, .r-field input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(79,107,246,0.08); }
+        .routing-decision-box { padding: 14px 18px; border-radius: 10px; font-size: 14px; font-weight: 700; text-align: center; }
+
+     
+.actions-bar {
+    text-align: center;
+    margin-top: 24px;
+    display: none;
+    justify-content: center;
+    gap: 10px;
+}
+
+.action-btn {
+    padding: 11px 26px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    color: var(--text-sec);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.action-btn:hover {
+    background: var(--gray-bg);
+}
+
+.action-btn.reset {
+    border-color: var(--red-border);
+    background: var(--red-bg);
+    color: var(--red-dark);
+}
+
+.action-btn.reset:hover {
+    background: var(--red);
+    color: #fff;
+}
+
+.status-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.status-action-btn {
+    padding: 7px 12px !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--border) !important;
+    background: var(--white) !important;
+    color: var(--text-sec) !important;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.status-action-btn:hover {
+    background: var(--gray-bg) !important;
+    color: var(--text) !important;
+    border-color: var(--border-hover) !important;
+}
+
+.status-action-btn.reset {
+    border-color: var(--red-border) !important;
+    background: var(--red-bg) !important;
+    color: var(--red-dark) !important;
+}
+
+.status-action-btn.reset:hover {
+    background: var(--red) !important;
+    color: #fff !important;
+    border-color: var(--red) !important;
+}
+
+
+
+        .footer { max-width: 1200px; margin: 0 auto; padding: 0 32px 40px; text-align: center; }
+        .footer p { font-size: 11px; color: var(--text-muted); }
+
+        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+      
+@media (max-width: 768px) {
+    .header-inner { padding: 28px 20px; }
+    .main { padding: 20px 16px 40px; }
+    .status-inner {
+        padding: 10px 16px;
+        flex-wrap: wrap;
+        align-items: stretch;
+        gap: 10px;
+    }
+    .status-progress {
+        min-width: 100%;
+    }
+    .status-actions {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .status-action-btn {
+        display: none;
+    }
+    .actions-bar {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .opp-fields { grid-template-columns: 1fr; }
+    .routing-grid { grid-template-columns: 1fr; }
+    .r-field.half { grid-column: 1 / -1; }
+    .legend-bar { padding: 12px 16px 0; }
+    .info-panel { width: 96%; max-height: 90vh; }
+}
+
+
+
+        @media print {
+            .status-bar, .actions-bar, .legend-bar, .info-btn, .info-overlay { display: none !important; }
+            body { background: #fff; }
+        }
+
+    body {
+      background-color: #f5f7f8;
+      color: #1a1a1a;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .header, .hero, .top-section {
+      background: linear-gradient(90deg, #041e2b, #0b2f3a) !important;
+      color: white !important;
+    }
+
+    button, .btn, .primary-btn {
+      background: transparent !important;
+      border: 2px solid #00a9b7 !important;
+      color: #00a9b7 !important;
+      border-radius: 6px !important;
+      transition: all 0.2s ease;
+    }
+
+    button:hover, .btn:hover, .primary-btn:hover {
+      background: #00a9b7 !important;
+      color: white !important;
+    }
+
+    .card, .panel, .box {
+      background: white !important;
+      border: 1px solid #d0e6e8 !important;
+      border-radius: 8px !important;
+      box-shadow: none !important;
+    }
+
+    .section, .section-light {
+      background: #e6f4f5 !important;
+    }
+
+    .chip, .tag {
+      border: 1px solid #d0e6e8 !important;
+      background: white !important;
+      color: #1a1a1a !important;
+    }
+
+    .helper, .info-box, .note {
+      background: #e6f4f5 !important;
+      border-left: 4px solid #00a9b7 !important;
+      color: #1a1a1a !important;
+    }
+
+    * {
+      box-shadow: none !important;
+    }
+
+    .section-divider {
+      height: 3px;
+      background: linear-gradient(90deg, #00a9b7, #6fd3db);
+      width: 80px;
+      margin: 10px 0 20px 0;
+      border-radius: 2px;
+    }
+    .section-sub {
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+</style>
+</head>
+<body>
+
+    <div class="info-overlay" id="infoOverlay" onclick="closeInfo(event)">
+        <div class="info-panel" onclick="event.stopPropagation()">
+            <div class="info-panel-header">
+                <div class="ip-icon">ℹ</div>
+                <div style="flex:1;"><div class="ip-title" id="ipTitle"></div><div class="ip-ref" id="ipRef"></div></div>
+                <button class="info-panel-close" onclick="closeInfo()">✕</button>
+            </div>
+            <div class="info-panel-body" id="ipBody"></div>
+        </div>
+    </div>
+
+    <div class="header">
+        <div class="header-inner">
+            <div class="header-badges">
+                <span class="h-badge elmo">● ELMO</span>
+                <span class="h-badge datapay">● DATAPAY</span>
+                <span class="h-badge ver">API v2.0 · Guided Qualification v3.0</span>
+            </div>
+            <h1>Seller <span>Guided Qualification</span></h1>
+            <p>Lead with what the integration does, confirm fit quickly, and route the opportunity with confidence.</p>
+            <div class="header-meta">
+                <div class="hm-item"><div class="hm-icon bl">i</div><div><div class="hm-val">Internal Only</div><div class="hm-label">Audience</div></div></div>
+                <div class="hm-item"><div class="hm-icon gr">⏱️</div><div><div class="hm-val">2–3 Minutes</div><div class="hm-label">Duration</div></div></div>
+                <div class="hm-item"><div class="hm-icon am">🎯</div><div><div class="hm-val">Guided Validation</div><div class="hm-label">Purpose</div></div></div>
+            </div>
+        </div>
+    </div>
+
+
+<div class="status-bar">
+    <div class="status-inner">
+        <div class="status-progress">
+            <span class="sp-label">Progress</span>
+            <div class="sp-track"><div class="sp-fill" id="progFill" style="width: 0%;"></div></div>
+            <span class="sp-pct" id="progPct">0%</span>
+        </div>
+
+        <div class="status-actions">
+            <div class="live-result pending" id="liveResult">⏳ 15 remaining</div>
+            <button class="status-action-btn" onclick="saveProgress()">Save</button>
+            <button class="status-action-btn" onclick="document.getElementById('loadProgressFile').click()">Load</button>
+            <button class="status-action-btn" onclick="window.print()">Print</button>
+            <button class="status-action-btn reset" onclick="resetAll()">Reset</button>
+        </div>
+    </div>
+</div>
+
+
+
+    <div class="legend-bar">
+        <div class="legend-row">
+            <div class="legend-item"><div class="legend-dot g"></div> Qualified — Proceed</div>
+            <div class="legend-item"><div class="legend-dot a"></div> Caution — Flag for PS Review</div>
+            <div class="legend-item"><div class="legend-dot r"></div> Route to Standard Motion</div>
+            <div class="legend-item"><div class="legend-dot b"></div> Disqualify — Not a Fit</div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="opp-card">
+            <h3>📋 Opportunity Details</h3>
+            <div class="opp-fields">
+                <div class="opp-field"><label>Customer Name</label><input type="text" id="custName" placeholder="Enter customer name"></div>
+                <div class="opp-field"><label>Seller Name</label><input type="text" id="sellerName" placeholder="Enter seller name"></div>
+                <div class="opp-field"><label>Date</label><input type="date" id="qualDate"></div>
+            </div>
+        </div>
+
+        <div class="section-label">Entry criteria</div>
+        <div class="section-sub">Non-negotiable requirements</div>       
+        <div class="section-divider"></div>
+
+        <div class="threshold-card" id="thresh1">
+            <div class="tc-top">
+                <span class="tc-num">01</span>
+                <div class="tc-q">Organisation size: <strong>100–2,000 employees</strong> <button class="info-btn" onclick="event.stopPropagation();showInfo('thresh-size')">i</button></div>
+            </div>
+            <div class="tc-btns">
+                <button class="tc-btn yes" onclick="setThreshold(0,'yes')">✓ Yes</button>
+                <button class="tc-btn no" onclick="setThreshold(0,'no')">✕ No</button>
+            </div>
+        </div>
+
+        <div class="threshold-card" id="thresh2">
+            <div class="tc-top">
+                <span class="tc-num">02</span>
+                <div class="tc-q"><strong>ELMO HRIS:</strong> Currently using or committed to implementation. <button class="info-btn" onclick="event.stopPropagation();showInfo('thresh-elmo')">i</button></div>
+            </div>
+            <div class="tc-btns">
+                <button class="tc-btn yes" onclick="setThreshold(1,'yes')">✓ Yes</button>
+                <button class="tc-btn no" onclick="setThreshold(1,'no')">✕ No</button>
+            </div>
+        </div>
+
+        <div class="stop-banner" id="thresholdStop">
+            <h4>⛔ STOP — Threshold Not Met</h4>
+            <p>Route to Standard Datapay Opportunity. Do not proceed to qualification or discovery.</p>
+        </div>
+
+        <div class="qual-section blocked" id="qualSection">
+            <div class="section-label">Guided fit check</div>
+            <div class="section-sub">Lead with the standard position, then confirm whether the customer fits it</div>
+            <div class="section-divider"></div>            
+            <div id="questionsContainer"></div>
+        </div>
+
+        <div class="result-section">
+            <div class="result-card inprogress" id="resultCard">
+                <div class="r-icon" id="rIcon">◉</div>    
+                <h3 id="rTitle">Guided Qualification In Progress</h3>
+                <p id="rText">15 items remaining.</p>
+                <div class="result-cautions" id="rCautions" style="display:none;">
+                    <h4 id="rCautionsTitle">⚠ Caution Flags Identified</h4>
+                    <ul id="rCautionList"></ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="routing-card">
+            <h3>📝 Routing Summary</h3>
+            <div class="routing-grid">
+                <div class="r-field"><label>Routing Decision</label><div class="routing-decision-box" id="routingBox" style="background: #f8fafc; color: #111827; border: 1px solid #d1d5db;">⏳ 15 remaining</div></div>
+                <div class="r-field"><label>Flags &amp; Notes</label><textarea id="cautionNotes" placeholder="Auto-populated from your guided selections..."></textarea></div>
+                <div class="r-field half"><label>Next Step</label><input type="text" id="nextStep" placeholder="e.g., Proceed to Lite Discovery"></div>
+                <div class="r-field half"><label>Owner</label><input type="text" id="nextOwner" placeholder="e.g., Adnan Siamwala"></div>
+                <div class="r-field"><label>Escalation Notes</label><textarea id="escNotes" placeholder="Any additional context..."></textarea></div>
+            </div>
+        </div>
+
+        <div class="actions-bar">
+    <button class="action-btn" onclick="saveProgress()">💾 Save Progress</button>
+    <button class="action-btn" onclick="document.getElementById('loadProgressFile').click()">📂 Load Progress</button>
+    <button class="action-btn" onclick="window.print()">🖨️ Print / PDF</button>
+    <button class="action-btn reset" onclick="resetAll()">↺ Reset All</button>
+    <input type="file" id="loadProgressFile" accept=".json" style="display:none" onchange="loadProgress(event)">
+</div>
+</div>
+
+<div class="footer">
+    <p>DATAPAY × ELMO PARTNERSHIP · API v2.0 — Guided Qualification Tool v3.0 · Internal Use Only</p>
+</div>
+
+    <script>
+        const infoContent = {
+            'thresh-size': {
+                title: 'Organisation Size: 100–2,000 Employees',
+                ref: 'Threshold 01',
+                sections: [
+                    { label: 'What This Means', text: 'The customer\'s total active employee headcount falls within 100 to 2,000. This includes all employees on payroll — full time, part time, casual, and contractors on invoice.' },
+                    { label: 'Why It Matters', text: 'The Qualified fast-track motion is designed for mid-market NZ organisations. Below 100 employees, the integration cost may not justify the investment. Above 2,000, complexity typically increases — multi-entity structures, complex awards, and bespoke requirements become more common.' },
+                    { label: 'How to Check', text: 'Use CRM data or Datapay records. This information should already be available in your account intelligence — you do not need to ask the customer directly.' },
+                    { label: 'Source', text: '<span class="ip-source">📄 Qualification Checklist v2.0</span>' }
+                ]
+            },
+            'thresh-elmo': {
+                title: 'ELMO HRIS — Authoritative Source',
+                ref: 'Threshold 02',
+                sections: [
+                    { label: 'What This Means', text: 'The customer is either already using ELMO as their HR Information System, or has committed to implementing it. They are not evaluating alternatives.' },
+                    { label: 'Why It Matters', text: 'The integration requires ELMO as the <strong>authoritative source for employee creation</strong>. All new hires must originate in ELMO — the integration syncs them to Datapay. If the customer isn\'t on ELMO, there\'s nothing to integrate with.' },
+                    { label: 'What "Committed" Means', text: 'The customer has signed with ELMO or is in active implementation. A customer who is "considering ELMO" does not qualify — the HRIS decision needs to be made first.' },
+                    { label: 'Source', text: '<span class="ip-source">📄 ELMO-Datapay Integration API</span> <span class="ip-source">📄 Integration Specs v2</span>' }
+                ]
+            },
+       
+
+'q-complexity': {
+    title: 'Payroll Complexity',
+    ref: 'Q3',
+    sections: [
+        { label: 'Why this matters', text: 'Complex payroll rules increase implementation effort and delivery risk. The Qualified fast-track is designed for standard NZ payroll structures.' },
+        { label: 'What to watch', text: 'Union coverage, awards, shift rules, penal rates, or bespoke calculations can signal hidden complexity — especially in industries like healthcare, education, transport, and hospitality.' },
+        { label: 'PS check', text: 'Confirm whether the customer’s payroll rules can be handled using standard Datapay configuration or whether broader scoping is needed before committing.' },
+        { label: 'Source', text: 'Qualification Checklist v2 · Datapay PS validation' }
+    ]
+},
+
+'q-contracts': {
+    title: 'Employee Contracts — Multi-Contract',
+    ref: 'Q8',
+    sections: [
+        { label: 'Why this matters', text: 'Multi-contract is not natively supported by the integration or by Datapay. The only workaround is separate employee profiles for each contract in both ELMO and Datapay.' },
+        { label: 'What to watch', text: 'Customers may describe this as one person doing multiple jobs, but if there are separate employment agreements, it is a multi-contract scenario.' },
+        { label: 'PS check', text: 'Validate early whether the customer would accept duplicate profiles for each contract. If not, do not proceed with the Qualified motion.' },
+        { label: 'Source', text: 'Integration Specs v2 · ELMO–Datapay API limitations · Datapay PS validation' }
+    ]
+},
+
+'q-multijob': {
+    title: 'Multi-Job Employees',
+    ref: 'Q9',
+    sections: [
+        { label: 'Why this matters', text: 'Multi-job is different from multi-contract, but it still creates complexity because the integration does not natively support multiple roles under a single employee profile.' },
+        { label: 'What to watch', text: 'The current workaround is duplicate profiles per role. This can create admin overhead and is more common in hospitality, retail, healthcare, and education.' },
+        { label: 'PS check', text: 'Confirm whether duplicate profiles are acceptable, or whether Datapay alternate rates and cost centres are enough for the customer’s scenario.' },
+        { label: 'Source', text: 'Integration Specs v2 · Employee scenario compatibility · Datapay PS validation' }
+    ]
+},
+
+'q-effective': {
+    title: 'Effective Dating',
+    ref: 'Q10',
+    sections: [
+        { label: 'Why this matters', text: 'Effective dating is only partially supported and depends on the field. That creates a risk of mismatched expectations if sellers assume all dated changes will flow cleanly.' },
+        { label: 'What to watch', text: 'Bank details and tax effective dating are still discovery items, while other fields may already behave differently across ELMO and Datapay.' },
+        { label: 'PS check', text: 'Confirm which fields the customer expects to support past-dated or future-dated changes before committing to the integration approach.' },
+        { label: 'Source', text: 'Integration Data Map · Integration Specs v2 roadmap' }
+    ]
+},
+
+'q-kiwisaver': {
+    title: 'KiwiSaver Sync',
+    ref: 'Q11',
+    sections: [
+        { label: 'Why this matters', text: 'KiwiSaver sync is a high-risk area because the integration supports only opt-in and opt-out, while Datapay supports additional statuses.' },
+        { label: 'What to watch', text: 'This creates a split admin experience across systems. Both pilot customers rejected KiwiSaver sync because it caused more frustration than it solved.' },
+        { label: 'PS check', text: 'Confirm whether the customer is happy to manage KiwiSaver manually or is genuinely comfortable with opt-in and opt-out only. If they expect full KiwiSaver sync, do not proceed.' },
+        { label: 'Source', text: 'Integration Data Map · Integration Specs v2 · Pilot feedback (Datapay PS)' }
+    ]
+},
+
+'q-transfers': {
+    title: 'Employee Transfers',
+    ref: 'Q13',
+    sections: [
+        { label: 'Why this matters', text: 'Employee transfers are not supported through the integration, including pay group and company transfer scenarios.' },
+        { label: 'What to watch', text: 'Customers may assume transfers will flow automatically, but they must be handled manually and there is no workaround.' },
+        { label: 'PS check', text: 'Confirm the customer is comfortable managing all transfers manually in both systems before proceeding with the Qualified motion.' },
+        { label: 'Source', text: 'Integration Specs v2 · Company movements & transfers · Datapay PS validation' }
+    ]
+},
+     
+            
+        };
+
+        function showInfo(key) {
+            const info = infoContent[key];
+            if (!info) return;
+            document.getElementById('ipTitle').textContent = info.title;
+            document.getElementById('ipRef').textContent = info.ref;
+            document.getElementById('ipBody').innerHTML = info.sections.map(s => `<div class="ip-section"><div class="ip-section-label">${s.label}</div><div class="ip-section-text">${s.text}</div></div>`).join('');
+            document.getElementById('infoOverlay').classList.add('visible');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeInfo(e) {
+            if (e && e.target !== document.getElementById('infoOverlay')) return;
+            document.getElementById('infoOverlay').classList.remove('visible');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') { document.getElementById('infoOverlay').classList.remove('visible'); document.body.style.overflow = ''; } });
+
+        const questions = [
+
+{ num:'Q1', text:'Integration Approach', infoKey:'q-integration',
+  support:'This integration is a <strong>standard ELMO ↔ Datapay API integration</strong>. It does not include middleware, bespoke development, or third-party connectors.',
+  confirm:'Confirm the customer is looking for the standard integration rather than a custom architecture.',
+  prompt:'<strong>Position it like this:</strong> “This integration is designed as a standard ELMO to Datapay connection. If you need other systems or custom middleware in play, we can discuss that separately.”',
+  options:[
+    { label:'Standard ELMO ↔ Datapay integration is suitable', tier:'green', note:'' },
+    { label:'Custom integration, middleware, or third-party connectors are required', tier:'amber', note:'This moves beyond the standard fast-track motion. Flag for PS scoping.' }
+]},
+
+{ num:'Q2', text:'Payroll Geography', infoKey:'q-geography',
+  support:'This integration is for <strong>New Zealand payroll only</strong>. Australia is not supported in the current Datapay integration scope.',
+  confirm:'Confirm the payroll in scope is NZ only.',
+  prompt:'<strong>Position it like this:</strong> “This integration is for NZ payroll. Just checking — the employees in scope are NZ only, not Australian payroll.”',
+  options:[
+    { label:'NZ payroll only', tier:'green', note:'' },
+    { label:'Multi-country or Australian payroll is required in scope', tier:'black', note:'Datapay supports NZ payroll only. Not a fit for this motion.' }
+]},
+
+{ num:'Q3', text:'Payroll Complexity', infoKey:'q-complexity',
+  support:'The fast-track motion suits <strong>standard NZ payroll environments</strong>. Collective agreements or bespoke payroll logic may still be possible, but they need review.',
+  confirm:'Confirm whether payroll is straightforward, mildly complex, or needs broader solutioning.',
+  prompt:'<strong>Position it like this:</strong> “This works best where payroll is reasonably standard. If you have collective agreements or more bespoke payroll rules, we may need pre-sales to review that with us.”',
+  options:[
+    { label:'Payroll is standard — no complex awards, bespoke rules, or unusual arrangements', tier:'green', note:'' },
+    { label:'Union coverage or some complexity is present, but likely manageable', tier:'amber', note:'Proceed, but flag for PS review before committing.' },
+    { label:'Complex awards, heavy interpretation, or bespoke payroll rules are in play', tier:'amber', note:'Needs broader scoping and should not be positioned as straightforward.' }
+]},
+
+{ num:'Q4', text:'Employment Types', infoKey:'q-emp-types',
+  support:'The integration supports <strong>Full Time, Part Time, Casual, and Contractor on Invoice</strong>. Other employment types sit outside the standard mapping.',
+  confirm:'Confirm the customer mainly uses the supported employment types.',
+  prompt:'<strong>Position it like this:</strong> “We support the standard Datapay employment types. If you use other types, we’ll need to check whether they can be mapped cleanly.”',
+  options:[
+    { label:'Supported employment types only', tier:'green', note:'' },
+    { label:'Other employment types are present beyond the standard four', tier:'amber', note:'Unsupported types can fail sync. Confirm with PS before committing.' }
+]},
+
+{ num:'Q5', text:'Pay Rate Types', infoKey:'q-payrate',
+  support:'The integration supports <strong>Basic Hourly Rate</strong> and <strong>Annual Salary</strong>. Daily rate and FTE structures are not part of the standard sync.',
+  confirm:'Confirm the customer’s pay rates fit the supported structure.',
+  prompt:'<strong>Position it like this:</strong> “We support hourly and salary-based pay rates through the integration. If you use daily rates or other structures, we’ll need to validate that separately.”',
+  options:[
+    { label:'Basic Hourly Rate and/or Annual Salary only', tier:'green', note:'' },
+    { label:'Daily rate, FTE, or other non-standard rate structures are used', tier:'amber', note:'These are outside the standard sync. Flag for PS review.' }
+]},
+
+{ num:'Q6', text:'System Dependencies', infoKey:'q-systems',
+  support:'This integration is for the <strong>ELMO ↔ Datapay employee data connection</strong>. It does not bring time and attendance, rostering, or other external systems into scope.',
+  confirm:'Confirm the customer is not expecting a wider multi-system integration in this phase.',
+  prompt:'<strong>Position it like this:</strong> “This integration covers ELMO and Datapay employee data sync. If you need T&A, rostering, or other systems in the same scope, we should treat that as a broader piece of work.”',
+  options:[
+    { label:'No wider system dependencies in scope', tier:'green', note:'' },
+    { label:'T&A, rostering, or other systems are expected to be part of this integration', tier:'amber', note:'Outside standard Tier One scope. Needs broader scoping.' }
+]},
+
+{ num:'Q7', text:'Data Flow Requirements', infoKey:'q-dataflows',
+  support:'The standard integration covers <strong>employee master data sync</strong>. It is not a general integration layer for finance, identity, or other non-standard data flows.',
+  confirm:'Confirm the customer is expecting standard employee data sync only.',
+  prompt:'<strong>Position it like this:</strong> “This integration is for employee data between HR and payroll. If you’re expecting GL, finance, benefits, or identity flows as well, that would sit outside this standard scope.”',
+  options:[
+    { label:'Standard employee master data sync only', tier:'green', note:'' },
+    { label:'Additional non-standard data flows are expected', tier:'amber', note:'Outside Tier One scope. Flag for broader scoping.' }
+]},
+
+{ num:'Q8', text:'Employee Contracts', infoKey:'q-contracts',
+  support:'The integration assumes <strong>one employee record per contract arrangement</strong>. Multiple concurrent contracts are not supported natively.',
+  confirm:'Confirm employees do not require multi-contract support.',
+  prompt:'<strong>Position it like this:</strong> “This integration is not designed for employees who hold multiple concurrent contracts. Just checking — that’s not something you need supported here.”',
+  options:[
+    { label:'Employees hold single contracts', tier:'green', note:'' },
+    { label:'Employees hold multiple concurrent contracts', tier:'black', note:'Multi-contract is not supported by the integration or Datapay natively.' }
+]},
+
+{ num:'Q9', text:'Multi-Job Employees', infoKey:'q-multijob',
+  support:'Multi-job can sometimes be worked through, but it is <strong>not native in the integration</strong>. It may require duplicate profiles or a reviewed setup.',
+  confirm:'Confirm whether employees work one role only, or whether multi-job handling needs to be reviewed.',
+  prompt:'<strong>Position it like this:</strong> “If employees work multiple roles under one contract, we can talk through the setup, but I’d want pre-sales to confirm the best approach before we commit.”',
+  options:[
+    { label:'Employees work a single role under their contract', tier:'green', note:'' },
+    { label:'Employees work multiple roles under one contract', tier:'amber', note:'Possible with caveats, but PS should assess before committing.' }
+]},
+
+{ num:'Q10', text:'Effective Dating', infoKey:'q-effective',
+  support:'Effective dating is <strong>partially supported</strong> and depends on the field. It should not be positioned as universal across the integration.',
+  confirm:'Confirm whether the customer needs back-dated or future-dated changes to flow automatically.',
+  prompt:'<strong>Position it like this:</strong> “Some effective-dated changes are supported and some aren’t, depending on the field. If that matters for you, we’ll validate exactly which parts are covered.”',
+  options:[
+    { label:'No meaningful requirement for effective-dated sync', tier:'green', note:'' },
+    { label:'Effective-dated changes are important to the customer', tier:'amber', note:'Partially supported only. Needs PS validation against the required fields.' }
+]},
+
+{ num:'Q11', text:'KiwiSaver Sync', infoKey:'q-kiwisaver',
+  support:'KiwiSaver through the integration should be positioned carefully. <strong>Opt-in and opt-out can sync</strong>, but full KiwiSaver status handling does not.',
+  confirm:'Confirm whether the customer is happy managing KiwiSaver manually, can live with limited sync, or expects full KiwiSaver support.',
+  prompt:'<strong>Position it like this:</strong> “We handle KiwiSaver opt-in and opt-out through the integration. Other KiwiSaver statuses are managed directly in Datapay. Just checking — are you comfortable with that split?”',
+  options:[
+    { label:'No expectation for KiwiSaver sync — manual handling is acceptable', tier:'green', note:'' },
+    { label:'Customer is comfortable with opt-in / opt-out sync only', tier:'amber', note:'Technically possible, but both pilots found this frustrating. Confirm with ELMO and Adnan before progressing.' },
+    { label:'Customer expects full KiwiSaver management through the integration', tier:'black', note:'Full KiwiSaver sync is not supported.' }
+]},
+
+{ num:'Q12', text:'Additional Super Funds', infoKey:'q-superfunds',
+  support:'Additional super funds beyond KiwiSaver are <strong>not part of the integration scope</strong>. They must be handled directly in Datapay.',
+  confirm:'Confirm whether the customer is happy managing any additional super funds manually.',
+  prompt:'<strong>Position it like this:</strong> “KiwiSaver aside, any other super funds would still be managed directly in Datapay. Just checking — you’d be comfortable with that.”',
+  options:[
+    { label:'No additional super funds in scope', tier:'green', note:'' },
+    { label:'Additional super funds exist, but manual Datapay handling is acceptable', tier:'amber', note:'Proceed, but make the manual handling expectation explicit.' },
+    { label:'Customer expects additional super funds to sync through the integration', tier:'black', note:'This is not supported in the current integration.' }
+]},
+
+{ num:'Q13', text:'Employee Transfers', infoKey:'q-transfers',
+  support:'Employee transfers are <strong>manual</strong>. The integration does not automate pay group, department, or entity transfers.',
+  confirm:'Confirm the customer accepts transfers as a manual process.',
+  prompt:'<strong>Position it like this:</strong> “Transfers are handled manually rather than through the integration. Just checking — that works for how you’d manage those changes.”',
+  options:[
+    { label:'Manual transfer handling is acceptable', tier:'green', note:'' },
+    { label:'Transfers will happen and need clear expectation-setting', tier:'amber', note:'Proceed only if the customer is comfortable managing transfers manually.' },
+    { label:'Customer expects transfers to sync automatically', tier:'black', note:'Automated transfers are not supported. No workaround available.' }
+]}
+
+];
+
+                let thresholds = [null, null];
+        let answers = new Array(questions.length).fill(null);
+
+        function renderQuestions() {
+            const c = document.getElementById('questionsContainer');
+            c.innerHTML = questions.map((q, qi) => {
+                const opts = q.options.map((o, oi) => {
+                    let tag = o.tier==='green'?'🟢 Qualified':o.tier==='amber'?'🟡 Caution':o.tier==='red'?'🔴 Standard':'⛔ Disqualify';
+                    return `<div class="q-option" onclick="selectOption(${qi},${oi})" id="opt-${qi}-${oi}">
+                        <div class="q-radio"><div class="q-radio-inner"></div></div>
+                        <div style="flex:1;">
+                            <div class="q-option-text">${o.label}</div>
+                            ${o.note?`<div class="q-note">${o.note}</div>`:''}
+                        </div>
+                        <span class="q-option-tag ${o.tier}">${tag}</span>
+                    </div>`;
+                }).join('');
+                const hasRed = q.options.some(o=>o.tier==='red');
+                const hasBlack = q.options.some(o=>o.tier==='black');
+                let stops = '';
+                if(hasRed) stops+=`<div class="q-inline-stop red-stop">🔴 Not Qualified — route to Standard Datapay sales motion.</div>`;
+                if(hasBlack) stops+=`<div class="q-inline-stop black-stop">⛔ Disqualified — not a fit for any current Datapay motion.</div>`;
+                return `<div class="q-card" id="qcard-${qi}">
+                    <div class="q-top">
+                        <span class="q-num">${q.num}</span>
+                        <div class="q-text">${q.text} 
+
+${['q-complexity','q-contracts','q-multijob','q-effective','q-kiwisaver','q-transfers'].includes(q.infoKey) 
+  ? `<button class="info-btn" onclick="event.stopPropagation();showInfo('${q.infoKey}')">⚠</button>` 
+  : ''}
+
+
+
+</div>
+                        <span class="q-answered-badge"></span>
+                    </div>
+                    <div class="q-guidance">
+                        <div class="q-guidance-block">
+                            <div class="q-guidance-label">What we support</div>
+                            <div class="q-guidance-text">${q.support}</div>
+                        </div>
+                        <div class="q-guidance-block">
+                            <div class="q-guidance-label">What to confirm</div>
+                            <div class="q-guidance-text">${q.confirm}</div>
+                        </div>
+                    </div>
+                    <div class="q-prompt">
+                        <div class="q-prompt-label">Suggested seller line</div>
+                        <div class="q-prompt-text">${q.prompt}</div>
+                    </div>
+                    <div class="q-options">${opts}</div>${stops}
+                </div>`;
+            }).join('');
+        }
+
+       function setThreshold(idx,val,isLoad=false) {
+    thresholds[idx]=val;
+    const card=document.getElementById(idx===0?'thresh1':'thresh2');
+    card.querySelectorAll('.tc-btn').forEach(b=>b.classList.remove('active'));
+    if(val==='yes'){
+        card.querySelectorAll('.tc-btn')[0].classList.add('active');
+        card.className='threshold-card passed';
+    } else {
+        card.querySelectorAll('.tc-btn')[1].classList.add('active');
+        card.className='threshold-card failed';
+    }
+    evalThresholds();
+    evaluate();
+}
+
+        function evalThresholds() {
+            const stop=document.getElementById('thresholdStop'),qual=document.getElementById('qualSection');
+            if(thresholds[0]===null||thresholds[1]===null){stop.classList.remove('visible');qual.classList.add('blocked');return;}
+            if(thresholds[0]==='yes'&&thresholds[1]==='yes'){stop.classList.remove('visible');qual.classList.remove('blocked');}
+            else{stop.classList.add('visible');qual.classList.add('blocked');}
+        }
+
+        function selectOption(qi,oi) {
+            const q=questions[qi],opt=q.options[oi];
+            answers[qi]={tier:opt.tier,label:q.text+': '+opt.label,num:q.num};
+            q.options.forEach((_,oIdx)=>{document.getElementById(`opt-${qi}-${oIdx}`).classList.remove('selected-green','selected-amber','selected-red','selected-black');});
+            document.getElementById(`opt-${qi}-${oi}`).classList.add('selected-'+opt.tier);
+            const card=document.getElementById(`qcard-${qi}`);
+            card.classList.remove('answered-green','answered-amber','answered-red','answered-black');
+            card.classList.add('answered-'+opt.tier);
+            evaluate();
+        }
+
+        function evaluate() {
+            const total=2+questions.length;let done=0;
+            if(thresholds[0]!==null)done++;if(thresholds[1]!==null)done++;
+            answers.forEach(a=>{if(a!==null)done++;});
+            const pct=Math.round((done/total)*100);
+            document.getElementById('progFill').style.width=pct+'%';
+            document.getElementById('progPct').textContent=pct+'%';
+            const tFail=(thresholds[0]==='no'||thresholds[1]==='no');
+            const tPass=(thresholds[0]==='yes'&&thresholds[1]==='yes');
+            const hasBlack=answers.some(a=>a&&a.tier==='black');
+            const hasRed=answers.some(a=>a&&a.tier==='red');
+            const cautions=answers.filter(a=>a&&a.tier==='amber');
+            const allAns=answers.every(a=>a!==null);
+            const allGreen=allAns&&!hasRed&&!hasBlack&&cautions.length===0;
+            const f=document.getElementById('progFill'),l=document.getElementById('liveResult');
+            const rc=document.getElementById('resultCard'),ri=document.getElementById('rIcon'),rt=document.getElementById('rTitle'),rtx=document.getElementById('rText');
+            const rC=document.getElementById('rCautions'),rCT=document.getElementById('rCautionsTitle'),rCL=document.getElementById('rCautionList');
+            const rb=document.getElementById('routingBox');
+            f.classList.remove('green','amber','red','black');rC.style.display='none';
+            if(tFail){
+                f.classList.add('red');l.className='live-result red';l.innerHTML='⛔ Route to Standard';
+                rc.className='result-card red';ri.textContent='⛔';rt.textContent='Route to Standard Motion';
+                rtx.textContent='Threshold gate failed. Route to Standard Datapay Opportunity.';
+                rb.style.background='var(--red-bg)';rb.style.color='var(--red-dark)';rb.textContent='🔴 Route to Standard Motion';
+                document.getElementById('cautionNotes').value='';document.getElementById('nextStep').value='Route to Standard Datapay Opportunity';return;
+            }
+            if(hasBlack){
+                const bi=answers.filter(a=>a&&a.tier==='black');
+                f.classList.add('black');l.className='live-result black';l.innerHTML='⛔ Disqualified';
+                rc.className='result-card black';ri.textContent='🚫';rt.textContent='Disqualified — Not a Fit';
+                rtx.textContent='This customer requires capability Datapay does not currently offer. Do not create an opportunity.';
+                rC.style.display='block';rCT.textContent='⛔ Disqualifying Factors';
+                rCL.innerHTML=bi.map(c=>'<li style="list-style:none;">'+c.num+': '+c.label+'</li>').join('');
+                rb.style.background='#E0E1E9';rb.style.color='var(--black-dark)';rb.textContent='⛔ Disqualified — Not a Fit';
+                document.getElementById('cautionNotes').value='DISQUALIFIED:\n'+bi.map(c=>c.num+': '+c.label).join('\n');
+                document.getElementById('nextStep').value='No action — customer is not a fit';return;
+            }
+            if(hasRed){
+                const ri2=answers.filter(a=>a&&a.tier==='red');
+                f.classList.add('red');l.className='live-result red';l.innerHTML='🔴 Route to Standard';
+                rc.className='result-card red';ri.textContent='🔴';rt.textContent='Route to Standard Motion';
+                rtx.textContent=ri2.length+' item'+(ri2.length>1?'s':'')+' exceed Qualified scope. Route to standard motion.';
+                rC.style.display='block';rCT.textContent='🔴 Items Requiring Standard Motion';
+                rCL.innerHTML=ri2.map(c=>'<li style="list-style:none;">'+c.num+': '+c.label+'</li>').join('');
+                rb.style.background='var(--red-bg)';rb.style.color='var(--red-dark)';rb.textContent='🔴 Route to Standard Motion';
+                document.getElementById('cautionNotes').value='ROUTE TO STANDARD:\n'+ri2.map(c=>c.num+': '+c.label).join('\n');
+                document.getElementById('nextStep').value='Route to Standard Datapay Opportunity';return;
+            }
+            if(!tPass||!allAns){
+                const rem=total-done;l.className='live-result pending';l.innerHTML='⏳ '+rem+' remaining';
+                rc.className='result-card inprogress';ri.textContent='🔍';rt.textContent='Qualification In Progress';
+                rtx.textContent=rem+' item'+(rem>1?'s':'')+' remaining.';
+                rb.style.background='var(--blue-bg)';rb.style.color='var(--blue-dark)';rb.textContent='⏳ '+rem+' remaining';return;
+            }
+            if(allGreen){
+                f.classList.add('green');l.className='live-result green';l.innerHTML='🟢 Qualified — Proceed';
+                rc.className='result-card green';ri.textContent='🎉';rt.textContent='Proceed as Qualified';
+                rtx.textContent='All checks passed. No knockouts. No caution flags. Proceed to Lite Discovery.';
+                rb.style.background='var(--green-bg)';rb.style.color='var(--green-dark)';rb.textContent='🟢 Qualified — Proceed to Lite Discovery';
+                document.getElementById('cautionNotes').value='';document.getElementById('nextStep').value='Route to Lite Discovery';return;
+            }
+            f.classList.add('amber');l.className='live-result amber';l.innerHTML='🟡 Caution ('+cautions.length+')';
+            rc.className='result-card amber';ri.textContent='⚠️';rt.textContent='Proceed with Caution';
+            rtx.textContent=cautions.length+' caution flag'+(cautions.length>1?'s':'')+' identified. Route to Lite Discovery + pre-sales review.';
+            rC.style.display='block';rCT.textContent='⚠ Caution Flags';
+            rCL.innerHTML=cautions.map(c=>'<li>'+c.num+': '+c.label+'</li>').join('');
+            rb.style.background='var(--amber-bg)';rb.style.color='var(--amber-dark)';rb.textContent='🟡 Proceed with Caution — Lite Discovery + PS Review';
+            document.getElementById('cautionNotes').value='CAUTION:\n'+cautions.map(c=>c.num+': '+c.label).join('\n');
+            document.getElementById('nextStep').value='Lite Discovery — flag caution items for pre-sales review';
+        }
+
+     function resetAll(){
+    if(!confirm('Reset all? This cannot be undone.')) return;
+    thresholds = [null, null];
+    answers = new Array(questions.length).fill(null);
+    document.querySelectorAll('.threshold-card').forEach(c => {
+        c.className = 'threshold-card';
+        c.querySelectorAll('.tc-btn').forEach(b => b.classList.remove('active'));
+    });
+    document.getElementById('thresholdStop').classList.remove('visible');
+    document.getElementById('qualSection').classList.add('blocked');
+    renderQuestions();
+    ['custName','sellerName','cautionNotes','nextStep','nextOwner','escNotes'].forEach(id => {
+        document.getElementById(id).value = '';
+    });
+    document.getElementById('qualDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('loadProgressFile').value = '';
+    evaluate();
+}
+
+document.getElementById('qualDate').value = new Date().toISOString().split('T')[0];
+renderQuestions();
+evaluate();
+
+function collectProgressData() {
+    return {
+        customerName: document.getElementById('custName').value || '',
+        sellerName: document.getElementById('sellerName').value || '',
+        qualDate: document.getElementById('qualDate').value || '',
+        cautionNotes: document.getElementById('cautionNotes').value || '',
+        nextStep: document.getElementById('nextStep').value || '',
+        nextOwner: document.getElementById('nextOwner').value || '',
+        escNotes: document.getElementById('escNotes').value || '',
+        thresholds: thresholds,
+        answers: answers,
+        savedAt: new Date().toISOString(),
+        version: 'v3.0'
+    };
+}
+
+function saveProgress() {
+    const data = collectProgressData();
+
+    const customerNameInput = document.getElementById('custName').value.trim();
+
+    // 🚫 Make Customer Name mandatory
+    if (!customerNameInput) {
+        alert('Please enter a Customer Name before saving progress.');
+        document.getElementById('custName').focus();
+        return;
+    }
+
+    // 🧼 Clean filename (remove weird characters)
+    const safeCustomer = customerNameInput
+        .replace(/[^a-z0-9\s-_]/gi, '')   // remove special chars
+        .replace(/\s+/g, '_')            // spaces → underscores
+        .toLowerCase();
+
+    const date = data.qualDate || new Date().toISOString().split('T')[0];
+
+    const filename = `${safeCustomer}_qualification_${date}.json`;
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    alert(`Progress saved as:\n${filename}`);
+}
+
+function loadProgress(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            applyProgressData(data);
+            alert('Saved progress loaded successfully.');
+        } catch (err) {
+            console.error(err);
+            alert('Could not load this file. Please make sure it is a valid saved progress file.');
+        }
+    };
+    reader.readAsText(file);
+}
+
+function applyProgressData(data) {
+    document.getElementById('custName').value = data.customerName || '';
+    document.getElementById('sellerName').value = data.sellerName || '';
+    document.getElementById('qualDate').value = data.qualDate || '';
+    document.getElementById('cautionNotes').value = data.cautionNotes || '';
+    document.getElementById('nextStep').value = data.nextStep || '';
+    document.getElementById('nextOwner').value = data.nextOwner || '';
+    document.getElementById('escNotes').value = data.escNotes || '';
+
+    thresholds = Array.isArray(data.thresholds) ? data.thresholds : [null, null];
+    answers = Array.isArray(data.answers) ? data.answers : new Array(questions.length).fill(null);
+
+    renderQuestions();
+
+    thresholds.forEach((val, idx) => {
+        if (val) {
+            setThreshold(idx, val, true);
+        }
+    });
+
+    answers.forEach((answer, qi) => {
+        if (!answer) return;
+
+        const optionIndex = questions[qi].options.findIndex(o => o.tier === answer.tier && answer.label.includes(o.label));
+        if (optionIndex === -1) return;
+
+        const selectedOption = document.getElementById(`opt-${qi}-${optionIndex}`);
+        const card = document.getElementById(`qcard-${qi}`);
+
+        if (selectedOption) {
+            selectedOption.classList.add('selected-' + answer.tier);
+        }
+
+        if (card) {
+            card.classList.remove('answered-green','answered-amber','answered-red','answered-black');
+            card.classList.add('answered-' + answer.tier);
+        }
+    });
+
+    evaluate();
+    document.getElementById('loadProgressFile').value = '';
+}   
+
+
+
+    </script>
+
+</body></html>
