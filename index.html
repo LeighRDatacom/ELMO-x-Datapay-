@@ -476,7 +476,7 @@
     <a onclick="showTab('process')" id="nav-process"><span class="nav-icon">⇄</span> Joint Sales Process<span class="nav-time">~20 min</span></a>
     <a onclick="showTab('pricing')" id="nav-pricing"><span class="nav-icon">$</span> Pricing<span class="nav-time">~10 min</span></a>
     <a onclick="showTab('toolkit')" id="nav-toolkit"><span class="nav-icon">◫</span> Toolkit<span class="nav-time">~10 min</span></a>
-    <a onclick="showTab('contacts')" id="nav-contacts"><span class="nav-icon">☎</span> Where to Get Help<span class="nav-time">~5 min</span></a>
+    <a onclick="showTab('help')" id="nav-contacts"><span class="nav-icon">☎</span> Where to Get Help<span class="nav-time">~5 min</span></a>
   </nav>
   <div class="sidebar-footer">Internal Only — Not for Customer Distribution<br>ELMO × Datapay Partnership 2026</div>
 </aside>
@@ -1752,21 +1752,98 @@ function showPricing(id) {
 
 
 <!-- ═══ TAB 5: WHERE TO GET HELP ═══ -->
-<div class="tab-content" id="tab-contacts">
-  <h1 class="page-title">Where to Get Help</h1>
-  <p class="page-subtitle">Clear routing. Know exactly where to go.</p>
-  <div class="section-title">Question Routing</div>
-  <div class="help-card"><h4>🔧 Product Fit / Technical</h4><p>Edge cases, eligibility uncertainty, Qualification Tool gaps.</p><div class="help-routing"><strong>Datapay:</strong> Krishan Sharma — krishan.sharma@datacom.com</div><div class="help-routing"><strong>ELMO:</strong> Anupam Kaushal — anupam.kaushal@elmosoftware.com.au</div></div>
-  <div class="help-card"><h4>⚙️ Implementation / PS</h4><p>SOW scope, timelines, testing, post-go-live support.</p><div class="help-routing"><strong>Datapay PS:</strong> Via SOW request (through Datapay AM)</div><div class="help-routing"><strong>ELMO PS:</strong> Morgan (Head of Professional Services)</div></div>
-  <div class="help-card"><h4>🤝 Partnership / GTM</h4><p>Process friction, assets, things that need to change.</p><div class="help-routing"><strong>Datapay:</strong> Eli Nana (GTM Manager)</div><div class="help-routing"><strong>ELMO:</strong> Jay Zeman (Head of Strategic Payroll Partnerships)</div></div>
-  <div class="help-card"><h4>📈 Deal Velocity</h4><p>Slow deals, need help from the other side, pricing delays.</p><div class="help-routing">Speak to counterpart AM first. If stuck:</div><div class="help-routing"><strong>ELMO:</strong> Rochelle Coad — rochelle.coad@elmosoftware.com.au</div><div class="help-routing"><strong>Datapay:</strong> Adnan Siamwala — adnan.siamwala@datacom.com</div></div>
-  <div class="divider"></div>
-  <div class="section-title">Team Directory</div>
-  <div class="contact-grid">
-    <div class="contact-card datapay-contacts"><h4>Datapay</h4><div class="contact-entry"><div class="contact-name">Adnan Siamwala</div><div class="contact-role">Account Director</div><div class="contact-email">adnan.siamwala@datacom.com</div></div><div class="contact-entry"><div class="contact-name">Eli Nana</div><div class="contact-role">GTM Manager</div></div><div class="contact-entry"><div class="contact-name">Jacinda Rennie</div><div class="contact-role">ARM</div><div class="contact-email">jacinda.rennie@datacom.com</div></div><div class="contact-entry"><div class="contact-name">Michelle Peterson</div><div class="contact-role">ARM</div><div class="contact-email">michelle.peterson@datacom.com</div></div><div class="contact-entry"><div class="contact-name">Pratishma Payal</div><div class="contact-role">ARM</div><div class="contact-email">pratishma.payal@datacom.com</div></div><div class="contact-entry"><div class="contact-name">Krishan Sharma</div><div class="contact-role">Product Manager</div><div class="contact-email">krishan.sharma@datacom.com</div></div></div>
-    <div class="contact-card elmo-contacts"><h4>ELMO</h4><div class="contact-entry"><div class="contact-name">Rochelle Coad</div><div class="contact-role">Head of AM</div><div class="contact-email">rochelle.coad@elmosoftware.com.au</div></div><div class="contact-entry"><div class="contact-name">Junior Falelima</div><div class="contact-role">Regional Director (AM)</div><div class="contact-email">junior.falelima@elmosoftware.com.au</div></div><div class="contact-entry"><div class="contact-name">Jay Zeman</div><div class="contact-role">Head of Strategic Payroll Partnerships</div></div><div class="contact-entry"><div class="contact-name">Amity Reece</div><div class="contact-role">Payroll Strategy Manager</div><div class="contact-email">amity.reece@elmosoftware.com.au</div></div><div class="contact-entry"><div class="contact-name">Barry Campbell</div><div class="contact-role">Payroll Solution Architect</div></div><div class="contact-entry"><div class="contact-name">Matt Reyes</div><div class="contact-role">Integration Lead</div></div><div class="contact-entry"><div class="contact-name">Bree Roberts</div><div class="contact-role">Solutions Director</div></div><div class="contact-entry"><div class="contact-name">Allan Kent</div><div class="contact-role">AM (NZ)</div><div class="contact-email">allan.kent@elmosoftware.co.nz</div></div><div class="contact-entry"><div class="contact-name">Sahil Mehta</div><div class="contact-role">AM (NZ)</div><div class="contact-email">sahil.mehta@elmosoftware.co.nz</div></div><div class="contact-entry"><div class="contact-name">Morgan</div><div class="contact-role">Head of Professional Services</div></div><div class="contact-entry"><div class="contact-name">Walter White</div><div class="contact-role">Solutions Consultant</div></div></div>
+
+
+<div class="tab-content" id="tab-help">
+
+  <div class="page-header">
+    <h1 class="page-title">Where to Get Help</h1>
+    <p class="page-description">
+      Submit your query below and it will be routed to the right team. This keeps support visible, easier to manage, and less dependent on knowing who to contact.
+    </p>
   </div>
-  <div class="card" style="background:var(--surface)"><h4>📂 Full Directory</h4><p style="font-size:14px;color:var(--text-secondary)">Available in the shared <strong>Datapay + ELMO Directory.xlsx</strong>.</p></div>
+
+  <div class="content-section">
+    <div class="section-intro" style="margin-bottom: 24px;">
+      <h3 style="margin-bottom: 8px;">Need support?</h3>
+      <p style="margin: 0; color: var(--text-secondary); line-height: 1.6;">
+        Use the appropriate form below for product, partnership, or pricing queries. Queries can be resolved asynchronously or taken into the weekly Datapay × ELMO alignment forum where needed.
+      </p>
+    </div>
+
+    <div class="help-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px;">
+
+      <!-- PRODUCT & INTEGRATION -->
+      <div class="help-card" style="background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(120,39,255,0.12); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700;">1</div>
+          <h3 style="margin: 0; font-size: 18px;">Product & Integration Queries</h3>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
+          Use this for API behaviour, feature questions, integration fit, product limitations, or technical clarification.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <input type="text" placeholder="Customer / Opportunity" style="padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px;">
+          <input type="text" placeholder="Opportunity stage" style="padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px;">
+          <textarea placeholder="Describe your product or integration query" rows="5" style="padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; resize: vertical;"></textarea>
+          <button style="padding: 12px 16px; border: none; border-radius: 10px; background: var(--primary); color: white; font-weight: 600; cursor: pointer;">
+            Submit Product Query
+          </button>
+        </div>
+      </div>
+
+      <!-- PARTNERSHIP SUPPORT -->
+      <div class="help-card" style="background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(120,39,255,0.12); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700;">2</div>
+          <h3 style="margin: 0; font-size: 18px;">Partnership Support & Escalations</h3>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
+          Use this for joint working issues, alignment questions, unclear ownership, or where timely response is needed across both sides.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <input type="text" placeholder="Customer / Opportunity" style="padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px;">
+          <input type="text" placeholder="What support or escalation is needed?" style="padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px;">
+          <textarea placeholder="Describe the issue or coordination challenge" rows="5" style="padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; resize: vertical;"></textarea>
+          <button style="padding: 12px 16px; border: none; border-radius: 10px; background: var(--primary); color: white; font-weight: 600; cursor: pointer;">
+            Submit Partnership Query
+          </button>
+        </div>
+      </div>
+
+      <!-- PRICING & COMMERCIAL -->
+      <div class="help-card" style="background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(120,39,255,0.12); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700;">3</div>
+          <h3 style="margin: 0; font-size: 18px;">Pricing & Commercial Queries</h3>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
+          Use this for pricing clarity, commercial structure, quote questions, or where approval guidance is needed.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <input type="text" placeholder="Customer / Opportunity" style="padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px;">
+          <input type="text" placeholder="What decision are you trying to make?" style="padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px;">
+          <textarea placeholder="Describe your pricing or commercial query" rows="5" style="padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; resize: vertical;"></textarea>
+          <button style="padding: 12px 16px; border: none; border-radius: 10px; background: var(--primary); color: white; font-weight: 600; cursor: pointer;">
+            Submit Commercial Query
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- WHAT HAPPENS NEXT -->
+    <div style="background: rgba(120,39,255,0.06); border: 1px solid rgba(120,39,255,0.15); border-radius: 16px; padding: 24px;">
+      <h3 style="margin-top: 0; margin-bottom: 12px;">What happens next</h3>
+      <ul style="margin: 0; padding-left: 20px; color: var(--text-secondary); line-height: 1.8;">
+        <li>Your query is routed to the appropriate Datapay and/or ELMO contact point.</li>
+        <li>Queries are triaged and picked up either asynchronously or in the weekly alignment forum.</li>
+        <li>Use the form to create visibility and avoid delays caused by unclear ownership.</li>
+      </ul>
+    </div>
+  </div>
 </div>
 
 </main>
