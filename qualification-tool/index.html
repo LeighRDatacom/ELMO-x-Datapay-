@@ -659,7 +659,7 @@
                     { label: 'What This Means', text: 'The customer\'s total active employee headcount falls within 100 to 2,000. This includes all employees on payroll — full time, part time, casual, and contractors on invoice.' },
                     { label: 'Why It Matters', text: 'The Qualified fast-track motion is designed for mid-market NZ organisations. Below 100 employees, the integration cost may not justify the investment. Above 2,000, complexity typically increases — multi-entity structures, complex awards, and bespoke requirements become more common.' },
                     { label: 'How to Check', text: 'Use CRM data or Datapay records. This information should already be available in your account intelligence — you do not need to ask the customer directly.' },
-                    { label: 'Source', text: '<span class="ip-source">📄 Qualification Checklist v2.0</span>' }
+                    { label: 'Source', text: '<span class="ip-source">⚠️ Internal guideline — not referenced in Customer 101 Manual v1.0 or Customer Presentation v2.0. Validate with PS.</span>' }
                 ]
             },
             'thresh-elmo': {
@@ -669,7 +669,8 @@
                     { label: 'What This Means', text: 'The customer is either already using ELMO as their HR Information System, or has committed to implementing it. They are not evaluating alternatives.' },
                     { label: 'Why It Matters', text: 'The integration requires ELMO as the <strong>authoritative source for employee creation</strong>. All new hires must originate in ELMO — the integration syncs them to Datapay. If the customer isn\'t on ELMO, there\'s nothing to integrate with.' },
                     { label: 'What "Committed" Means', text: 'The customer has signed with ELMO or is in active implementation. A customer who is "considering ELMO" does not qualify — the HRIS decision needs to be made first.' },
-                    { label: 'Source', text: '<span class="ip-source">📄 ELMO-Datapay Integration API</span> <span class="ip-source">📄 Integration Specs v2</span>' }
+		{ label: 'Source', text: '<span class="ip-source">📄 Customer 101 Manual v1.0</span> <span class="ip-source">📄 Customer Presentation v2.0</span>' }                    
+
                 ]
             },
        
@@ -680,8 +681,10 @@
     sections: [
         { label: 'Why this matters', text: 'Complex payroll rules increase implementation effort and delivery risk. The Qualified fast-track is designed for standard NZ payroll structures.' },
         { label: 'What to watch', text: 'Union coverage, awards, shift rules, penal rates, or bespoke calculations can signal hidden complexity — especially in industries like healthcare, education, transport, and hospitality.' },
-        { label: 'PS check', text: 'Confirm whether the customer’s payroll rules can be handled using standard Datapay configuration or whether broader scoping is needed before committing.' },
-        { label: 'Source', text: 'Qualification Checklist v2 · Datapay PS validation' }
+        { label: 'Before you commit', text: 'Confirm whether the customer’s payroll rules can be handled using standard Datapay configuration or whether broader scoping is needed before committing.' },
+{ label: 'Source', text: 'Customer 101 Manual v1.0 (Data Mapping & Core Payroll Processes)' }	
+
+       
     ]
 },
 
@@ -689,10 +692,10 @@
     title: 'Employee Contracts — Multi-Contract',
     ref: 'Q8',
     sections: [
-        { label: 'Why this matters', text: 'Multi-contract is not natively supported by the integration or by Datapay. The only workaround is separate employee profiles for each contract in both ELMO and Datapay.' },
-        { label: 'What to watch', text: 'Customers may describe this as one person doing multiple jobs, but if there are separate employment agreements, it is a multi-contract scenario.' },
-        { label: 'PS check', text: 'Validate early whether the customer would accept duplicate profiles for each contract. If not, do not proceed with the Qualified motion.' },
-        { label: 'Source', text: 'Integration Specs v2 · ELMO–Datapay API limitations · Datapay PS validation' }
+        { label: 'Why this matters', text: 'Multi-contract (separate employment agreements) is not supported and is a <strong>disqualifier</strong> for this integration. No workaround is described in the current documentation.' },
+        { label: 'What to watch', text: 'Customers may describe this as one person doing multiple jobs. If there are separate employment agreements, it is a multi-contract scenario and a <strong>disqualifier</strong>. If it is one contract with multiple roles, that is a multi-job scenario (see Q9) — different handling.' },
+        { label: 'Before you commit', text: 'Multi-contract is a disqualifier. If the customer has employees with separate concurrent employment agreements, do not proceed with this integration.' },
+        { label: 'Source', text: 'Customer 101 Manual v1.0 · Customer Presentation v2.0 · Datapay PS validation' }
     ]
 },
 
@@ -701,9 +704,11 @@
     ref: 'Q9',
     sections: [
         { label: 'Why this matters', text: 'Multi-job is different from multi-contract, but it still creates complexity because the integration does not natively support multiple roles under a single employee profile.' },
-        { label: 'What to watch', text: 'The current workaround is duplicate profiles per role. This can create admin overhead and is more common in hospitality, retail, healthcare, and education.' },
-        { label: 'PS check', text: 'Confirm whether duplicate profiles are acceptable, or whether Datapay alternate rates and cost centres are enough for the customer’s scenario.' },
-        { label: 'Source', text: 'Integration Specs v2 · Employee scenario compatibility · Datapay PS validation' }
+	{ label: 'What to watch', text: 'Multi-job is explicitly out of scope for the current API v2 integration. No workaround is documented. More common in hospitality, retail, healthcare, and education.' },        
+
+        
+	{ label: 'Before you commit', text: 'Confirm with PS whether the customer\'s multi-job scenario can be managed outside the integration, or whether this is a disqualifier.' },
+        { label: 'Source', text: 'Customer 101 Manual v1.0 · Customer Presentation v2.0 · Datapay PS validation' }
     ]
 },
 
@@ -711,10 +716,11 @@
     title: 'Effective Dating',
     ref: 'Q10',
     sections: [
-        { label: 'Why this matters', text: 'Effective dating is only partially supported and depends on the field. That creates a risk of mismatched expectations if sellers assume all dated changes will flow cleanly.' },
-        { label: 'What to watch', text: 'Bank details and tax effective dating are still discovery items, while other fields may already behave differently across ELMO and Datapay.' },
-        { label: 'PS check', text: 'Confirm which fields the customer expects to support past-dated or future-dated changes before committing to the integration approach.' },
-        { label: 'Source', text: 'Integration Data Map · Integration Specs v2 roadmap' }
+	{ label: 'Why this matters', text: 'The integration uses a consistent effective date rule: Start Date for new employees, Current Date (Pacific/Auckland) for updates. Future-dated and back-dated changes are not described as supported, which creates a risk of mismatched expectations.' },        
+	{ label: 'What to watch', text: 'The integration uses the later of Employee Start Date or Current Date (Pacific/Auckland) as the effective date for updates. Future-dating and back-dating are not described as supported behaviours.' },
+        { label: 'Before you commit', text: 'Confirm which fields the customer expects to support past-dated or future-dated changes before committing to the integration approach.' },
+	{ label: 'Source', text: 'Customer 101 Manual v1.0 (Data Mapping & Core Payroll Processes)' }
+
     ]
 },
 
@@ -723,9 +729,10 @@
     ref: 'Q11',
     sections: [
         { label: 'Why this matters', text: 'KiwiSaver sync is a high-risk area because the integration supports only opt-in and opt-out, while Datapay supports additional statuses.' },
-        { label: 'What to watch', text: 'This creates a split admin experience across systems. Both pilot customers rejected KiwiSaver sync because it caused more frustration than it solved.' },
-        { label: 'PS check', text: 'Confirm whether the customer is happy to manage KiwiSaver manually or is genuinely comfortable with opt-in and opt-out only. If they expect full KiwiSaver sync, do not proceed.' },
-        { label: 'Source', text: 'Integration Data Map · Integration Specs v2 · Pilot feedback (Datapay PS)' }
+	{ label: 'What to watch', text: 'Only Opt In and Opt Out statuses are supported. Unsupported statuses (Exempt, Existing Member, etc.) cause the entire KiwiSaver section to skip. This creates a split admin experience for employees with other statuses.' },        
+        { label: 'Before you commit', text: 'Confirm whether the customer is happy to manage KiwiSaver manually or is genuinely comfortable with opt-in and opt-out only. If they expect full KiwiSaver sync, do not proceed.' },
+{ label: 'Source', text: 'Customer 101 Manual v1.0 (KiwiSaver Details & Troubleshooting) · Customer Presentation v2.0' }        
+
     ]
 },
 
@@ -733,10 +740,11 @@
     title: 'Employee Transfers',
     ref: 'Q13',
     sections: [
-        { label: 'Why this matters', text: 'Employee transfers are not supported through the integration, including pay group and company transfer scenarios.' },
+	{ label: 'Why this matters', text: 'Employee transfers are not supported through the integration, including pay group, same-country entity, and cross-country transfer scenarios.' },        
+
         { label: 'What to watch', text: 'Customers may assume transfers will flow automatically, but they must be handled manually and there is no workaround.' },
-        { label: 'PS check', text: 'Confirm the customer is comfortable managing all transfers manually in both systems before proceeding with the Qualified motion.' },
-        { label: 'Source', text: 'Integration Specs v2 · Company movements & transfers · Datapay PS validation' }
+        { label: 'Before you commit', text: 'Confirm the customer is comfortable managing all transfers manually in both systems before proceeding with the Qualified motion.' },
+        { label: 'Source', text: 'Customer 101 Manual v1.0 (Company Transfers & Integration Exclusions) · Customer Presentation v2.0' }
     ]
 },
      
@@ -801,12 +809,18 @@
 ]},
 
 { num:'Q5', text:'Pay Rate Types', infoKey:'q-payrate',
-  support:'The integration supports <strong>Basic Hourly Rate</strong> and <strong>Annual Salary</strong>. Daily rate and FTE structures are not part of the standard sync.',
-  confirm:'Confirm the customer’s pay rates fit the supported structure.',
-  prompt:'<strong>Position it like this:</strong> “We support hourly and salary-based pay rates through the integration. If you use daily rates or other structures, we’ll need to validate that separately.”',
+  
+support:'The integration supports <strong>Basic Hourly Rate</strong>, <strong>Daily Rate</strong>, and <strong>Annual Salary</strong>. FTE structures are not part of the standard sync.',
+
+confirm:'Confirm the customer’s pay rates fit the supported structure.',
+  
+prompt:'<strong>Position it like this:</strong> "We support hourly, daily, and salary-based pay rates through the integration. If you use other rate structures like FTE, we\'ll need to validate that separately."',
+
   options:[
-    { label:'Basic Hourly Rate and/or Annual Salary only', tier:'green', note:'' },
-    { label:'Daily rate, FTE, or other non-standard rate structures are used', tier:'amber', note:'These are outside the standard sync. Flag for PS review.' }
+{ label:'Basic Hourly Rate, Daily Rate, and/or Annual Salary only', tier:'green', note:'' },    
+    
+
+{ label:'FTE or other non-standard rate structures are used (note: Daily Rate is supported)', tier:'amber', note:'These are outside the standard sync. Flag for PS review.' }
 ]},
 
 { num:'Q6', text:'System Dependencies', infoKey:'q-systems',
@@ -837,16 +851,21 @@
 ]},
 
 { num:'Q9', text:'Multi-Job Employees', infoKey:'q-multijob',
-  support:'Multi-job can sometimes be worked through, but it is <strong>not native in the integration</strong>. It may require duplicate profiles or a reviewed setup.',
+  support:'Multi-job (one contract, multiple roles) is <strong>not supported</strong> and is explicitly out of scope for API v2. No workaround is documented.',
+
   confirm:'Confirm whether employees work one role only, or whether multi-job handling needs to be reviewed.',
-  prompt:'<strong>Position it like this:</strong> “If employees work multiple roles under one contract, we can talk through the setup, but I’d want pre-sales to confirm the best approach before we commit.”',
+  
+prompt:'<strong>Position it like this:</strong> "Multi-job isn\'t supported by this integration. If employees work multiple roles, I\'d want to check with pre-sales whether that\'s a blocker before we go further."',
+
+
   options:[
     { label:'Employees work a single role under their contract', tier:'green', note:'' },
-    { label:'Employees work multiple roles under one contract', tier:'amber', note:'Possible with caveats, but PS should assess before committing.' }
+    { label:'Employees work multiple roles under one contract', tier:'black', note:'Multi-job is explicitly not supported in API v2. Confirm with PS, but do not position as available.' }
 ]},
 
 { num:'Q10', text:'Effective Dating', infoKey:'q-effective',
-  support:'Effective dating is <strong>partially supported</strong> and depends on the field. It should not be positioned as universal across the integration.',
+    support:'The integration applies the <strong>later of Employee Start Date or Current Date</strong> as the effective date. Start Date only   syncs at initial creation. Future-dated and back-dated changes are not described as supported.',  
+
   confirm:'Confirm whether the customer needs back-dated or future-dated changes to flow automatically.',
   prompt:'<strong>Position it like this:</strong> “Some effective-dated changes are supported and some aren’t, depending on the field. If that matters for you, we’ll validate exactly which parts are covered.”',
   options:[
@@ -860,12 +879,13 @@
   prompt:'<strong>Position it like this:</strong> “We handle KiwiSaver opt-in and opt-out through the integration. Other KiwiSaver statuses are managed directly in Datapay. Just checking — are you comfortable with that split?”',
   options:[
     { label:'No expectation for KiwiSaver sync — manual handling is acceptable', tier:'green', note:'' },
-    { label:'Customer is comfortable with opt-in / opt-out sync only', tier:'amber', note:'Technically possible, but both pilots found this frustrating. Confirm with ELMO and Adnan before progressing.' },
+    { label:'Customer is comfortable with opt-in / opt-out sync only', tier:'amber', note:'Only Opt In and Opt Out statuses sync. Unsupported statuses cause the KiwiSaver section to skip entirely. Confirm the customer is aware of this limitation before progressing.' },   
     { label:'Customer expects full KiwiSaver management through the integration', tier:'black', note:'Full KiwiSaver sync is not supported.' }
 ]},
 
 { num:'Q12', text:'Additional Super Funds', infoKey:'q-superfunds',
-  support:'Additional super funds beyond KiwiSaver are <strong>not part of the integration scope</strong>. They must be handled directly in Datapay.',
+  support:'Additional super funds beyond KiwiSaver are <strong>not part of the integration scope</strong>. They must be handled directly in Datapay. (Note: this is inferred — neither current document explicitly addresses additional super funds.)',
+
   confirm:'Confirm whether the customer is happy managing any additional super funds manually.',
   prompt:'<strong>Position it like this:</strong> “KiwiSaver aside, any other super funds would still be managed directly in Datapay. Just checking — you’d be comfortable with that.”',
   options:[
@@ -875,7 +895,8 @@
 ]},
 
 { num:'Q13', text:'Employee Transfers', infoKey:'q-transfers',
-  support:'Employee transfers are <strong>manual</strong>. The integration does not automate pay group, department, or entity transfers.',
+support:'Employee transfers are <strong>manual</strong>. The integration does not automate pay group, same-country entity, or cross-country transfers.',  
+
   confirm:'Confirm the customer accepts transfers as a manual process.',
   prompt:'<strong>Position it like this:</strong> “Transfers are handled manually rather than through the integration. Just checking — that works for how you’d manage those changes.”',
   options:[
